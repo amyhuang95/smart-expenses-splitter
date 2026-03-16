@@ -21,14 +21,14 @@ SplitEasy solves this problem by providing a simple, centralized platform where 
 - Read: As a user, I want to view a dashboard listing all the groups I am a part of, with a summary card for each group showing the group name, members, total group spending, and a balance status indicator, so I can quickly see which groups need attention. I also want to search and filter groups by name using a search bar at the top of the dashboard.
 - Read: As a group member, I want to view the expenses submitted by other group members and who are involved in those expenses.
 - Update: As a group creator, I want to click an "Edit" button on a group card to open an edit modal where I can rename the group, add new members, or remove existing members if someone leaves the group.
-- Update: As a group member, I want to mark the settled expenses as “Paid” when I made my payment.
+- Update: As a group member, I want to mark the settlement as “Paid” when I made my payment.
 - Delete: As a group owner, I want to click a "Delete" button on a group card to remove a group I no longer need. If there are still unsettled balances, the app will show a confirmation warning dialog asking me to confirm before proceeding, so I don't accidentally lose important data.
 - Delete: As a group member, I want to delete unsettled expenses I added by mistake.
 
 #### Design decisions:
 1. Only group owner can add and remove group members.
 2. Only group owner can delete the group.
-3. Only group owner can settle expenses for a group.
+3. Only group owner can settle expenses for a group. Once "Settle Up" is triggered, no new expenses can be added until all debts are marked paid.
 4. Instead of using a separate expenses collection, the expenses of a group is included as a list in the Group collection as it matches the usage pattern better.
 
 ### Expenses & Balances Tracker (MongoDB Collections: Expenses)
@@ -70,12 +70,12 @@ The application uses **three MongoDB collections**.
   name: string,
   members: [userId],
   owner: userId
-  settlements: [
+  debts: [  // written once when owner hits "Settle Up"
     {
       senderId: userId,
       receiverId: userId,
       amount: float
-      isPaid: boolean
+      isPaid: boolean  // each member marks their row isPaid: true
     }
   ],
   expenses: [
@@ -87,11 +87,13 @@ The application uses **three MongoDB collections**.
       category,
       paidBy,
       splitBetween: [userId],
-      status: string (paid, unpaid), // for group expense, mark as paid when all group expenses are paid
       dateCreated: timestamp
     }
   ]
-  status: string (open, settled), // mark as settled when all the settlements are paid off
+  status: string (open, settling, settled), 
+          // open - expenses can be added;
+          // settling - owner hit Settle Up, debts generated, waiting for payments;
+          // settled - all debts marked isPaid
   dateCreated: timestamp
 }
 ```
