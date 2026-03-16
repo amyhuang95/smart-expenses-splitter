@@ -1,0 +1,33 @@
+{
+  "name": "spliteasy-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SplitEasy frontend - React with Bootstrap and recharts",
+  "keywords": [
+    "expense",
+    "splitter",
+    "react",
+    "bootstrap",
+    "recharts"
+  ],
+  "author": "Pangta Huang & Amy Huang",
+  "license": "MIT",
+  "dependencies": {
+    "bootstrap": "^5.3.2",
+    "prop-types": "^15.8.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "recharts": "^2.10.3"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "format": "prettier --write src/"
+  },
+  "proxy": "http://localhost:5000",
+  "browserslist": {
+    "production": [">0.2%", "not dead"],
+    "development": ["last 1 chrome version"]
+  }
+}

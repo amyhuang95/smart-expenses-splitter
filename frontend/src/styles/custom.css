@@ -1,0 +1,30 @@
+.category-food { color: #ff6b6b; }
+.category-transport { color: #4ecdc4; }
+.category-utilities { color: #ffd93d; }
+.category-entertainment { color: #a855f7; }
+.category-other { color: #6b7280; }
+
+.member-avatar {
+  width: 32px; height: 32px; border-radius: 50%; background: #6c5ce7;
+  color: white; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 600;
+}
+.member-avatar:nth-child(2) { background: #ff6b6b; }
+.member-avatar:nth-child(3) { background: #4ecdc4; }
+.member-avatar:nth-child(4) { background: #f59e0b; }
+.member-avatar:nth-child(5) { background: #a855f7; }
+
+.card-hover:hover { border-color: #0d6efd; box-shadow: 0 4px 12px rgba(13,110,253,0.15); cursor: pointer; }
+
+.modal-backdrop-custom {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.5); display: flex; align-items: center;
+  justify-content: center; z-index: 1050;
+}
+
+.member-tag {
+  display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;
+  border-radius: 20px; font-size: 0.85rem; background: rgba(13,110,253,0.1);
+  color: #0d6efd; border: 1px solid rgba(13,110,253,0.3);
+}
+.member-tag button { background: none; border: none; color: #0d6efd; cursor: pointer; font-size: 1rem; padding: 0; }
