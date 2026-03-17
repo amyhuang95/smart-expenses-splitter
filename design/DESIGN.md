@@ -108,3 +108,13 @@ SplitEasy solves this problem by providing a simple, centralized platform where 
 Link: https://excalidraw.com/#room=d0e905ee7d25efadaa40,3_SXWqsJVJVCZQAcikCCQQ
 
 ![mockup](./mockups/mockup-0316.png)
+
+## API
+
+### `/api/users`
+
+POST /api/users/register
+POST /api/users/login
+POST /api/users/logout
+GET /api/users/me
+GET /api/users/ protected by auth
