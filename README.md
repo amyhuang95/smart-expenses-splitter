@@ -38,3 +38,34 @@ The README must include:
 * MongoDB Atlas
 * `bcrypt` and `express-session` for user authentication
 * Development tools: nodemon
+
+## Repository Structure
+
+The repository is organized into separate frontend, backend, and design workspaces.
+
+```
+smart-expenses-splitter/
+├── AGENTS.md
+├── README.md
+├── design/
+│   ├── DESIGN.md
+│   └── mockups/
+├── frontend/
+│   ├── package.json
+│   ├── public/
+│   └── src/
+│       ├── components/
+│       ├── context/
+│       ├── pages/
+│       ├── services/
+│       ├── styles/
+│       ├── App.js
+│       └── index.js
+└── backend/
+    ├── package.json
+    ├── server.js
+    ├── config/
+    ├── db/
+    ├── middleware/
+    └── routes/
+```
