@@ -1,49 +1,60 @@
-import "dotenv/config";
 import express from "express";
-import { config } from "./config/index.js";
-import { fileURLToPath } from "url";
+import session from "express-session";
 import { dirname, join } from "path";
-import { connectDB, closeDB } from "./db/connection.js";
-import { logger } from "./utils/logger.js";
+import { fileURLToPath } from "url";
+import { config } from "./config/index.js";
+import { closeDB, connectDB } from "./db/connection.js";
+import { hydrateSessionUser } from "./middleware/auth.js";
 import { requestLogger } from "./middleware/requestLogger.js";
-
+import expensesRouter from "./routes/expenses.js";
 import groupsRouter from "./routes/groups.js";
 import usersRouter from "./routes/users.js";
-import expensesRouter from "./routes/expenses.js";
+import { logger } from "./utils/logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
-
 const app = express();
 
-/* Middleware */
 app.use(requestLogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(
+  session({
+    name: "spliteasy.sid",
+    secret: config.sessionSecret,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+    },
+  }),
+);
+app.use(hydrateSessionUser);
 
-// Routes
-app.use('/api/users', usersRouter);
-app.use('/api/groups', groupsRouter);
-app.use('/api/expenses', expensesRouter);
+app.use("/api/users", usersRouter);
+app.use("/api/groups", groupsRouter);
+app.use("/api/expenses", expensesRouter);
 
-// Serve React in development
-
-
-// Serve React in production
 app.use(express.static(join(__dirname, "..", "frontend", "dist")));
-app.get('*', (req, res) => {
+app.get("*", (req, res) => {
   res.sendFile(join(__dirname, "..", "frontend", "dist", "index.html"));
 });
 
-/* Start */
+app.use((error, req, res, next) => {
+  logger.error("Unhandled server error", error.message);
+  res.status(500).json({ error: "Internal server error." });
+});
+
 async function startServer() {
   try {
     await connectDB();
     app.listen(config.port, () => {
-      logger.info(`Server is running on localhost:${config.port}`);
+      logger.info(`Server is running on http://localhost:${config.port}`);
     });
   } catch (error) {
-    logger.error("Failed to start server:", error);
+    logger.error("Failed to start server", error.message);
     process.exit(1);
   }
 }
