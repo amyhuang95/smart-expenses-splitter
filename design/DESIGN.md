@@ -127,25 +127,25 @@ Link: https://excalidraw.com/#room=d0e905ee7d25efadaa40,3_SXWqsJVJVCZQAcikCCQQ
 All group routes are protected by auth.
 
 - `GET /api/groups`
-  Returns the current user's groups for the dashboard.
+  Returns the current user's group dashboard summaries.
 - `POST /api/groups`
-  Creates a group. Request body includes `name` and optional `memberEmails`.
+  Creates a group. Request body includes `name` and optional `memberEmails`. The backend currently caps groups at 50 total members.
 - `GET /api/groups/:groupId`
   Returns one group's full detail payload, including members, expenses, balances, debts, and summary.
 - `POST /api/groups/:groupId/members`
-  Adds a member by email. Owner only.
+  Adds a member by email. Owner only. The backend currently caps groups at 50 total members.
 - `DELETE /api/groups/:groupId/members/:memberId`
   Removes a member while the group is still open. Owner only.
 - `POST /api/groups/:groupId/expenses`
-  Creates a new expense for the group.
+  Creates a new expense for the group. Supported categories are `food`, `transport`, `accommodation`, `entertainment`, `utilities`, `shopping`, `health`, and `other`.
 - `GET /api/groups/:groupId/expenses/:expenseId`
   Returns one expense nested under its group.
 - `PATCH /api/groups/:groupId/expenses/:expenseId`
-  Updates an existing expense while the group is open.
+  Updates an existing expense while the group is open. Only the payer or group owner may edit it.
 - `POST /api/groups/:groupId/settle`
   Freezes the current balances into settlement debts. Owner only.
 - `PATCH /api/groups/:groupId/debts/:debtId/pay`
-  Marks a settlement debt as paid.
+  Marks a settlement debt as paid. The sender, receiver, or group owner may perform this action.
 
 ### `/api/expenses`
 
