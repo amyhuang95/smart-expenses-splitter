@@ -1,5 +1,6 @@
 import Spinner from "react-bootstrap/Spinner";
-import { UserProvider, useUser } from "./context/UserContext.jsx";
+import { UserProvider } from "./context/UserProvider.jsx";
+import { useUser } from "./context/useUser.js";
 import BaseTemplate from "./pages/BaseTemplate.jsx";
 import IndexPage from "./pages/IndexPage/IndexPage";
 

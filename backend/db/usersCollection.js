@@ -35,7 +35,9 @@ export async function findUserById(userId) {
     return null;
   }
 
-  return getUsersCollection().findOne({ _id: ObjectId.createFromHexString(userId) });
+  return getUsersCollection().findOne({
+    _id: ObjectId.createFromHexString(userId),
+  });
 }
 
 export async function listUsers() {

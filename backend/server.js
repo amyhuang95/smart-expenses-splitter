@@ -42,7 +42,7 @@ app.get("*", (req, res) => {
   res.sendFile(join(__dirname, "..", "frontend", "dist", "index.html"));
 });
 
-app.use((error, req, res, next) => {
+app.use((error, req, res) => {
   logger.error("Unhandled server error", error.message);
   res.status(500).json({ error: "Internal server error." });
 });

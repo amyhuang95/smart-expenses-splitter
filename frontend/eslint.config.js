@@ -1,47 +1,29 @@
-import globals from "globals";
-import js from "@eslint/js";
-import eslintConfigPrettier from "eslint-config-prettier";
-import prettier from "eslint-plugin-prettier";
-export default [
+import js from '@eslint/js'
+import globals from 'globals'
+import reactHooks from 'eslint-plugin-react-hooks'
+import reactRefresh from 'eslint-plugin-react-refresh'
+import { defineConfig, globalIgnores } from 'eslint/config'
+
+export default defineConfig([
+  globalIgnores(['dist']),
   {
-    files: ["**/*.{js,jsx,mjs,cjs,ts,tsx}"],
+    files: ['**/*.{js,jsx}'],
+    extends: [
+      js.configs.recommended,
+      reactHooks.configs.flat.recommended,
+      reactRefresh.configs.vite,
+    ],
     languageOptions: {
-      ecmaVersion: "latest",
-      sourceType: "module",
+      ecmaVersion: 2020,
+      globals: globals.browser,
       parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
+        ecmaVersion: 'latest',
+        ecmaFeatures: { jsx: true },
+        sourceType: 'module',
       },
-      globals: {
-        ...globals.browser,
-        ...globals.node,
-        ...globals.es2025,
-      },
-    },
-    plugins: {
-      prettier: prettier,
     },
     rules: {
-      ...js.configs.recommended.rules,
-      indent: [
-        "error",
-        2,
-        {
-          SwitchCase: 1,
-        },
-      ],
-      "linebreak-style": ["error", "unix"],
-      quotes: ["error", "double"],
-      semi: ["error", "always"],
-      "no-console": 0,
-      "prettier/prettier": [
-        "error",
-        {
-          endOfLine: "lf",
-        },
-      ],
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },
-  eslintConfigPrettier,
-];
+])

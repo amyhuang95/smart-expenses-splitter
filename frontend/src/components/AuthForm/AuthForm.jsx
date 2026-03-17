@@ -4,7 +4,7 @@ import Button from "react-bootstrap/Button";
 import ButtonGroup from "react-bootstrap/ButtonGroup";
 import Form from "react-bootstrap/Form";
 import Spinner from "react-bootstrap/Spinner";
-import { useUser } from "../../context/UserContext.jsx";
+import { useUser } from "../../context/useUser.js";
 import "./AuthForm.css";
 
 const INITIAL_LOGIN_FORM = {
