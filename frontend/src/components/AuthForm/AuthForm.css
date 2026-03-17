@@ -54,3 +54,7 @@
   border-radius: 12px;
   font-weight: 700;
 }
+
+.auth-form__spinner {
+  vertical-align: text-bottom;
+}
