@@ -3,11 +3,9 @@ import { Router } from "express";
 import {
   createUser,
   findUserByEmail,
-  listUsers,
   normalizeEmail,
   serializeUser,
 } from "../db/usersCollection.js";
-import { requireAuth } from "../middleware/auth.js";
 
 const router = Router();
 const SALT_ROUNDS = 10;
@@ -15,16 +13,6 @@ const SALT_ROUNDS = 10;
 function readBodyString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
-
-// Get all users (for testing purposes, not exposed in production)
-router.get("/", requireAuth, async (req, res, next) => {
-  try {
-    const users = await listUsers();
-    res.json({ users: users.map(serializeUser) });
-  } catch (error) {
-    next(error);
-  }
-});
 
 // Get current authenticated user
 router.get("/me", (req, res) => {
@@ -58,8 +46,12 @@ router.post("/register", async (req, res, next) => {
       passwordHash,
     });
 
-    req.session.userId = user._id.toString();
-    res.status(201).json({ user: serializeUser(user) });
+    // Regenerate session to prevent fixation and set userId
+    req.session.regenerate((err) => {
+      if (err) return next(err);
+      req.session.userId = user._id.toString();
+      res.status(201).json({ user: serializeUser(user) });
+    });
   } catch (error) {
     next(error);
   }
@@ -88,8 +80,12 @@ router.post("/login", async (req, res, next) => {
       return;
     }
 
-    req.session.userId = user._id.toString();
-    res.json({ user: serializeUser(user) });
+    // Regenerate session to prevent fixation and set userId
+    req.session.regenerate((err) => {
+      if (err) return next(err);
+      req.session.userId = user._id.toString();
+      res.json({ user: serializeUser(user) });
+    });
   } catch (error) {
     next(error);
   }
