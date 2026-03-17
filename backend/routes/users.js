@@ -25,10 +25,17 @@ router.post("/register", async (req, res, next) => {
   const email = readBodyString(req.body?.email);
   const password = readBodyString(req.body?.password);
 
+  // Basic validation
   if (!name || !email || !password) {
     res.status(400).json({ error: "Name, email, and password are required." });
     return;
   }
+
+  // Basic password strength check (can be enhanced with more rules)
+  if (password.length < 8) {
+  res.status(400).json({ error: "Password must be at least 8 characters." });
+  return;
+}
 
   try {
     const existingUser = await findUserByEmail(email);
