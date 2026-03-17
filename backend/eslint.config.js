@@ -35,6 +35,7 @@ export default [
       quotes: ["error", "double"],
       semi: ["error", "always"],
       "no-console": 0,
+      "no-unused-vars": ["error", { argsIgnorePattern: "^_" }],
       "prettier/prettier": [
         "error",
         {
