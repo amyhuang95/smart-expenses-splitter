@@ -45,9 +45,15 @@ export async function createGroup({ name, ownerId, memberIds }) {
     dateCreated: new Date(),
   };
 
-  logger.debug("[groups] insertOne", { name: group.name, ownerId, memberCount: group.memberIds.length });
+  logger.debug("[groups] insertOne", {
+    name: group.name,
+    ownerId,
+    memberCount: group.memberIds.length,
+  });
   const result = await getGroupsCollection().insertOne(group);
-  logger.debug("[groups] insertOne OK", { groupId: result.insertedId.toString() });
+  logger.debug("[groups] insertOne OK", {
+    groupId: result.insertedId.toString(),
+  });
 
   return {
     ...group,
@@ -114,27 +120,41 @@ export async function addMemberToGroup(groupId, memberId) {
 
 export async function removeMemberFromGroup(groupId, memberId) {
   if (!ObjectId.isValid(groupId)) {
-    logger.warn("[groups] removeMemberFromGroup — invalid groupId", { groupId });
+    logger.warn("[groups] removeMemberFromGroup — invalid groupId", {
+      groupId,
+    });
     return null;
   }
 
-  logger.debug("[groups] updateOne removeMemberFromGroup", { groupId, memberId });
+  logger.debug("[groups] updateOne removeMemberFromGroup", {
+    groupId,
+    memberId,
+  });
   await getGroupsCollection().updateOne(
     { _id: ObjectId.createFromHexString(groupId) },
     { $pull: { memberIds: memberId } },
   );
-  logger.debug("[groups] updateOne removeMemberFromGroup OK", { groupId, memberId });
+  logger.debug("[groups] updateOne removeMemberFromGroup OK", {
+    groupId,
+    memberId,
+  });
 
   return findGroupById(groupId);
 }
 
 export async function updateGroupSettlement(groupId, { debts, status }) {
   if (!ObjectId.isValid(groupId)) {
-    logger.warn("[groups] updateGroupSettlement — invalid groupId", { groupId });
+    logger.warn("[groups] updateGroupSettlement — invalid groupId", {
+      groupId,
+    });
     return null;
   }
 
-  logger.debug("[groups] updateOne settlement", { groupId, status, debtCount: debts.length });
+  logger.debug("[groups] updateOne settlement", {
+    groupId,
+    status,
+    debtCount: debts.length,
+  });
   await getGroupsCollection().updateOne(
     { _id: ObjectId.createFromHexString(groupId) },
     {
@@ -206,6 +226,9 @@ export async function listGroupSummariesByMember(userId) {
       { $project: { _expenseDocs: 0 } },
     ])
     .toArray();
-  logger.debug("[groups] aggregate listGroupSummariesByMember OK", { userId, count: groups.length });
+  logger.debug("[groups] aggregate listGroupSummariesByMember OK", {
+    userId,
+    count: groups.length,
+  });
   return groups;
 }

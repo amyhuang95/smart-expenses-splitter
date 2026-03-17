@@ -47,9 +47,17 @@ export async function createGroupExpense({
     dateCreated: new Date(),
   };
 
-  logger.debug("[groupExpenses] insertOne", { groupId, name: expense.name, amount: expense.amount, paidBy, splitCount: expense.splitBetween.length });
+  logger.debug("[groupExpenses] insertOne", {
+    groupId,
+    name: expense.name,
+    amount: expense.amount,
+    paidBy,
+    splitCount: expense.splitBetween.length,
+  });
   const result = await getGroupExpensesCollection().insertOne(expense);
-  logger.debug("[groupExpenses] insertOne OK", { expenseId: result.insertedId.toString() });
+  logger.debug("[groupExpenses] insertOne OK", {
+    expenseId: result.insertedId.toString(),
+  });
 
   return {
     ...expense,
@@ -63,13 +71,18 @@ export async function listExpensesByGroupId(groupId) {
     .find({ groupId })
     .sort({ dateCreated: -1 })
     .toArray();
-  logger.debug("[groupExpenses] find by groupId OK", { groupId, count: expenses.length });
+  logger.debug("[groupExpenses] find by groupId OK", {
+    groupId,
+    count: expenses.length,
+  });
   return expenses;
 }
 
 export async function findExpenseById(expenseId) {
   if (!ObjectId.isValid(expenseId)) {
-    logger.warn("[groupExpenses] findExpenseById — invalid expenseId", { expenseId });
+    logger.warn("[groupExpenses] findExpenseById — invalid expenseId", {
+      expenseId,
+    });
     return null;
   }
 
@@ -77,7 +90,10 @@ export async function findExpenseById(expenseId) {
   const expense = await getGroupExpensesCollection().findOne({
     _id: ObjectId.createFromHexString(expenseId),
   });
-  logger.debug("[groupExpenses] findOne OK", { expenseId, found: expense !== null });
+  logger.debug("[groupExpenses] findOne OK", {
+    expenseId,
+    found: expense !== null,
+  });
   return expense;
 }
 
@@ -86,11 +102,19 @@ export async function updateGroupExpense(
   { name, description, amount, category, splitBetween },
 ) {
   if (!ObjectId.isValid(expenseId)) {
-    logger.warn("[groupExpenses] updateGroupExpense — invalid expenseId", { expenseId });
+    logger.warn("[groupExpenses] updateGroupExpense — invalid expenseId", {
+      expenseId,
+    });
     return null;
   }
 
-  logger.debug("[groupExpenses] updateOne", { expenseId, name, amount, category, splitCount: splitBetween.length });
+  logger.debug("[groupExpenses] updateOne", {
+    expenseId,
+    name,
+    amount,
+    category,
+    splitCount: splitBetween.length,
+  });
   await getGroupExpensesCollection().updateOne(
     { _id: ObjectId.createFromHexString(expenseId) },
     {

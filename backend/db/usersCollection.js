@@ -31,7 +31,10 @@ export async function findUserByEmail(email) {
   const normalized = normalizeEmail(email);
   logger.debug("[users] findOne by email", { email: normalized });
   const user = await getUsersCollection().findOne({ email: normalized });
-  logger.debug("[users] findOne by email OK", { email: normalized, found: user !== null });
+  logger.debug("[users] findOne by email OK", {
+    email: normalized,
+    found: user !== null,
+  });
   return user;
 }
 
@@ -73,7 +76,10 @@ export async function findUsersByIds(userIds) {
   const users = await getUsersCollection()
     .find({ _id: { $in: objectIds } }, { projection: { passwordHash: 0 } })
     .toArray();
-  logger.debug("[users] find by ids OK", { requested: objectIds.length, found: users.length });
+  logger.debug("[users] find by ids OK", {
+    requested: objectIds.length,
+    found: users.length,
+  });
   return users;
 }
 
@@ -88,7 +94,9 @@ export async function createUser({ name, email, passwordHash }) {
 
   logger.debug("[users] insertOne", { email: user.email, name: user.name });
   const result = await getUsersCollection().insertOne(user);
-  logger.debug("[users] insertOne OK", { userId: result.insertedId.toString() });
+  logger.debug("[users] insertOne OK", {
+    userId: result.insertedId.toString(),
+  });
 
   return {
     ...user,
@@ -106,12 +114,18 @@ export async function addGroupToUsers(userIds, groupId) {
     return;
   }
 
-  logger.debug("[users] updateMany addGroupToUsers", { groupId, userCount: objectIds.length });
+  logger.debug("[users] updateMany addGroupToUsers", {
+    groupId,
+    userCount: objectIds.length,
+  });
   await getUsersCollection().updateMany(
     { _id: { $in: objectIds } },
     { $addToSet: { groups: groupId } },
   );
-  logger.debug("[users] updateMany addGroupToUsers OK", { groupId, userCount: objectIds.length });
+  logger.debug("[users] updateMany addGroupToUsers OK", {
+    groupId,
+    userCount: objectIds.length,
+  });
 }
 
 export async function removeGroupFromUsers(userIds, groupId) {
@@ -120,14 +134,22 @@ export async function removeGroupFromUsers(userIds, groupId) {
     .map((userId) => ObjectId.createFromHexString(userId));
 
   if (!objectIds.length) {
-    logger.debug("[users] removeGroupFromUsers — empty id list, skipping query");
+    logger.debug(
+      "[users] removeGroupFromUsers — empty id list, skipping query",
+    );
     return;
   }
 
-  logger.debug("[users] updateMany removeGroupFromUsers", { groupId, userCount: objectIds.length });
+  logger.debug("[users] updateMany removeGroupFromUsers", {
+    groupId,
+    userCount: objectIds.length,
+  });
   await getUsersCollection().updateMany(
     { _id: { $in: objectIds } },
     { $pull: { groups: groupId } },
   );
-  logger.debug("[users] updateMany removeGroupFromUsers OK", { groupId, userCount: objectIds.length });
+  logger.debug("[users] updateMany removeGroupFromUsers OK", {
+    groupId,
+    userCount: objectIds.length,
+  });
 }
