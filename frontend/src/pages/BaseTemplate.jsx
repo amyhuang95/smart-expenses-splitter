@@ -1,6 +1,7 @@
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
+import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { useUser } from "../context/useUser.js";
 
@@ -22,9 +23,24 @@ export default function BaseTemplate() {
               </span>
             </span>
           </Navbar.Brand>
-          <Button onClick={logout} type="button" variant="outline-dark">
-            Log Out
-          </Button>
+          <div className="startup-page__topbar-actions">
+            <Nav className="startup-page__nav">
+              <Nav.Link href="/groups" className="startup-page__nav-link">
+                Group Expenses
+              </Nav.Link>
+              <Nav.Link href="/single-expenses" className="startup-page__nav-link">
+                Single Expenses
+              </Nav.Link>
+
+              <Nav.Link href="/profile" className="startup-page__nav-link">
+                Profile
+              </Nav.Link>
+
+            </Nav>
+            <Button onClick={logout} type="button" variant="outline-dark">
+              Log Out
+            </Button>
+          </div>
         </Navbar>
 
         <Card className="startup-page__auth-card">
