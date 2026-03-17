@@ -15,7 +15,7 @@ SplitEasy solves this problem by providing a simple, centralized platform where 
 
 ## User Stories
 
-### Groups & Group Expenses Management (MongoDB Collections: Groups)
+### Group Expenses Management
 - Create: As a user, I want to create a new group (e.g., "Miami Trip 2026") by filling in a group name and adding members through a form modal, so we can keep our shared expenses organized in one place.
 - Create: As a group member, I want to add an expense that I have paid for, including the details such as item name, amount, group members to split with.
 - Read: As a user, I want to view a dashboard listing all the groups I am a part of, with a summary card for each group showing the group name, members, total group spending, and a balance status indicator, so I can quickly see which groups need attention. I also want to search and filter groups by name using a search bar at the top of the dashboard.
@@ -28,10 +28,10 @@ SplitEasy solves this problem by providing a simple, centralized platform where 
 #### Design decisions:
 1. Only group owner can add and remove group members.
 2. Only group owner can delete the group.
-3. Only group owner can settle expenses for a group. Once "Settle Up" is triggered, no new expenses can be added until all debts are marked paid.
-4. Instead of using a separate expenses collection, the expenses of a group is included as a list in the Group collection as it matches the usage pattern better.
+3. Only group owner can settle expenses for a group. Once "Settle Up" is triggered, no new expenses can be added until the settlements are all paid for.
+4. Expenses are locked once it's settled. 
 
-### Expenses & Balances Tracker (MongoDB Collections: Expenses)
+### Single Expenses & Balances Tracker
 - Create: As a user, I want to click an "Add Expense" button to open a form modal where I can enter an expense description (e.g., "Dinner at Joe's"), specify the total amount, select a category from a dropdown (food, transport, utilities, entertainment, other), choose a split method (equal split, custom amounts, or percentage-based), and select who paid, so the system can automatically calculate each person's share.
 - Read: As a user, I want to see a scrollable feed of all recorded expenses within a specific group, with each expense card showing the payer, amount, category icon, and date. Within this view, I also want to:
     - Use a filter bar to narrow expenses by category, date range, or payer, and sort the feed by date (newest/oldest), amount (highest/lowest), or category.
@@ -41,16 +41,15 @@ SplitEasy solves this problem by providing a simple, centralized platform where 
 - Update: As a user, I want to click an "Edit" icon on any expense card to reopen the form modal pre-filled with the current data, so I can correct the amount, change the category, or update the split if I made a mistake when logging the receipt.
 - Delete: As a user, I want to click a "Delete" icon on any expense card to remove an expense that was entered by mistake. The app will show a confirmation dialog before deleting to prevent accidental removals.
 
-### User registration and authentication (MongoDB Collection: Users)
+### User registration and authentication
 - Create: As a user, I want to register a new account so that I can keep track of my expenses and group expenses. 
-
 
 ## Database Design
 
-The application uses **three MongoDB collections**.
-
 ## Users
 
+- Used by both group expenses and single expenses features. 
+ 
 ```
 {
   _id,
@@ -61,9 +60,11 @@ The application uses **three MongoDB collections**.
   dateCreated: timestamp
 }
 ```
-
+ 
 ## Groups
 
+- Used by group expenses feature.
+ 
 ```
 {
   _id,
@@ -74,28 +75,33 @@ The application uses **three MongoDB collections**.
     {
       senderId: userId,
       receiverId: userId,
-      amount: float
-      isPaid: boolean  // each member marks their row isPaid: true
+      amount: float,
+      isPaid: boolean  // each member marks their row
     }
   ],
-  expenses: [
-    {
-      _id,
-      name,
-      description,
-      amount,
-      category,
-      paidBy,
-      splitBetween: [userId],
-      dateCreated: timestamp
-    }
-  ]
-  status: string (open, settling, settled), 
-          // open - expenses can be added;
-          // settling - owner hit Settle Up, debts generated, waiting for payments;
-          // settled - all debts marked isPaid
+  status: "open" | "settling" | "settled",
   dateCreated: timestamp
 }
+```
+ 
+## GroupExpenses
+
+- Used by group expenses feature.
+
+```
+{
+  _id,
+  groupId: ObjectId,
+  name: string,
+  description: string,
+  amount: number,
+  category: string,
+  paidBy: userId,
+  splitBetween: [userId],
+  isPaid: boolean,
+  dateCreated: timestamp
+}
+
 ```
 
 ## Mockup
