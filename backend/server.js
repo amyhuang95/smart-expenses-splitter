@@ -13,6 +13,8 @@ import { logger } from "./utils/logger.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
+const distPath = join(__dirname, "..", "frontend", "dist");
+
 const app = express();
 
 app.use(requestLogger);
@@ -27,7 +29,7 @@ app.use(
     cookie: {
       httpOnly: true,
       sameSite: "lax",
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
     },
   }),
 );
@@ -37,12 +39,12 @@ app.use("/api/users", usersRouter);
 app.use("/api/groups", groupsRouter);
 app.use("/api/expenses", expensesRouter);
 
-app.use(express.static(join(__dirname, "..", "frontend", "dist")));
-app.get("*", (req, res) => {
-  res.sendFile(join(__dirname, "..", "frontend", "dist", "index.html"));
+app.use(express.static(distPath));
+app.get("*", (_req, res) => {
+  res.sendFile(join(distPath, "index.html"));
 });
 
-app.use((error, req, res) => {
+app.use((error, req, res, _next) => {
   logger.error("Unhandled server error", error.message);
   res.status(500).json({ error: "Internal server error." });
 });

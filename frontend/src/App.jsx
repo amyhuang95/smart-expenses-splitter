@@ -1,10 +1,12 @@
 import Spinner from "react-bootstrap/Spinner";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { UserProvider } from "./context/UserProvider.jsx";
 import { useUser } from "./context/useUser.js";
-import BaseTemplate from "./pages/BaseTemplate.jsx";
-import IndexPage from "./pages/IndexPage/IndexPage";
+import AppLayout from "./layouts/AppLayout.jsx";
+import HomePage from "./pages/HomePage/HomePage.jsx";
+import IndexPage from "./pages/IndexPage/IndexPage.jsx";
 
-function AppContent() {
+function AppRoutes() {
   const { isAuthenticated, isLoadingUser } = useUser();
 
   if (isLoadingUser) {
@@ -17,13 +19,29 @@ function AppContent() {
     );
   }
 
-  return isAuthenticated ? <BaseTemplate /> : <IndexPage />;
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={isAuthenticated ? <Navigate to="/home" /> : <IndexPage />}
+      />
+      <Route
+        element={isAuthenticated ? <AppLayout /> : <Navigate to="/" />}
+      >
+        <Route path="/home" element={<HomePage />} />
+        <Route path="/groups" element={<HomePage />} />
+        <Route path="/single-expenses" element={<HomePage />} />
+      </Route>
+    </Routes>
+  );
 }
 
 function App() {
   return (
     <UserProvider>
-      <AppContent />
+      <BrowserRouter>
+        <AppRoutes />
+      </BrowserRouter>
     </UserProvider>
   );
 }
