@@ -2,8 +2,9 @@ import { Router } from "express";
 import {
   addMemberToGroup,
   createGroup,
+  deleteGroupById,
   findGroupById,
-  listGroupsByMember,
+  listGroupSummariesByMember,
   markGroupDebtPaid,
   removeMemberFromGroup,
   serializeGroup,
@@ -34,6 +35,19 @@ import {
 } from "../utils/currency.js";
 
 const router = Router();
+
+const VALID_CATEGORIES = new Set([
+  "food",
+  "transport",
+  "accommodation",
+  "entertainment",
+  "utilities",
+  "shopping",
+  "health",
+  "other",
+]);
+
+const MAX_GROUP_MEMBERS = 50;
 
 // Normalizes optional string fields from request bodies.
 function readBodyString(value) {
@@ -114,18 +128,37 @@ async function buildGroupPayload(group, currentUserId) {
 router.use(requireAuth);
 
 // Returns the current user's group dashboard cards.
+// Uses a single aggregation query instead of calling buildGroupPayload per
+// group, avoiding the 2N DB queries the previous approach incurred on load.
+// Member user objects are omitted from summary cards and only fetched when
+// the user opens a specific group.
 router.get("/", async (req, res, next) => {
   try {
-    const groups = await listGroupsByMember(req.currentUser._id);
-    const summaries = await Promise.all(
-      groups.map(async (group) => {
-        const payload = await buildGroupPayload(group, req.currentUser._id);
-        return {
-          ...payload.group,
-          summary: payload.summary,
-        };
-      }),
-    );
+    const groupDocs = await listGroupSummariesByMember(req.currentUser._id);
+
+    const summaries = groupDocs.map((group) => {
+      const storedDebts = (group.debts ?? []).map((debt) => ({
+        ...debt,
+        amount: Number(debt.amount),
+      }));
+      const outstandingDebts = storedDebts.filter((debt) => !debt.isPaid);
+
+      return {
+        ...serializeGroup(group),
+        currentUserRole: isGroupOwner(group, req.currentUser._id)
+          ? "owner"
+          : "member",
+        summary: {
+          totalSpent: Number((group._totalSpent ?? 0).toFixed(2)),
+          totalExpenses: group._expenseCount ?? 0,
+          // For open groups debts are only written at settle time, so
+          // outstandingDebtAmount stays 0 on dashboard cards until settlement.
+          outstandingDebtAmount: summarizeOutstandingDebts(storedDebts),
+          settledDebtCount: storedDebts.filter((debt) => debt.isPaid).length,
+          outstandingDebtCount: outstandingDebts.length,
+        },
+      };
+    });
 
     res.json({ groups: summaries });
   } catch (error) {
@@ -147,6 +180,14 @@ router.post("/", async (req, res, next) => {
     return;
   }
 
+  // Owner is added automatically, so the invite list is capped at MAX - 1.
+  if (normalizedEmails.length >= MAX_GROUP_MEMBERS) {
+    res.status(400).json({
+      error: `A group may have at most ${MAX_GROUP_MEMBERS} members.`,
+    });
+    return;
+  }
+
   try {
     const uniqueEmails = [...new Set(normalizedEmails)];
     const resolvedMembers = await Promise.all(
@@ -157,8 +198,9 @@ router.post("/", async (req, res, next) => {
     );
 
     if (missingEmails.length) {
+      const label = missingEmails.length === 1 ? "this email" : "these emails";
       res.status(404).json({
-        error: `No account found for: ${missingEmails.join(", ")}.`,
+        error: `No account found for ${label}: ${missingEmails.join(", ")}. Please ask them to register for an account before adding them to a group.`,
       });
       return;
     }
@@ -171,8 +213,23 @@ router.post("/", async (req, res, next) => {
         .map((member) => member._id.toString()),
     });
 
-    // Users keep a reverse reference to groups for quick dashboard lookups.
-    await addGroupToUsers(group.memberIds, group._id.toString());
+    // Even though all users are confirmed to exist, addGroupToUsers can still
+    // fail for infrastructure reasons unrelated to user existence: a transient
+    // DB connection error, a write-concern timeout, or a replica set failover
+    // between the two writes. If it does, the group document already exists but
+    // the users' reverse-reference arrays are stale. Attempt a compensating
+    // delete so both collections stay consistent.
+    try {
+      await addGroupToUsers(group.memberIds, group._id.toString());
+    } catch (syncError) {
+      try {
+        await deleteGroupById(group._id.toString());
+      } catch (_) {
+        // Compensating delete also failed — requires manual reconciliation.
+      }
+      throw syncError;
+    }
+
     const payload = await buildGroupPayload(group, req.currentUser._id);
     res.status(201).json(payload);
   } catch (error) {
@@ -219,10 +276,19 @@ router.post("/:groupId/members", async (req, res, next) => {
       return;
     }
 
+    if (group.memberIds.length >= MAX_GROUP_MEMBERS) {
+      res.status(400).json({
+        error: `A group may have at most ${MAX_GROUP_MEMBERS} members.`,
+      });
+      return;
+    }
+
     const user = await findUserByEmail(email);
 
     if (!user) {
-      res.status(404).json({ error: "No user found with that email." });
+      res.status(404).json({
+        error: `No account found for ${email}. Please ask them to register for an account before adding them to a group.`,
+      });
       return;
     }
 
@@ -233,8 +299,22 @@ router.post("/:groupId/members", async (req, res, next) => {
     }
 
     const updatedGroup = await addMemberToGroup(req.params.groupId, memberId);
-    // Keep the user's `groups` array aligned with the group membership change.
-    await addGroupToUsers([memberId], req.params.groupId);
+
+    // Same infrastructure-failure guard as group creation: the user is known
+    // to exist, but the reverse-reference update can still fail due to a
+    // transient DB error between the two writes. Roll back the membership
+    // change if it does so both collections stay in sync.
+    try {
+      await addGroupToUsers([memberId], req.params.groupId);
+    } catch (syncError) {
+      try {
+        await removeMemberFromGroup(req.params.groupId, memberId);
+      } catch (_) {
+        // Compensating rollback failed — requires manual reconciliation.
+      }
+      throw syncError;
+    }
+
     const payload = await buildGroupPayload(updatedGroup, req.currentUser._id);
     res.status(201).json(payload);
   } catch (error) {
@@ -296,7 +376,20 @@ router.delete("/:groupId/members/:memberId", async (req, res, next) => {
       req.params.groupId,
       req.params.memberId,
     );
-    await removeGroupFromUsers([req.params.memberId], req.params.groupId);
+
+    // If the user reverse-reference update fails, restore the membership so
+    // both collections stay in sync.
+    try {
+      await removeGroupFromUsers([req.params.memberId], req.params.groupId);
+    } catch (syncError) {
+      try {
+        await addMemberToGroup(req.params.groupId, req.params.memberId);
+      } catch (_) {
+        // Compensating rollback failed — requires manual reconciliation.
+      }
+      throw syncError;
+    }
+
     const payload = await buildGroupPayload(updatedGroup, req.currentUser._id);
     res.json(payload);
   } catch (error) {
@@ -308,7 +401,7 @@ router.delete("/:groupId/members/:memberId", async (req, res, next) => {
 router.post("/:groupId/expenses", async (req, res, next) => {
   const name = readBodyString(req.body?.name);
   const description = readBodyString(req.body?.description);
-  const category = readBodyString(req.body?.category) || "other";
+  const rawCategory = readBodyString(req.body?.category) || "other";
   const amount = Number(req.body?.amount);
   const splitBetween = Array.isArray(req.body?.splitBetween)
     ? req.body.splitBetween.map((memberId) => readBodyString(memberId))
@@ -324,6 +417,20 @@ router.post("/:groupId/expenses", async (req, res, next) => {
   if (!hasAtMostTwoDecimals(amount)) {
     res.status(400).json({
       error: "Amount must use at most 2 decimal places.",
+    });
+    return;
+  }
+
+  if (!VALID_CATEGORIES.has(rawCategory)) {
+    res.status(400).json({
+      error: `Invalid category. Must be one of: ${[...VALID_CATEGORIES].join(", ")}.`,
+    });
+    return;
+  }
+
+  if (splitBetween.length > MAX_GROUP_MEMBERS) {
+    res.status(400).json({
+      error: `Expense split may not exceed ${MAX_GROUP_MEMBERS} members.`,
     });
     return;
   }
@@ -361,7 +468,7 @@ router.post("/:groupId/expenses", async (req, res, next) => {
       name,
       description,
       amount: normalizeCurrencyAmount(amount),
-      category,
+      category: rawCategory,
       paidBy: req.currentUser._id,
       splitBetween: selectedMembers,
     });
@@ -389,8 +496,6 @@ router.get("/:groupId/expenses/:expenseId", async (req, res, next) => {
 
     const expense = await findExpenseById(req.params.expenseId);
 
-    // Bug fix #3: compare both sides as strings to guard against groupId being
-    // stored as an ObjectId in some documents rather than a plain string.
     if (!expense || expense.groupId.toString() !== req.params.groupId) {
       res.status(404).json({ error: "Expense not found." });
       return;
@@ -406,7 +511,7 @@ router.get("/:groupId/expenses/:expenseId", async (req, res, next) => {
 router.patch("/:groupId/expenses/:expenseId", async (req, res, next) => {
   const name = readBodyString(req.body?.name);
   const description = readBodyString(req.body?.description);
-  const category = readBodyString(req.body?.category) || "other";
+  const rawCategory = readBodyString(req.body?.category) || "other";
   const amount = Number(req.body?.amount);
   const splitBetween = Array.isArray(req.body?.splitBetween)
     ? req.body.splitBetween.map((memberId) => readBodyString(memberId))
@@ -426,6 +531,20 @@ router.patch("/:groupId/expenses/:expenseId", async (req, res, next) => {
     return;
   }
 
+  if (!VALID_CATEGORIES.has(rawCategory)) {
+    res.status(400).json({
+      error: `Invalid category. Must be one of: ${[...VALID_CATEGORIES].join(", ")}.`,
+    });
+    return;
+  }
+
+  if (splitBetween.length > MAX_GROUP_MEMBERS) {
+    res.status(400).json({
+      error: `Expense split may not exceed ${MAX_GROUP_MEMBERS} members.`,
+    });
+    return;
+  }
+
   try {
     const group = await findGroupById(req.params.groupId);
 
@@ -436,8 +555,6 @@ router.patch("/:groupId/expenses/:expenseId", async (req, res, next) => {
 
     const expense = await findExpenseById(req.params.expenseId);
 
-    // Bug fix #3: compare both sides as strings to guard against groupId being
-    // stored as an ObjectId in some documents rather than a plain string.
     if (!expense || expense.groupId.toString() !== req.params.groupId) {
       res.status(404).json({ error: "Expense not found." });
       return;
@@ -476,12 +593,12 @@ router.patch("/:groupId/expenses/:expenseId", async (req, res, next) => {
       name,
       description,
       amount: normalizeCurrencyAmount(amount),
-      category,
+      category: rawCategory,
       splitBetween: selectedMembers,
     });
 
-    // Bug fix #2: re-fetch the group after the expense update so the returned
-    // payload reflects the latest balances and summary, not stale data.
+    // Re-fetch the group so the returned payload reflects the latest balances
+    // and summary rather than the state before this edit was applied.
     const refreshedGroup = await findGroupById(req.params.groupId);
     const payload = await buildGroupPayload(
       refreshedGroup,
@@ -533,7 +650,9 @@ router.post("/:groupId/settle", async (req, res, next) => {
   }
 });
 
-// A debt can be marked paid by the sender, or by the owner overseeing cleanup.
+// A debt can be marked paid by the sender (debtor), the receiver (creditor),
+// or the group owner. Both parties to the debt are permitted so the creditor
+// can acknowledge receipt without depending on the debtor to act.
 router.patch("/:groupId/debts/:debtId/pay", async (req, res, next) => {
   try {
     const group = await findGroupById(req.params.groupId);
@@ -552,12 +671,13 @@ router.patch("/:groupId/debts/:debtId/pay", async (req, res, next) => {
       return;
     }
 
-    if (
-      debt.senderId !== req.currentUser._id &&
-      !isGroupOwner(group, req.currentUser._id)
-    ) {
+    const isDebtor = debt.senderId === req.currentUser._id;
+    const isCreditor = debt.receiverId === req.currentUser._id;
+
+    if (!isDebtor && !isCreditor && !isGroupOwner(group, req.currentUser._id)) {
       res.status(403).json({
-        error: "Only the payer or group owner can mark this debt as paid.",
+        error:
+          "Only the sender, receiver, or group owner can mark this debt as paid.",
       });
       return;
     }

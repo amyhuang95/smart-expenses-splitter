@@ -116,7 +116,8 @@ export function calculateGroupBalances(memberIds, expenses) {
  * Sums the remaining unpaid settlement rows for groups already in settlement.
  */
 export function summarizeOutstandingDebts(debts) {
-  return debts
+  const total = debts
     .filter((debt) => !debt.isPaid)
     .reduce((sum, debt) => sum + Number(debt.amount), 0);
+  return Number(total.toFixed(2));
 }
