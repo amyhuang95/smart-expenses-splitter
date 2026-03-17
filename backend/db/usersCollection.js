@@ -47,6 +47,20 @@ export async function listUsers() {
     .toArray();
 }
 
+export async function findUsersByIds(userIds) {
+  const objectIds = [...new Set(userIds)]
+    .filter((userId) => ObjectId.isValid(userId))
+    .map((userId) => ObjectId.createFromHexString(userId));
+
+  if (!objectIds.length) {
+    return [];
+  }
+
+  return getUsersCollection()
+    .find({ _id: { $in: objectIds } }, { projection: { passwordHash: 0 } })
+    .toArray();
+}
+
 export async function createUser({ name, email, passwordHash }) {
   const user = {
     name: name.trim(),
@@ -61,4 +75,34 @@ export async function createUser({ name, email, passwordHash }) {
     ...user,
     _id: result.insertedId,
   };
+}
+
+export async function addGroupToUsers(userIds, groupId) {
+  const objectIds = [...new Set(userIds)]
+    .filter((userId) => ObjectId.isValid(userId))
+    .map((userId) => ObjectId.createFromHexString(userId));
+
+  if (!objectIds.length) {
+    return;
+  }
+
+  await getUsersCollection().updateMany(
+    { _id: { $in: objectIds } },
+    { $addToSet: { groups: groupId } },
+  );
+}
+
+export async function removeGroupFromUsers(userIds, groupId) {
+  const objectIds = [...new Set(userIds)]
+    .filter((userId) => ObjectId.isValid(userId))
+    .map((userId) => ObjectId.createFromHexString(userId));
+
+  if (!objectIds.length) {
+    return;
+  }
+
+  await getUsersCollection().updateMany(
+    { _id: { $in: objectIds } },
+    { $pull: { groups: groupId } },
+  );
 }
