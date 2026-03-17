@@ -34,9 +34,9 @@ router.post("/register", async (req, res, next) => {
 
   // Basic password strength check (can be enhanced with more rules)
   if (password.length < 8) {
-  res.status(400).json({ error: "Password must be at least 8 characters." });
-  return;
-}
+    res.status(400).json({ error: "Password must be at least 8 characters." });
+    return;
+  }
 
   try {
     const existingUser = await findUserByEmail(email);
