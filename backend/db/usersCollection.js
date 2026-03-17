@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getDB } from "./connection.js";
+import { logger } from "../utils/logger.js";
 
 const USERS_COLLECTION = "users";
 
@@ -27,24 +28,35 @@ export function serializeUser(user) {
 }
 
 export async function findUserByEmail(email) {
-  return getUsersCollection().findOne({ email: normalizeEmail(email) });
+  const normalized = normalizeEmail(email);
+  logger.debug("[users] findOne by email", { email: normalized });
+  const user = await getUsersCollection().findOne({ email: normalized });
+  logger.debug("[users] findOne by email OK", { email: normalized, found: user !== null });
+  return user;
 }
 
 export async function findUserById(userId) {
   if (!ObjectId.isValid(userId)) {
+    logger.warn("[users] findUserById — invalid userId", { userId });
     return null;
   }
 
-  return getUsersCollection().findOne({
+  logger.debug("[users] findOne by id", { userId });
+  const user = await getUsersCollection().findOne({
     _id: ObjectId.createFromHexString(userId),
   });
+  logger.debug("[users] findOne by id OK", { userId, found: user !== null });
+  return user;
 }
 
 export async function listUsers() {
-  return getUsersCollection()
+  logger.debug("[users] find all");
+  const users = await getUsersCollection()
     .find({}, { projection: { passwordHash: 0 } })
     .sort({ dateCreated: -1 })
     .toArray();
+  logger.debug("[users] find all OK", { count: users.length });
+  return users;
 }
 
 export async function findUsersByIds(userIds) {
@@ -53,12 +65,16 @@ export async function findUsersByIds(userIds) {
     .map((userId) => ObjectId.createFromHexString(userId));
 
   if (!objectIds.length) {
+    logger.debug("[users] findUsersByIds — empty id list, skipping query");
     return [];
   }
 
-  return getUsersCollection()
+  logger.debug("[users] find by ids", { count: objectIds.length });
+  const users = await getUsersCollection()
     .find({ _id: { $in: objectIds } }, { projection: { passwordHash: 0 } })
     .toArray();
+  logger.debug("[users] find by ids OK", { requested: objectIds.length, found: users.length });
+  return users;
 }
 
 export async function createUser({ name, email, passwordHash }) {
@@ -70,7 +86,10 @@ export async function createUser({ name, email, passwordHash }) {
     dateCreated: new Date(),
   };
 
+  logger.debug("[users] insertOne", { email: user.email, name: user.name });
   const result = await getUsersCollection().insertOne(user);
+  logger.debug("[users] insertOne OK", { userId: result.insertedId.toString() });
+
   return {
     ...user,
     _id: result.insertedId,
@@ -83,13 +102,16 @@ export async function addGroupToUsers(userIds, groupId) {
     .map((userId) => ObjectId.createFromHexString(userId));
 
   if (!objectIds.length) {
+    logger.debug("[users] addGroupToUsers — empty id list, skipping query");
     return;
   }
 
+  logger.debug("[users] updateMany addGroupToUsers", { groupId, userCount: objectIds.length });
   await getUsersCollection().updateMany(
     { _id: { $in: objectIds } },
     { $addToSet: { groups: groupId } },
   );
+  logger.debug("[users] updateMany addGroupToUsers OK", { groupId, userCount: objectIds.length });
 }
 
 export async function removeGroupFromUsers(userIds, groupId) {
@@ -98,11 +120,14 @@ export async function removeGroupFromUsers(userIds, groupId) {
     .map((userId) => ObjectId.createFromHexString(userId));
 
   if (!objectIds.length) {
+    logger.debug("[users] removeGroupFromUsers — empty id list, skipping query");
     return;
   }
 
+  logger.debug("[users] updateMany removeGroupFromUsers", { groupId, userCount: objectIds.length });
   await getUsersCollection().updateMany(
     { _id: { $in: objectIds } },
     { $pull: { groups: groupId } },
   );
+  logger.debug("[users] updateMany removeGroupFromUsers OK", { groupId, userCount: objectIds.length });
 }
