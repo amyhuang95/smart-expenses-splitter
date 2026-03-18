@@ -1,5 +1,4 @@
 import PropTypes from "prop-types";
-import "./ExpenseFilter.css";
 
 const CATEGORIES = ["all", "food", "transport", "utilities", "entertainment", "other"];
 
