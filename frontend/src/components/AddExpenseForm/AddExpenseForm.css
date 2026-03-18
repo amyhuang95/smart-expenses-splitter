@@ -20,3 +20,15 @@
   border-radius: 0.75rem;
   padding: 0.75rem 0.75rem 0.75rem 2.5rem;
 }
+
+@media (max-width: 767px) {
+  .add-expense-form__split,
+  .add-expense-form__members {
+    grid-template-columns: 1fr;
+  }
+
+  .add-expense-form__check {
+    min-height: 3.25rem;
+    padding-right: 1rem;
+  }
+}

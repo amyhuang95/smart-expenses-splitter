@@ -59,6 +59,16 @@
 }
 
 @media (max-width: 767px) {
+  .balance-summary__filter {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .balance-summary__filter-tag {
+    min-width: 0;
+    width: 100%;
+  }
+
   .balance-summary__list {
     max-height: 22rem;
   }
@@ -69,6 +79,11 @@
   }
 
   .balance-summary__actions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .balance-summary__actions .btn {
     width: 100%;
   }
 }

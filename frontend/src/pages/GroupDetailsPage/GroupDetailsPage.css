@@ -29,6 +29,10 @@
   justify-content: flex-end;
 }
 
+.group-details-page__hero-actions .btn {
+  white-space: nowrap;
+}
+
 .group-details-page__stats {
   display: grid;
   gap: 1rem;
@@ -74,6 +78,17 @@
   }
 
   .group-details-page__hero-actions {
+    align-items: stretch;
+    flex-direction: column;
     justify-content: flex-start;
+    width: 100%;
+  }
+
+  .group-details-page__hero-actions .btn {
+    width: 100%;
+  }
+
+  .group-details-page__stats {
+    grid-template-columns: 1fr;
   }
 }

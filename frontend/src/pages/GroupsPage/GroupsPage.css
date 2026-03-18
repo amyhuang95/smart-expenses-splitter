@@ -32,6 +32,11 @@
 
 .groups-page__toolbar {
   max-width: 26rem;
+  width: 100%;
+}
+
+.groups-page__toolbar .form-control {
+  width: 100%;
 }
 
 .groups-page__empty {
@@ -49,5 +54,13 @@
   .groups-page__header {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .groups-page__header .btn {
+    width: 100%;
+  }
+
+  .groups-page__toolbar {
+    max-width: none;
   }
 }

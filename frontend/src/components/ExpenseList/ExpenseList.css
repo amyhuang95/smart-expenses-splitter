@@ -28,6 +28,7 @@
 
 .expense-list__actions {
   display: flex;
+  flex-wrap: wrap;
   gap: 0.5rem;
   margin-top: 0.75rem;
 }
@@ -51,8 +52,30 @@
 }
 
 @media (max-width: 767px) {
+  .expense-list__item {
+    flex-direction: column;
+  }
+
+  .expense-list__title-row {
+    flex-wrap: wrap;
+  }
+
+  .expense-list__item > strong {
+    align-self: flex-start;
+  }
+
+  .expense-list__actions .btn {
+    flex: 1 1 8rem;
+  }
+
   .expense-list__footer {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .expense-list__pagination {
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
   }
 }

@@ -18,3 +18,14 @@
   color: #6c757d;
   font-size: 0.875rem;
 }
+
+@media (max-width: 767px) {
+  .member-list-modal__item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .member-list-modal__item .btn {
+    width: 100%;
+  }
+}

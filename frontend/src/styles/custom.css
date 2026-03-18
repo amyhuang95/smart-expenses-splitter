@@ -120,3 +120,19 @@
 .startup-page__settings-button:focus {
   color: #0d6efd;
 }
+
+@media (max-width: 767px) {
+  .modal-footer {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .modal-footer > * {
+    margin: 0;
+    width: 100%;
+  }
+
+  .modal-footer .btn {
+    width: 100%;
+  }
+}
