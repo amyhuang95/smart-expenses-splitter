@@ -22,6 +22,12 @@ export async function fetchGroupDetails(groupId) {
   });
 }
 
+export async function deleteGroup(groupId) {
+  return request(`/api/groups/${groupId}`, {
+    method: "DELETE",
+  });
+}
+
 export async function addGroupMember(groupId, email) {
   return request(`/api/groups/${groupId}/members`, {
     method: "POST",

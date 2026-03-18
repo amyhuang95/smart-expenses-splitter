@@ -6,7 +6,7 @@ import Card from "react-bootstrap/Card";
 import Col from "react-bootstrap/Col";
 import Row from "react-bootstrap/Row";
 import Spinner from "react-bootstrap/Spinner";
-import { Link, useParams } from "react-router";
+import { Link, useNavigate, useParams } from "react-router";
 import AddExpenseForm from "../../components/AddExpenseForm/AddExpenseForm.jsx";
 import AddMemberForm from "../../components/AddMemberForm/AddMemberForm.jsx";
 import BalanceSummary from "../../components/BalanceSummary/BalanceSummary.jsx";
@@ -15,6 +15,7 @@ import { useUser } from "../../context/useUser.js";
 import {
   addGroupMember,
   createGroupExpense,
+  deleteGroup,
   fetchGroupDetails,
   markDebtAsPaid,
   removeGroupMember,
@@ -29,10 +30,12 @@ const ACTION = {
   MEMBER: "member",
   SETTLE: "settle",
   MARK_PAID: "markPaid",
+  DELETE: "delete",
 };
 
 export default function GroupDetailsPage() {
   const { groupId } = useParams();
+  const navigate = useNavigate();
   const { user } = useUser();
   const [groupData, setGroupData] = useState(null);
   const [error, setError] = useState("");
@@ -115,6 +118,31 @@ export default function GroupDetailsPage() {
     }
 
     await runAction(ACTION.SETTLE, () => settleGroup(groupData.group._id));
+  }
+
+  async function handleDeleteGroup() {
+    const didConfirm = window.confirm(
+      `Delete "${groupData.group.name}"? This will permanently remove the group and all of its shared expenses.`,
+    );
+
+    if (!didConfirm) {
+      return;
+    }
+
+    try {
+      setWorkingActions((prev) => new Set(prev).add(ACTION.DELETE));
+      setError("");
+      await deleteGroup(groupData.group._id);
+      navigate("/groups");
+    } catch (actionError) {
+      setError(actionError.message);
+    } finally {
+      setWorkingActions((prev) => {
+        const next = new Set(prev);
+        next.delete(ACTION.DELETE);
+        return next;
+      });
+    }
   }
 
   if (isLoading) {
@@ -201,6 +229,16 @@ export default function GroupDetailsPage() {
                   variant="outline-dark"
                 >
                   {isWorking(ACTION.SETTLE) ? "Settling…" : "Settle Up"}
+                </Button>
+              ) : null}
+              {isOwner ? (
+                <Button
+                  disabled={isWorking(ACTION.DELETE)}
+                  onClick={handleDeleteGroup}
+                  type="button"
+                  variant="outline-danger"
+                >
+                  {isWorking(ACTION.DELETE) ? "Deleting..." : "Delete Group"}
                 </Button>
               ) : null}
             </div>

@@ -97,6 +97,12 @@ export async function findExpenseById(expenseId) {
   return expense;
 }
 
+export async function deleteGroupExpensesByGroupId(groupId) {
+  logger.debug("[groupExpenses] deleteMany by groupId", { groupId });
+  await getGroupExpensesCollection().deleteMany({ groupId });
+  logger.debug("[groupExpenses] deleteMany by groupId OK", { groupId });
+}
+
 export async function updateGroupExpense(
   expenseId,
   { name, description, amount, category, splitBetween },

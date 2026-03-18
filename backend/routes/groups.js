@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   addMemberToGroup,
   createGroup,
+  deleteGroupAndExpenses,
   deleteGroupById,
   findGroupById,
   listGroupSummariesByMember,
@@ -249,6 +250,35 @@ router.get("/:groupId", async (req, res, next) => {
 
     const payload = await buildGroupPayload(group, req.currentUser._id);
     res.json(payload);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Only the owner can delete a group. This removes both the group document and
+// its expense ledger, then clears the reverse-reference from each member.
+router.delete("/:groupId", async (req, res, next) => {
+  try {
+    const group = await findGroupById(req.params.groupId);
+
+    if (!group || !isGroupMember(group, req.currentUser._id)) {
+      res.status(404).json({ error: "Group not found." });
+      return;
+    }
+
+    if (!isGroupOwner(group, req.currentUser._id)) {
+      res
+        .status(403)
+        .json({ error: "Only the group owner can delete groups." });
+      return;
+    }
+
+    await deleteGroupAndExpenses(req.params.groupId);
+    // The group is already gone at this point, so if this reverse-reference
+    // cleanup fails it requires manual reconciliation rather than a rollback.
+    await removeGroupFromUsers(group.memberIds ?? [], req.params.groupId);
+
+    res.status(204).end();
   } catch (error) {
     next(error);
   }

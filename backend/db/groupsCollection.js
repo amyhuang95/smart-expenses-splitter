@@ -1,5 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getDB } from "./connection.js";
+import { deleteGroupExpensesByGroupId } from "./groupExpensesCollection.js";
 import { logger } from "../utils/logger.js";
 
 const GROUPS_COLLECTION = "groups";
@@ -76,6 +77,15 @@ export async function deleteGroupById(groupId) {
     _id: ObjectId.createFromHexString(groupId.toString()),
   });
   logger.debug("[groups] deleteOne OK", { groupId });
+}
+
+export async function deleteGroupAndExpenses(groupId) {
+  logger.debug("[groups] deleteGroupAndExpenses start", { groupId });
+  await Promise.all([
+    deleteGroupById(groupId),
+    deleteGroupExpensesByGroupId(groupId),
+  ]);
+  logger.debug("[groups] deleteGroupAndExpenses OK", { groupId });
 }
 
 export async function listGroupsByMember(userId) {
