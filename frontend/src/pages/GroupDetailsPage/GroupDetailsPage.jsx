@@ -196,9 +196,10 @@ export default function GroupDetailsPage() {
     ? "Edit Shared Expense"
     : "Add Shared Expense";
   const expenseSubmitLabel = editingExpense ? "Save Changes" : "Save Expense";
-  const previewMembers = group.members.slice(0, MEMBER_PREVIEW_LIMIT);
+  const members = group.members ?? [];
+  const previewMembers = members.slice(0, MEMBER_PREVIEW_LIMIT);
   const hiddenMemberCount = Math.max(
-    group.members.length - MEMBER_PREVIEW_LIMIT,
+    members.length - MEMBER_PREVIEW_LIMIT,
     0,
   );
 
@@ -349,7 +350,7 @@ export default function GroupDetailsPage() {
         isOpen={isExpenseOpen}
         initialValues={editingExpense}
         isSubmitting={isWorking(ACTION.EXPENSE)}
-        members={group.members}
+        members={members}
         onClose={() => {
           setEditingExpense(null);
           setIsExpenseOpen(false);
@@ -388,7 +389,7 @@ export default function GroupDetailsPage() {
         isOpen={isMembersOpen}
         isOwner={isOwner && group.status === "open"}
         isSubmitting={isAnyWorking}
-        members={group.members}
+        members={members}
         onClose={() => setIsMembersOpen(false)}
         onRemoveMember={handleRemoveMember}
         ownerId={group.ownerId}
