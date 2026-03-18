@@ -23,7 +23,6 @@ router.post("/", async (req, res) => {
       });
     }
 
-    // Auto-calculate equal split
     const parsedAmount = parseFloat(amount);
     const share =
       Math.round((parsedAmount / splitBetween.length) * 100) / 100;
@@ -31,7 +30,7 @@ router.post("/", async (req, res) => {
     const paidStatus = {};
     splitBetween.forEach((userId) => {
       splitDetails[userId] = share;
-      paidStatus[userId] = userId === paidBy; // payer is auto-paid
+      paidStatus[userId] = userId === paidBy;
     });
 
     const newExpense = {
@@ -83,6 +82,66 @@ router.get("/", async (req, res) => {
     res.status(500).json({ error: "Failed to fetch expenses" });
   }
 });
+
+router.get("/stats", async (req, res) => {
+  try {
+    const col = getExpensesCollection();
+    const { user } = req.query;
+    if (!user) {
+      return res.status(400).json({ error: "user query required" });
+    }
+
+    const expenses = await col.find({ splitBetween: user }).toArray();
+
+    const totalSpending = expenses.reduce((sum, e) => sum + e.amount, 0);
+    const avgExpense =
+      expenses.length > 0 ? totalSpending / expenses.length : 0;
+    const biggestExpense =
+      expenses.length > 0
+        ? expenses.reduce((max, e) => (e.amount > max.amount ? e : max))
+        : null;
+
+    const categoryBreakdown = {};
+    expenses.forEach((e) => {
+      categoryBreakdown[e.category] =
+        (categoryBreakdown[e.category] || 0) + e.amount;
+    });
+
+    // Calculate what user owes and is owed
+    let youOwe = 0;
+    let owedToYou = 0;
+    expenses.forEach((e) => {
+      if (e.settled) return;
+      const myShare = e.splitDetails?.[user] || 0;
+      if (e.paidBy === user) {
+        e.splitBetween.forEach((p) => {
+          if (p !== user && !e.paidStatus?.[p]) {
+            owedToYou += e.splitDetails?.[p] || 0;
+          }
+        });
+      } else {
+        if (!e.paidStatus?.[user]) {
+          youOwe += myShare;
+        }
+      }
+    });
+
+    res.json({
+      totalSpending,
+      avgExpense: Math.round(avgExpense * 100) / 100,
+      biggestExpense,
+      expenseCount: expenses.length,
+      categoryBreakdown,
+      youOwe: Math.round(youOwe * 100) / 100,
+      owedToYou: Math.round(owedToYou * 100) / 100,
+    });
+  } catch (err) {
+    console.error("Error fetching stats:", err);
+    res.status(500).json({ error: "Failed to fetch stats" });
+  }
+});
+
+// ══════════════════════════════════════════════════
 
 // ── READ ONE ──
 router.get("/:id", async (req, res) => {
