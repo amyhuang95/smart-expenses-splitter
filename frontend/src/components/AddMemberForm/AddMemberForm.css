@@ -1,0 +1,13 @@
+.add-member-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.add-member-form__body {
+  display: grid;
+  gap: 1rem;
+}
+
+.add-member-form .alert {
+  margin-bottom: 0;
+}

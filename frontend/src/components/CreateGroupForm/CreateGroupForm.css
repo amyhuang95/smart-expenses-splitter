@@ -1,0 +1,8 @@
+.create-group-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.create-group-form__textarea {
+  min-height: 7rem;
+}

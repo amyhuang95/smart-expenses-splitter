@@ -1,31 +1,8 @@
-/*
- * Frontend service functions for user authentication and session management.
- **/
+import { request } from "./api.js";
 
-async function readJsonResponse(response) {
-  const text = await response.text();
-  return text ? JSON.parse(text) : null;
-}
-
-// Helper function to make API requests with proper error handling and JSON parsing.
-async function request(path, options = {}) {
-  const response = await fetch(path, {
-    credentials: "include",
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-    ...options,
-  });
-
-  const data = await readJsonResponse(response);
-
-  if (!response.ok) {
-    throw new Error(data?.error || "Request failed.");
-  }
-
-  return data;
-}
+/**
+ * Auth service for handling user authentication and session management.
+ */
 
 export async function fetchCurrentUser() {
   const data = await request("/api/users/me", {

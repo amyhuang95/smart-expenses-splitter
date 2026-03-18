@@ -1,4 +1,6 @@
+import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
+import { Link } from "react-router";
 import { useUser } from "../../context/useUser.js";
 
 export default function HomePage() {
@@ -12,9 +14,12 @@ export default function HomePage() {
           Welcome back{user?.name ? `, ${user.name}` : ""}.
         </h1>
         <p className="startup-page__auth-copy">
-          Your auth flow is connected. The next step is replacing this
-          placeholder with the post-login homepage and group list.
+          Your group workspace is ready. Open the dashboard to create a group,
+          log shared expenses, and settle balances.
         </p>
+        <Button as={Link} to="/groups" type="button" variant="dark">
+          Open Group Dashboard
+        </Button>
       </Card.Body>
     </Card>
   );

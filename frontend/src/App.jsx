@@ -3,6 +3,8 @@ import { BrowserRouter, Navigate, Route, Routes } from "react-router";
 import { UserProvider } from "./context/UserProvider.jsx";
 import { useUser } from "./context/useUser.js";
 import AppLayout from "./layouts/AppLayout.jsx";
+import GroupDetailsPage from "./pages/GroupDetailsPage/GroupDetailsPage.jsx";
+import GroupsPage from "./pages/GroupsPage/GroupsPage.jsx";
 import HomePage from "./pages/HomePage/HomePage.jsx";
 import IndexPage from "./pages/IndexPage/IndexPage.jsx";
 
@@ -25,11 +27,10 @@ function AppRoutes() {
         path="/"
         element={isAuthenticated ? <Navigate to="/home" /> : <IndexPage />}
       />
-      <Route
-        element={isAuthenticated ? <AppLayout /> : <Navigate to="/" />}
-      >
+      <Route element={isAuthenticated ? <AppLayout /> : <Navigate to="/" />}>
         <Route path="/home" element={<HomePage />} />
-        <Route path="/groups" element={<HomePage />} />
+        <Route path="/groups" element={<GroupsPage />} />
+        <Route path="/groups/:groupId" element={<GroupDetailsPage />} />
         <Route path="/single-expenses" element={<HomePage />} />
       </Route>
     </Routes>

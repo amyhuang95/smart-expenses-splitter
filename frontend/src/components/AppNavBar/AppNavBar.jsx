@@ -1,9 +1,11 @@
+import PropTypes from "prop-types";
 import Navbar from "react-bootstrap/Navbar";
+import { Link } from "react-router";
 
 export default function AppNavBar({ children }) {
   return (
     <Navbar expand="md" className="startup-page__topbar">
-      <Navbar.Brand href="/" className="startup-page__brand">
+      <Navbar.Brand as={Link} to="/" className="startup-page__brand">
         <span className="startup-page__brand-mark" aria-hidden="true">
           $
         </span>
@@ -18,3 +20,7 @@ export default function AppNavBar({ children }) {
     </Navbar>
   );
 }
+
+AppNavBar.propTypes = {
+  children: PropTypes.node,
+};

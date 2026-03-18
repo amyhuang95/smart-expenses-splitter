@@ -1,0 +1,22 @@
+.balance-summary {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.balance-summary__item {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.balance-summary__actions {
+  align-items: center;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.balance-summary__meta {
+  color: #6c757d;
+  margin-top: 0.25rem;
+}

@@ -1,0 +1,31 @@
+.expense-list {
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.expense-list__item {
+  align-items: flex-start;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.expense-list__title-row {
+  align-items: center;
+  display: flex;
+  gap: 0.5rem;
+}
+
+.expense-list__meta {
+  color: #6c757d;
+  font-size: 0.9rem;
+  margin-top: 0.35rem;
+}
+
+.expense-list__description {
+  margin-top: 0.5rem;
+}
+
+.expense-list__actions {
+  margin-top: 0.75rem;
+}

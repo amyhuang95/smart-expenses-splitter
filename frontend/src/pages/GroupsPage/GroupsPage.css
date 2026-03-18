@@ -1,0 +1,53 @@
+.groups-page {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.groups-page__header {
+  align-items: flex-end;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.groups-page__eyebrow {
+  color: #6c757d;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+}
+
+.groups-page__title {
+  font-size: clamp(2rem, 4vw, 3rem);
+  margin-bottom: 0.5rem;
+}
+
+.groups-page__copy {
+  color: #6c757d;
+  margin: 0;
+  max-width: 48rem;
+}
+
+.groups-page__toolbar {
+  max-width: 26rem;
+}
+
+.groups-page__empty {
+  align-items: center;
+  border: 1px dashed rgba(33, 37, 41, 0.15);
+  border-radius: 1rem;
+  display: grid;
+  justify-items: center;
+  min-height: 16rem;
+  padding: 2rem;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .groups-page__header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+}

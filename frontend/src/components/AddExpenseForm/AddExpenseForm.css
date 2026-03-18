@@ -1,0 +1,22 @@
+.add-expense-form {
+  display: grid;
+  gap: 1rem;
+}
+
+.add-expense-form__split {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.add-expense-form__members {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.add-expense-form__check {
+  border: 1px solid rgba(33, 37, 41, 0.12);
+  border-radius: 0.75rem;
+  padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+}
