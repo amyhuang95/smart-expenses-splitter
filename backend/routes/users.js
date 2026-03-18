@@ -117,4 +117,29 @@ router.post("/logout", requireAuth, (req, res, next) => {
   });
 });
 
+// Search users by name
+router.get("/search", async (req, res, next) => {
+  try {
+    const { q } = req.query;
+    if (!q || q.trim().length === 0) {
+      res.json([]);
+      return;
+    }
+
+    const db = (await import("../db/connection.js")).getDB();
+    const users = await db
+      .collection("users")
+      .find(
+        { name: { $regex: q.trim(), $options: "i" } },
+        { projection: { passwordHash: 0 } },
+      )
+      .limit(10)
+      .toArray();
+
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

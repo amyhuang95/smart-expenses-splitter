@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
-import PropTypes from "prop-types";
+import { useUser } from "../../context/useUser.js";
 import QuickStats from "../../components/QuickStats/QuickStats.jsx";
 import ExpenseFilter from "../../components/ExpenseFilter/ExpenseFilter.jsx";
 import ExpenseCard from "../../components/ExpenseCard/ExpenseCard.jsx";
 import ExpenseForm from "../../components/ExpenseForm/ExpenseForm.jsx";
-import BalanceSummary from "../../components/BalanceSummary/BalanceSummary.jsx";
+import PersonalBalanceSummary from "../../components/PersonalBalanceSummary/PersonalBalanceSummary.jsx";
 import SpendingChart from "../../components/SpendingChart/SpendingChart.jsx";
 import {
   fetchExpenses,
@@ -16,14 +16,16 @@ import {
   deleteExpense,
 } from "../../services/expenses.js";
 
-export default function MyExpenses({ user }) {
+
+export default function MyExpenses() {
+  const { user } = useUser();
   const [expenses, setExpenses] = useState([]);
   const [stats, setStats] = useState(null);
   const [balances, setBalances] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editingExpense, setEditingExpense] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
     category: "all",
     paidBy: "all",
@@ -31,38 +33,40 @@ export default function MyExpenses({ user }) {
     sortOrder: "desc",
   });
 
-  const currentUser = user.name || user.displayName;
+  const userName = user?.name;
 
-  // Fetch all data
   const loadExpenses = useCallback(async () => {
+    if (!userName) return;
     try {
       setLoading(true);
-      const data = await fetchExpenses(currentUser, filters);
+      const data = await fetchExpenses(userName, filters);
       setExpenses(data);
     } catch (err) {
       console.error("Error loading expenses:", err);
     } finally {
       setLoading(false);
     }
-  }, [currentUser, filters]);
+  }, [userName, filters]);
 
   const loadStats = useCallback(async () => {
+    if (!userName) return;
     try {
-      const data = await fetchExpenseStats(currentUser);
+      const data = await fetchExpenseStats(userName);
       setStats(data);
     } catch (err) {
       console.error("Error loading stats:", err);
     }
-  }, [currentUser]);
+  }, [userName]);
 
   const loadBalances = useCallback(async () => {
+    if (!userName) return;
     try {
-      const data = await fetchBalances(currentUser);
+      const data = await fetchBalances(userName);
       setBalances(data);
     } catch (err) {
       console.error("Error loading balances:", err);
     }
-  }, [currentUser]);
+  }, [userName]);
 
   const refreshAll = useCallback(() => {
     loadExpenses();
@@ -74,7 +78,7 @@ export default function MyExpenses({ user }) {
     refreshAll();
   }, [refreshAll]);
 
-  // CRUD handlers
+  // CREATE
   const handleCreate = async (data) => {
     try {
       await createExpense(data);
@@ -85,6 +89,7 @@ export default function MyExpenses({ user }) {
     }
   };
 
+  // UPDATE
   const handleUpdate = async (data) => {
     try {
       await updateExpense(editingExpense._id, data);
@@ -95,18 +100,20 @@ export default function MyExpenses({ user }) {
     }
   };
 
+  // MARK PAID
   const handleMarkPaid = async (expenseId) => {
     try {
-      await markExpensePaid(expenseId, currentUser);
+      await markExpensePaid(expenseId, userName);
       refreshAll();
     } catch (err) {
       console.error("Error marking paid:", err);
     }
   };
 
-  const handleDelete = async (expenseId) => {
+  // DELETE
+  const handleDelete = async (id) => {
     try {
-      await deleteExpense(expenseId);
+      await deleteExpense(id);
       setConfirmDelete(null);
       refreshAll();
     } catch (err) {
@@ -117,7 +124,11 @@ export default function MyExpenses({ user }) {
   // Collect all people from expenses for filter dropdown
   const allPeople = [
     ...new Set(expenses.flatMap((e) => e.splitBetween || [])),
-  ];
+  ].sort();
+
+  if (!userName) {
+    return <p className="text-center text-secondary py-5">Loading...</p>;
+  }
 
   return (
     <div>
@@ -135,29 +146,31 @@ export default function MyExpenses({ user }) {
       {/* Quick Stats */}
       {stats && <QuickStats stats={stats} />}
 
-      {/* Main layout */}
-      <div className="row g-4">
-        {/* Left column: Expense feed */}
-        <div className="col-lg-8">
-          <ExpenseFilter
-            filters={filters}
-            onFilterChange={setFilters}
-            people={allPeople}
-          />
+      {/* Filter */}
+      <ExpenseFilter
+        filters={filters}
+        onFilterChange={setFilters}
+        people={allPeople}
+      />
 
+      <div className="row g-4">
+        {/* Left: Expense List */}
+        <div className="col-lg-8">
           {loading ? (
             <p className="text-center text-secondary py-4">Loading...</p>
           ) : expenses.length === 0 ? (
             <div className="text-center text-secondary py-5">
-              <p className="fs-5 mb-2">No expenses yet</p>
-              <p className="small">Click &quot;+ New Expense&quot; to add your first split!</p>
+              <p className="mb-2">No expenses yet.</p>
+              <p className="small">
+                Click &quot;+ New Expense&quot; to add your first one!
+              </p>
             </div>
           ) : (
             expenses.map((exp) => (
               <ExpenseCard
                 key={exp._id}
                 expense={exp}
-                currentUser={currentUser}
+                currentUser={userName}
                 onEdit={() => setEditingExpense(exp)}
                 onDelete={() => setConfirmDelete(exp)}
                 onMarkPaid={() => handleMarkPaid(exp._id)}
@@ -166,9 +179,9 @@ export default function MyExpenses({ user }) {
           )}
         </div>
 
-        {/* Right column: Balance + Chart */}
+        {/* Right: Sidebar */}
         <div className="col-lg-4">
-          <BalanceSummary balances={balances} />
+          <PersonalBalanceSummary balances={balances} />
           {stats && stats.categoryBreakdown && (
             <div className="mt-3">
               <SpendingChart categoryBreakdown={stats.categoryBreakdown} />
@@ -188,12 +201,12 @@ export default function MyExpenses({ user }) {
         >
           <div
             className="bg-white rounded-3 p-4 shadow"
-            style={{ width: 500, maxHeight: "90vh", overflowY: "auto" }}
+            style={{ width: 480, maxHeight: "90vh", overflowY: "auto" }}
             onClick={(e) => e.stopPropagation()}
           >
             <ExpenseForm
               expense={editingExpense}
-              currentUser={currentUser}
+              currentUser={userName}
               onSubmit={editingExpense ? handleUpdate : handleCreate}
               onCancel={() => {
                 setShowForm(false);
@@ -240,11 +253,3 @@ export default function MyExpenses({ user }) {
     </div>
   );
 }
-
-MyExpenses.propTypes = {
-  user: PropTypes.shape({
-    _id: PropTypes.string,
-    name: PropTypes.string,
-    displayName: PropTypes.string,
-  }).isRequired,
-};

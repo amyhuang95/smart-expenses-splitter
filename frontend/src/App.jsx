@@ -7,6 +7,7 @@ import GroupDetailsPage from "./pages/GroupDetailsPage/GroupDetailsPage.jsx";
 import GroupsPage from "./pages/GroupsPage/GroupsPage.jsx";
 import HomePage from "./pages/HomePage/HomePage.jsx";
 import IndexPage from "./pages/IndexPage/IndexPage.jsx";
+import MyExpenses from "./pages/MyExpenses/MyExpenses.jsx";
 import "./pages/IndexPage/IndexPage.css";
 
 function AppRoutes() {
@@ -32,7 +33,7 @@ function AppRoutes() {
         <Route path="/home" element={<HomePage />} />
         <Route path="/groups" element={<GroupsPage />} />
         <Route path="/groups/:groupId" element={<GroupDetailsPage />} />
-        <Route path="/single-expenses" element={<HomePage />} />
+        <Route path="/single-expenses" element={<MyExpenses />} />
       </Route>
     </Routes>
   );
