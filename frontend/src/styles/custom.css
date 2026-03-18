@@ -94,17 +94,28 @@
 
 .startup-page__nav {
   align-items: center;
-  gap: 0.25rem;
+  gap: 1.5rem;
 }
 
 .startup-page__nav-link {
-  color: inherit;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  color: #6c757d;
   font-weight: 500;
+  padding-bottom: 0.2rem;
+  text-decoration: none;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 
 .startup-page__nav-link:hover,
 .startup-page__nav-link:focus {
-  color: #0d6efd;
+  color: #212529;
+}
+
+.startup-page__nav-link.active {
+  border-bottom-color: #212529;
+  color: #212529;
+  font-weight: 600;
 }
 
 .startup-page__settings-button {

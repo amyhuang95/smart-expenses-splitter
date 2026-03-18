@@ -38,6 +38,7 @@
 .balance-summary__list {
   max-height: 28rem;
   overflow-y: auto;
+  border-top: 1px solid rgba(0, 0, 0, 0.125);
 }
 
 .balance-summary__item {

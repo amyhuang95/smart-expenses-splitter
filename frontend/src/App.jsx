@@ -7,6 +7,7 @@ import GroupDetailsPage from "./pages/GroupDetailsPage/GroupDetailsPage.jsx";
 import GroupsPage from "./pages/GroupsPage/GroupsPage.jsx";
 import HomePage from "./pages/HomePage/HomePage.jsx";
 import IndexPage from "./pages/IndexPage/IndexPage.jsx";
+import "./pages/IndexPage/IndexPage.css";
 
 function AppRoutes() {
   const { isAuthenticated, isLoadingUser } = useUser();

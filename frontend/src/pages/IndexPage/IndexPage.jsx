@@ -3,7 +3,6 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import AppNavBar from "../../components/AppNavBar/AppNavBar";
 import AuthForm from "../../components/AuthForm/AuthForm";
-import "./IndexPage.css";
 
 export default function IndexPage() {
   return (

@@ -29,6 +29,7 @@ export default function BalanceSummary({
   currentUserId,
   debts,
   groupStatus,
+  groupOwnerId,
   isSubmitting,
   onMarkPaid,
 }) {
@@ -81,7 +82,9 @@ export default function BalanceSummary({
             filteredDebts.map((debt) => {
               const canMarkPaid =
                 !debt.isPaid &&
-                currentUserId === debt.senderId &&
+                (currentUserId === debt.senderId ||
+                  currentUserId === debt.receiverId ||
+                  currentUserId === groupOwnerId) &&
                 groupStatus !== "open";
 
               return (
@@ -90,7 +93,7 @@ export default function BalanceSummary({
                   className="balance-summary__item"
                 >
                   <div>
-                    <strong>{debt.sender?.name ?? "Member"}</strong> owes{" "}
+                    <strong>{debt.sender?.name ?? "Member"}</strong> →{" "}
                     <strong>{debt.receiver?.name ?? "Member"}</strong>
                     <div className="balance-summary__meta">
                       {currency(debt.amount)}
@@ -142,6 +145,7 @@ BalanceSummary.propTypes = {
     }),
   ).isRequired,
   groupStatus: PropTypes.string.isRequired,
+  groupOwnerId: PropTypes.string.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
   onMarkPaid: PropTypes.func.isRequired,
 };

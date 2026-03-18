@@ -3,16 +3,65 @@
   gap: 1rem;
 }
 
+.add-expense-form__layout {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+}
+
+.add-expense-form__main,
+.add-expense-form__sidebar {
+  display: grid;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.add-expense-form__sidebar {
+  border-left: 1px solid rgba(33, 37, 41, 0.12);
+  padding-left: 1rem;
+}
+
 .add-expense-form__split {
   display: grid;
   gap: 1rem;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
 }
 
+.add-expense-form__fieldset {
+  border: 0;
+  margin: 0;
+  min-width: 0;
+  padding: 0;
+}
+
+.add-expense-form__fieldset-label {
+  margin-bottom: 0.5rem;
+}
+
+.add-expense-form__members-tools {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.add-expense-form__members-summary {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.add-expense-form__member-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
 .add-expense-form__members {
   display: grid;
   gap: 0.5rem;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  max-height: 16rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
 }
 
 .add-expense-form__check {
@@ -21,10 +70,26 @@
   padding: 0.75rem 0.75rem 0.75rem 2.5rem;
 }
 
+.add-expense-form__empty {
+  color: #6c757d;
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
 @media (max-width: 767px) {
+  .add-expense-form__layout,
   .add-expense-form__split,
   .add-expense-form__members {
     grid-template-columns: 1fr;
+  }
+
+  .add-expense-form__sidebar {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .add-expense-form__member-actions .btn {
+    flex: 1 1 10rem;
   }
 
   .add-expense-form__check {

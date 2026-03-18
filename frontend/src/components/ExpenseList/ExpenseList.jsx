@@ -9,6 +9,8 @@ import { currency, formatDate } from "../../utils/format.js";
 import "./ExpenseList.css";
 
 const PAGE_SIZE = 5;
+const SPLIT_MEMBER_PREVIEW_LIMIT = 6;
+const CATEGORY_FILTER_ALL = "all";
 
 export default function ExpenseList({
   currentUserId,
@@ -18,50 +20,90 @@ export default function ExpenseList({
   onDelete,
   onEdit,
 }) {
+  const [categoryFilter, setCategoryFilter] = useState(CATEGORY_FILTER_ALL);
   const [currentPage, setCurrentPage] = useState(1);
-  const totalPages = Math.max(Math.ceil(expenses.length / PAGE_SIZE), 1);
+  const categoryOptions = [
+    CATEGORY_FILTER_ALL,
+    ...new Set(expenses.map((expense) => expense.category)),
+  ];
+  const filteredExpenses =
+    categoryFilter === CATEGORY_FILTER_ALL
+      ? expenses
+      : expenses.filter((expense) => expense.category === categoryFilter);
+  const totalPages = Math.max(Math.ceil(filteredExpenses.length / PAGE_SIZE), 1);
   const safeCurrentPage = Math.min(currentPage, totalPages);
   const visibleStart = (safeCurrentPage - 1) * PAGE_SIZE;
-  const visibleExpenses = expenses.slice(
+  const visibleExpenses = filteredExpenses.slice(
     visibleStart,
     visibleStart + PAGE_SIZE,
   );
-  const visibleRangeStart = expenses.length ? visibleStart + 1 : 0;
-  const visibleRangeEnd = Math.min(visibleStart + PAGE_SIZE, expenses.length);
+  const visibleRangeStart = filteredExpenses.length ? visibleStart + 1 : 0;
+  const visibleRangeEnd = Math.min(
+    visibleStart + PAGE_SIZE,
+    filteredExpenses.length,
+  );
+
+  function formatSplitMembers(members) {
+    if (members.length <= SPLIT_MEMBER_PREVIEW_LIMIT) {
+      return members.map((member) => member.name).join(", ");
+    }
+
+    const visibleMembers = members
+      .slice(0, SPLIT_MEMBER_PREVIEW_LIMIT)
+      .map((member) => member.name)
+      .join(", ");
+    const hiddenMemberCount = members.length - SPLIT_MEMBER_PREVIEW_LIMIT;
+    const hiddenMemberLabel = hiddenMemberCount === 1 ? "person" : "people";
+
+    return `${visibleMembers}, and ${hiddenMemberCount} ${hiddenMemberLabel}`;
+  }
+
+  function formatCategoryLabel(category) {
+    return category.charAt(0).toUpperCase() + category.slice(1);
+  }
 
   return (
     <Card className="expense-list">
       <Card.Body>
         <Card.Title>Expense Activity ({expenses.length})</Card.Title>
-        <Card.Text className="text-muted">
-          Recent shared expenses for the group.
-        </Card.Text>
+        <div aria-label="Filter expenses by category" className="expense-list__filter" role="group">
+          {categoryOptions.map((category) => (
+            <button
+              aria-pressed={categoryFilter === category}
+              className={`expense-list__filter-tag${
+                categoryFilter === category
+                  ? " expense-list__filter-tag--active"
+                  : ""
+              }`}
+              key={category}
+              onClick={() => {
+                setCategoryFilter(category);
+                setCurrentPage(1);
+              }}
+              type="button"
+            >
+              {category === CATEGORY_FILTER_ALL ? "All" : category}
+            </button>
+          ))}
+        </div>
       </Card.Body>
       <ListGroup variant="flush">
-        {expenses.length ? (
+        {filteredExpenses.length ? (
           visibleExpenses.map((expense) => (
             <ListGroup.Item key={expense._id} className="expense-list__item">
               <div>
                 <div className="expense-list__title-row">
                   <strong>{expense.name}</strong>
                   <Badge bg="light" text="dark">
-                    {expense.category}
+                    {formatCategoryLabel(expense.category)}
                   </Badge>
                 </div>
                 <div className="expense-list__meta">
                   Paid by {expense.paidByUser?.name ?? "Member"} on{" "}
                   {formatDate(expense.dateCreated)}
                 </div>
-                {expense.description ? (
-                  <div className="expense-list__description">
-                    {expense.description}
-                  </div>
-                ) : null}
                 <div className="expense-list__meta">
-                  Split with{" "}
-                  {expense.splitBetweenUsers
-                    .map((member) => member.name)
-                    .join(", ")}
+                  Split with {formatSplitMembers(expense.splitBetweenUsers)}
                 </div>
                 {groupStatus === "open" &&
                 (expense.paidBy === currentUserId ||
@@ -90,13 +132,18 @@ export default function ExpenseList({
             </ListGroup.Item>
           ))
         ) : (
-          <ListGroup.Item>No expenses have been added yet.</ListGroup.Item>
+          <ListGroup.Item>
+            {categoryFilter === CATEGORY_FILTER_ALL
+              ? "No expenses have been added yet."
+              : `No ${categoryFilter} expenses found.`}
+          </ListGroup.Item>
         )}
       </ListGroup>
-      {expenses.length ? (
+      {filteredExpenses.length ? (
         <Card.Footer className="expense-list__footer">
           <div className="expense-list__summary">
-            Showing {visibleRangeStart}-{visibleRangeEnd} of {expenses.length}
+            Showing {visibleRangeStart}-{visibleRangeEnd} of{" "}
+            {filteredExpenses.length}
           </div>
           {totalPages > 1 ? (
             <Pagination className="expense-list__pagination">

@@ -207,7 +207,7 @@ export default function GroupDetailsPage() {
     <section className="group-details-page">
       <div className="group-details-page__backlink">
         <Button as={Link} to="/groups" type="button" variant="link">
-          Back to groups
+          ← Back To Groups
         </Button>
       </div>
 
@@ -215,19 +215,21 @@ export default function GroupDetailsPage() {
         <Card.Body>
           <div className="group-details-page__hero-top">
             <div>
-              <p className="groups-page__eyebrow">Group Detail</p>
-              <Badge
-                bg={
-                  group.status === "settled"
-                    ? "success"
-                    : group.status === "settling"
-                      ? "warning"
-                      : "primary"
-                }
-              >
-                {group.status}
-              </Badge>
-              <h1>{group.name}</h1>
+              <p className="group-details-page__eyebrow">Group Details</p>
+              <div className="group-details-page__title-row">
+                <h1>{group.name}</h1>
+                <Badge
+                  bg={
+                    group.status === "settled"
+                      ? "success"
+                      : group.status === "settling"
+                        ? "warning"
+                        : "primary"
+                  }
+                >
+                  {group.status}
+                </Badge>
+              </div>
             </div>
             <div className="group-details-page__hero-actions">
               <Button
@@ -317,7 +319,7 @@ export default function GroupDetailsPage() {
       {error ? <Alert variant="danger">{error}</Alert> : null}
 
       <Row className="g-4">
-        <Col lg={8}>
+        <Col lg={7}>
           <ExpenseList
             currentUserId={user._id}
             expenses={expenses}
@@ -330,11 +332,12 @@ export default function GroupDetailsPage() {
             }}
           />
         </Col>
-        <Col lg={4}>
+        <Col lg={5}>
           <BalanceSummary
             currentUserId={user._id}
             debts={debts}
             groupStatus={group.status}
+            groupOwnerId={group.ownerId}
             isSubmitting={isWorking(ACTION.MARK_PAID)}
             onMarkPaid={(debtId) =>
               runAction(ACTION.MARK_PAID, () =>

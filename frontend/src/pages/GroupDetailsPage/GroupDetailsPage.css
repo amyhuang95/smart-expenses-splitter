@@ -21,6 +21,26 @@
   justify-content: space-between;
 }
 
+.group-details-page__eyebrow {
+  color: #6c757d;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.25rem;
+  text-transform: uppercase;
+}
+
+.group-details-page__title-row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.group-details-page__title-row h1 {
+  margin-bottom: 0;
+}
+
 .group-details-page__hero-actions {
   align-items: center;
   display: flex;
@@ -49,6 +69,7 @@
 .group-details-page__members-section {
   display: grid;
   gap: 0.5rem;
+  margin-top: 1rem;
 }
 
 .group-details-page__members-more {
@@ -75,6 +96,10 @@
 @media (max-width: 767px) {
   .group-details-page__hero-top {
     flex-direction: column;
+  }
+
+  .group-details-page__title-row {
+    align-items: flex-start;
   }
 
   .group-details-page__hero-actions {
