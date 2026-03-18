@@ -1,7 +1,6 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 import Badge from "react-bootstrap/Badge";
-import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
 
@@ -97,19 +96,19 @@ export default function BalanceSummary({
                     </div>
                   </div>
                   <div className="d-flex align-items-center gap-3">
-                    <Badge bg={debt.isPaid ? "success" : "warning"}>
-                      {debt.isPaid ? "Paid" : "Pending"}
-                    </Badge>
+                    {debt.isPaid ? (
+                      <Badge bg="success">Paid</Badge>
+                    ) : null}
                     {canMarkPaid ? (
-                      <Button
+                      <button
+                        className="btn btn-outline-success btn-sm py-0 px-2 ms-1"
                         disabled={isSubmitting}
                         onClick={() => onMarkPaid(debt.debtId)}
-                        size="sm"
+                        style={{ fontSize: "0.7rem", whiteSpace: "nowrap" }}
                         type="button"
-                        variant="outline-dark"
                       >
                         Mark Paid
-                      </Button>
+                      </button>
                     ) : null}
                   </div>
                 </ListGroup.Item>

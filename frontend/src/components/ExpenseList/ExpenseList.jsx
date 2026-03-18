@@ -9,6 +9,7 @@ import { currency, formatDate } from "../../utils/format.js";
 const PAGE_SIZE = 5;
 const SPLIT_MEMBER_PREVIEW_LIMIT = 6;
 const CATEGORY_FILTER_ALL = "all";
+const CATEGORY_ORDER = ["food", "transport", "utilities", "entertainment", "other"];
 
 export default function ExpenseList({
   currentUserId,
@@ -22,7 +23,9 @@ export default function ExpenseList({
   const [currentPage, setCurrentPage] = useState(1);
   const categoryOptions = [
     CATEGORY_FILTER_ALL,
-    ...new Set(expenses.map((expense) => expense.category)),
+    ...CATEGORY_ORDER.filter((cat) =>
+      expenses.some((expense) => expense.category === cat)
+    ),
   ];
   const filteredExpenses =
     categoryFilter === CATEGORY_FILTER_ALL
@@ -86,7 +89,7 @@ export default function ExpenseList({
               }}
               type="button"
             >
-              {category === CATEGORY_FILTER_ALL ? "All" : category}
+              {category === CATEGORY_FILTER_ALL ? "All" : formatCategoryLabel(category)}
             </button>
           ))}
         </div>
