@@ -1,16 +1,15 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 import Badge from "react-bootstrap/Badge";
-import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
 import Pagination from "react-bootstrap/Pagination";
 import { currency, formatDate } from "../../utils/format.js";
-import "./ExpenseList.css";
 
 const PAGE_SIZE = 5;
 const SPLIT_MEMBER_PREVIEW_LIMIT = 6;
 const CATEGORY_FILTER_ALL = "all";
+const CATEGORY_ORDER = ["food", "transport", "utilities", "entertainment", "other"];
 
 export default function ExpenseList({
   currentUserId,
@@ -24,7 +23,9 @@ export default function ExpenseList({
   const [currentPage, setCurrentPage] = useState(1);
   const categoryOptions = [
     CATEGORY_FILTER_ALL,
-    ...new Set(expenses.map((expense) => expense.category)),
+    ...CATEGORY_ORDER.filter((cat) =>
+      expenses.some((expense) => expense.category === cat)
+    ),
   ];
   const filteredExpenses =
     categoryFilter === CATEGORY_FILTER_ALL
@@ -62,18 +63,24 @@ export default function ExpenseList({
     return category.charAt(0).toUpperCase() + category.slice(1);
   }
 
+  const canEdit = (expense) =>
+    groupStatus === "open" &&
+    (expense.paidBy === currentUserId || groupOwnerId === currentUserId);
+
   return (
-    <Card className="expense-list">
+    <Card className="rounded-4 overflow-hidden">
       <Card.Body>
         <Card.Title>Expense Activity ({expenses.length})</Card.Title>
-        <div aria-label="Filter expenses by category" className="expense-list__filter" role="group">
+        <div
+          aria-label="Filter expenses by category"
+          className="d-flex flex-wrap gap-2 mt-3"
+          role="group"
+        >
           {categoryOptions.map((category) => (
             <button
               aria-pressed={categoryFilter === category}
-              className={`expense-list__filter-tag${
-                categoryFilter === category
-                  ? " expense-list__filter-tag--active"
-                  : ""
+              className={`btn btn-sm rounded-pill ${
+                categoryFilter === category ? "btn-primary" : "btn-light"
               }`}
               key={category}
               onClick={() => {
@@ -82,7 +89,7 @@ export default function ExpenseList({
               }}
               type="button"
             >
-              {category === CATEGORY_FILTER_ALL ? "All" : category}
+              {category === CATEGORY_FILTER_ALL ? "All" : formatCategoryLabel(category)}
             </button>
           ))}
         </div>
@@ -90,45 +97,48 @@ export default function ExpenseList({
       <ListGroup variant="flush">
         {filteredExpenses.length ? (
           visibleExpenses.map((expense) => (
-            <ListGroup.Item key={expense._id} className="expense-list__item">
-              <div>
-                <div className="expense-list__title-row">
+            <ListGroup.Item
+              key={expense._id}
+              className="d-flex justify-content-between align-items-start gap-3"
+            >
+              <div className="flex-grow-1">
+                <div className="d-flex align-items-center gap-2">
                   <strong>{expense.name}</strong>
                   <Badge bg="light" text="dark">
                     {formatCategoryLabel(expense.category)}
                   </Badge>
                 </div>
-                <div className="expense-list__meta">
+                <div className="text-secondary small mt-1">
                   Paid by {expense.paidByUser?.name ?? "Member"} on{" "}
                   {formatDate(expense.dateCreated)}
                 </div>
-                <div className="expense-list__meta">
+                <div className="text-secondary small mt-1">
                   Split with {formatSplitMembers(expense.splitBetweenUsers)}
                 </div>
-                {groupStatus === "open" &&
-                (expense.paidBy === currentUserId ||
-                  groupOwnerId === currentUserId) ? (
-                  <div className="expense-list__actions">
-                    <Button
+              </div>
+              <div className="d-flex flex-column align-items-end gap-2 flex-shrink-0">
+                <strong>{currency(expense.amount)}</strong>
+                {canEdit(expense) ? (
+                  <div className="d-flex gap-1">
+                    <button
+                      className="btn btn-sm btn-outline-secondary py-0 px-2"
                       onClick={() => onEdit(expense)}
-                      size="sm"
+                      title="Edit"
                       type="button"
-                      variant="outline-dark"
                     >
-                      Edit
-                    </Button>
-                    <Button
+                      ✏️
+                    </button>
+                    <button
+                      className="btn btn-sm btn-outline-danger py-0 px-2"
                       onClick={() => onDelete(expense)}
-                      size="sm"
+                      title="Delete"
                       type="button"
-                      variant="outline-danger"
                     >
-                      Delete
-                    </Button>
+                      🗑️
+                    </button>
                   </div>
                 ) : null}
               </div>
-              <strong>{currency(expense.amount)}</strong>
             </ListGroup.Item>
           ))
         ) : (
@@ -140,13 +150,13 @@ export default function ExpenseList({
         )}
       </ListGroup>
       {filteredExpenses.length ? (
-        <Card.Footer className="expense-list__footer">
-          <div className="expense-list__summary">
+        <Card.Footer className="d-flex flex-wrap justify-content-between align-items-center gap-3 bg-transparent">
+          <div className="text-secondary small">
             Showing {visibleRangeStart}-{visibleRangeEnd} of{" "}
             {filteredExpenses.length}
           </div>
           {totalPages > 1 ? (
-            <Pagination className="expense-list__pagination">
+            <Pagination className="mb-0">
               <Pagination.Prev
                 disabled={safeCurrentPage === 1}
                 onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}

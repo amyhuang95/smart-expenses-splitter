@@ -9,10 +9,10 @@ import Spinner from "react-bootstrap/Spinner";
 import CreateGroupForm from "../../components/CreateGroupForm/CreateGroupForm.jsx";
 import GroupCard from "../../components/GroupCard/GroupCard.jsx";
 import { createGroup, fetchGroups } from "../../services/groups.js";
-import "./GroupsPage.css";
 
 const GROUPS_PER_PAGE = 9;
 const MAX_VISIBLE_PAGES = 5;
+const STATUS_FILTERS = ["all", "open", "settling", "settled"];
 
 export default function GroupsPage() {
   const [groups, setGroups] = useState([]);
@@ -22,6 +22,7 @@ export default function GroupsPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [query, setQuery] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
 
   useEffect(() => {
     let isMounted = true;
@@ -53,14 +54,12 @@ export default function GroupsPage() {
   const filteredGroups = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    if (!normalizedQuery) {
-      return groups;
-    }
-
-    return groups.filter((group) =>
-      group.name.toLowerCase().includes(normalizedQuery),
-    );
-  }, [groups, query]);
+    return groups.filter((group) => {
+      const matchesQuery = !normalizedQuery || group.name.toLowerCase().includes(normalizedQuery);
+      const matchesStatus = statusFilter === "all" || group.status === statusFilter;
+      return matchesQuery && matchesStatus;
+    });
+  }, [groups, query, statusFilter]);
 
   const totalPages = Math.max(
     1,
@@ -100,7 +99,7 @@ export default function GroupsPage() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [query]);
+  }, [query, statusFilter]);
 
   useEffect(() => {
     if (currentPage > totalPages) {
@@ -108,9 +107,6 @@ export default function GroupsPage() {
     }
   }, [currentPage, totalPages]);
 
-  // Errors are intentionally not caught here — they propagate up to
-  // CreateGroupForm's own catch block so they display inside the modal
-  // rather than on the page behind it.
   async function handleCreateGroup(payload) {
     try {
       setIsSubmitting(true);
@@ -130,8 +126,8 @@ export default function GroupsPage() {
   }
 
   return (
-    <section className="groups-page">
-      <div className="groups-page__toolbar">
+    <section className="d-grid gap-4">
+      <div className="d-flex flex-column flex-sm-row gap-3">
         <Form.Control
           aria-label="Search groups"
           onChange={(event) => setQuery(event.target.value)}
@@ -140,25 +136,41 @@ export default function GroupsPage() {
           value={query}
         />
         <Button
+          className="flex-shrink-0"
           onClick={() => setIsCreateOpen(true)}
           type="button"
-          variant="dark"
         >
-          Create Group
+          + Create Group
         </Button>
+      </div>
+
+      <div
+        aria-label="Filter groups by status"
+        className="d-flex flex-wrap gap-2"
+        role="group"
+      >
+        {STATUS_FILTERS.map((status) => (
+          <button
+            aria-pressed={statusFilter === status}
+            className={`btn btn-sm rounded-pill ${statusFilter === status ? "btn-dark" : "btn-light"}`}
+            key={status}
+            onClick={() => setStatusFilter(status)}
+            type="button"
+          >
+            {status.charAt(0).toUpperCase() + status.slice(1)}
+          </button>
+        ))}
       </div>
 
       {error ? <Alert variant="danger">{error}</Alert> : null}
 
       {isLoading ? (
-        <div className="groups-page__empty">
+        <div className="d-flex align-items-center justify-content-center" style={{ minHeight: "16rem" }}>
           <Spinner animation="border" role="status" variant="dark" />
         </div>
       ) : filteredGroups.length ? (
         <>
-          <div className="groups-page__results">
-            <p className="groups-page__results-label">{resultsLabel}</p>
-          </div>
+          <p className="text-secondary mb-0">{resultsLabel}</p>
 
           <Row className="g-4">
             {paginatedGroups.map((group) => (
@@ -169,7 +181,7 @@ export default function GroupsPage() {
           </Row>
 
           {totalPages > 1 ? (
-            <Pagination className="groups-page__pagination">
+            <Pagination className="justify-content-end mb-0">
               <Pagination.First
                 disabled={currentPage === 1}
                 onClick={() => setCurrentPage(1)}
@@ -205,13 +217,18 @@ export default function GroupsPage() {
           ) : null}
         </>
       ) : (
-        <div className="groups-page__empty">
-          <h2>{query.trim() ? "No matching groups" : "No groups yet"}</h2>
-          <p>
-            {query.trim()
-              ? "Try a different search term or create a new group."
-              : "Create your first group to start splitting expenses."}
-          </p>
+        <div
+          className="d-grid align-items-center justify-items-center text-center p-5 rounded-4"
+          style={{ minHeight: "16rem", border: "1px dashed rgba(33,37,41,0.15)" }}
+        >
+          <div>
+            <h2>{query.trim() || statusFilter !== "all" ? "No matching groups" : "No groups yet"}</h2>
+            <p className="text-secondary mb-0">
+              {query.trim() || statusFilter !== "all"
+                ? "Try a different search term or filter."
+                : "Create your first group to start splitting expenses."}
+            </p>
+          </div>
         </div>
       )}
 

@@ -6,12 +6,12 @@ export default function AppNavBar({ children }) {
   return (
     <Navbar expand="md" className="startup-page__topbar">
       <Navbar.Brand as={Link} to="/" className="startup-page__brand">
-        <span className="startup-page__brand-mark" aria-hidden="true">
+        <span className="startup-page__brand-mark bg-dark text-white" aria-hidden="true">
           $
         </span>
         <span>
           <span className="startup-page__brand-name">SplitEasy</span>
-          <span className="startup-page__brand-tagline">
+          <span className="startup-page__brand-tagline text-secondary">
             Split group expenses easily
           </span>
         </span>

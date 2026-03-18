@@ -55,7 +55,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1050;
+  z-index: 1060;
 }
 
 .member-tag {
@@ -76,6 +76,20 @@
   cursor: pointer;
   font-size: 1rem;
   padding: 0;
+}
+
+/* Dashed pill button used in GroupDetailsPage for overflow member count */
+.group-details-page__members-more {
+  background: rgba(33, 37, 41, 0.08);
+  border: 1px dashed rgba(33, 37, 41, 0.2);
+  border-radius: 999px;
+  color: #212529;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.75rem;
+}
+.group-details-page__members-more:hover,
+.group-details-page__members-more:focus {
+  background: rgba(33, 37, 41, 0.12);
 }
 
 .startup-page__topbar {

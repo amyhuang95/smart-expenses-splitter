@@ -1,5 +1,8 @@
 import PropTypes from "prop-types";
+import { useState } from "react";
+import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
+import Form from "react-bootstrap/Form";
 import ListGroup from "react-bootstrap/ListGroup";
 import Modal from "react-bootstrap/Modal";
 import "./MemberListModal.css";
@@ -10,12 +13,36 @@ export default function MemberListModal({
   isOwner,
   isSubmitting,
   members,
+  onAddMember,
   onClose,
   onRemoveMember,
   ownerId,
 }) {
+  const [email, setEmail] = useState("");
+  const [error, setError] = useState("");
+
+  function handleExited() {
+    setEmail("");
+    setError("");
+  }
+
+  async function handleAddMember(event) {
+    event.preventDefault();
+    if (!email.trim()) {
+      setError("Enter an email to add a member.");
+      return;
+    }
+    try {
+      setError("");
+      await onAddMember(email.trim());
+      setEmail("");
+    } catch (submitError) {
+      setError(submitError.message);
+    }
+  }
+
   return (
-    <Modal show={isOpen} onHide={onClose}>
+    <Modal show={isOpen} onExited={handleExited} onHide={onClose}>
       <Modal.Header closeButton>
         <Modal.Title>{groupName} Members</Modal.Title>
       </Modal.Header>
@@ -43,13 +70,33 @@ export default function MemberListModal({
                     type="button"
                     variant="outline-danger"
                   >
-                    Remove
+                    ❌
                   </Button>
                 ) : null}
               </ListGroup.Item>
             );
           })}
         </ListGroup>
+        {isOwner ? (
+          <Form className="mt-3" onSubmit={handleAddMember}>
+            {error ? <Alert variant="danger">{error}</Alert> : null}
+            <Form.Group controlId="member-list-add-email">
+              <Form.Label>Add a member by email</Form.Label>
+              <div className="d-flex gap-2">
+                <Form.Control
+                  disabled={isSubmitting}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  type="email"
+                  value={email}
+                />
+                <Button disabled={isSubmitting} type="submit" variant="dark">
+                  {isSubmitting ? "Adding..." : "Add"}
+                </Button>
+              </div>
+            </Form.Group>
+          </Form>
+        ) : null}
       </Modal.Body>
     </Modal>
   );
@@ -66,6 +113,7 @@ MemberListModal.propTypes = {
       name: PropTypes.string.isRequired,
     }),
   ).isRequired,
+  onAddMember: PropTypes.func.isRequired,
   onClose: PropTypes.func.isRequired,
   onRemoveMember: PropTypes.func.isRequired,
   ownerId: PropTypes.string.isRequired,

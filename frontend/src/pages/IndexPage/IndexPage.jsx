@@ -3,6 +3,7 @@ import Container from "react-bootstrap/Container";
 import Row from "react-bootstrap/Row";
 import AppNavBar from "../../components/AppNavBar/AppNavBar";
 import AuthForm from "../../components/AuthForm/AuthForm";
+import "./IndexPage.css";
 
 export default function IndexPage() {
   return (
@@ -13,7 +14,7 @@ export default function IndexPage() {
           <h1 className="startup-page__title">
             Track and settle every group expense in one place, easily.
           </h1>
-          <p className="startup-page__description">
+          <p className="startup-page__description text-secondary">
             SplitEasy keeps group spendings organized, and generates smart
             settlements so you don't have to make multiple payments in a group.
           </p>
