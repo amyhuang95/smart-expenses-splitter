@@ -11,6 +11,7 @@ export default function ExpenseList({
   expenses,
   groupOwnerId,
   groupStatus,
+  onDelete,
   onEdit,
 }) {
   return (
@@ -59,6 +60,14 @@ export default function ExpenseList({
                     >
                       Edit
                     </Button>
+                    <Button
+                      onClick={() => onDelete(expense)}
+                      size="sm"
+                      type="button"
+                      variant="outline-danger"
+                    >
+                      Delete
+                    </Button>
                   </div>
                 ) : null}
               </div>
@@ -97,5 +106,6 @@ ExpenseList.propTypes = {
   ).isRequired,
   groupOwnerId: PropTypes.string.isRequired,
   groupStatus: PropTypes.string.isRequired,
+  onDelete: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
 };

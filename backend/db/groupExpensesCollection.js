@@ -103,6 +103,26 @@ export async function deleteGroupExpensesByGroupId(groupId) {
   logger.debug("[groupExpenses] deleteMany by groupId OK", { groupId });
 }
 
+export async function deleteGroupExpenseById(expenseId) {
+  if (!ObjectId.isValid(expenseId)) {
+    logger.warn("[groupExpenses] deleteGroupExpenseById — invalid expenseId", {
+      expenseId,
+    });
+    return false;
+  }
+
+  logger.debug("[groupExpenses] deleteOne", { expenseId });
+  const result = await getGroupExpensesCollection().deleteOne({
+    _id: ObjectId.createFromHexString(expenseId),
+  });
+  logger.debug("[groupExpenses] deleteOne OK", {
+    expenseId,
+    deletedCount: result.deletedCount,
+  });
+
+  return result.deletedCount === 1;
+}
+
 export async function updateGroupExpense(
   expenseId,
   { name, description, amount, category, splitBetween },

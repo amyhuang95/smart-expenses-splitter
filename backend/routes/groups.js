@@ -13,6 +13,7 @@ import {
 } from "../db/groupsCollection.js";
 import {
   createGroupExpense,
+  deleteGroupExpenseById,
   findExpenseById,
   listExpensesByGroupId,
   serializeGroupExpense,
@@ -629,6 +630,53 @@ router.patch("/:groupId/expenses/:expenseId", async (req, res, next) => {
 
     // Re-fetch the group so the returned payload reflects the latest balances
     // and summary rather than the state before this edit was applied.
+    const refreshedGroup = await findGroupById(req.params.groupId);
+    const payload = await buildGroupPayload(
+      refreshedGroup,
+      req.currentUser._id,
+    );
+    res.json(payload);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Deletion follows the same authorization and locking rules as editing.
+router.delete("/:groupId/expenses/:expenseId", async (req, res, next) => {
+  try {
+    const group = await findGroupById(req.params.groupId);
+
+    if (!group || !isGroupMember(group, req.currentUser._id)) {
+      res.status(404).json({ error: "Group not found." });
+      return;
+    }
+
+    const expense = await findExpenseById(req.params.expenseId);
+
+    if (!expense || expense.groupId.toString() !== req.params.groupId) {
+      res.status(404).json({ error: "Expense not found." });
+      return;
+    }
+
+    if (group.status !== "open") {
+      res.status(409).json({
+        error: "Expenses can only be deleted while the group is open.",
+      });
+      return;
+    }
+
+    if (
+      expense.paidBy !== req.currentUser._id &&
+      !isGroupOwner(group, req.currentUser._id)
+    ) {
+      res.status(403).json({
+        error: "Only the payer or group owner can delete this expense.",
+      });
+      return;
+    }
+
+    await deleteGroupExpenseById(req.params.expenseId);
+
     const refreshedGroup = await findGroupById(req.params.groupId);
     const payload = await buildGroupPayload(
       refreshedGroup,

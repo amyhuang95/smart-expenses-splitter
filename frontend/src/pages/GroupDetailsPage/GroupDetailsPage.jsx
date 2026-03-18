@@ -16,6 +16,7 @@ import {
   addGroupMember,
   createGroupExpense,
   deleteGroup,
+  deleteGroupExpense,
   fetchGroupDetails,
   markDebtAsPaid,
   removeGroupMember,
@@ -142,6 +143,25 @@ export default function GroupDetailsPage() {
         next.delete(ACTION.DELETE);
         return next;
       });
+    }
+  }
+
+  async function handleDeleteExpense(expense) {
+    const didConfirm = window.confirm(
+      `Delete "${expense.name}" from "${groupData.group.name}"? This cannot be undone.`,
+    );
+
+    if (!didConfirm) {
+      return;
+    }
+
+    await runAction(ACTION.EXPENSE, () =>
+      deleteGroupExpense(groupData.group._id, expense._id),
+    );
+
+    if (editingExpense?._id === expense._id) {
+      setEditingExpense(null);
+      setIsExpenseOpen(false);
     }
   }
 
@@ -276,6 +296,7 @@ export default function GroupDetailsPage() {
             expenses={expenses}
             groupOwnerId={group.ownerId}
             groupStatus={group.status}
+            onDelete={handleDeleteExpense}
             onEdit={(expense) => {
               setEditingExpense(expense);
               setIsExpenseOpen(true);

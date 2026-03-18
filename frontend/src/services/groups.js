@@ -55,6 +55,12 @@ export async function updateGroupExpense(groupId, groupExpenseId, payload) {
   });
 }
 
+export async function deleteGroupExpense(groupId, groupExpenseId) {
+  return request(`/api/groups/${groupId}/expenses/${groupExpenseId}`, {
+    method: "DELETE",
+  });
+}
+
 export async function settleGroup(groupId) {
   return request(`/api/groups/${groupId}/settle`, {
     method: "POST",
