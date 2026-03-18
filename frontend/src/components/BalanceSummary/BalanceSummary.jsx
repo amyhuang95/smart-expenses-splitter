@@ -62,10 +62,11 @@ export default function BalanceSummary({
           {FILTER_OPTIONS.map((option) => (
             <button
               aria-pressed={statusFilter === option.value}
-              className={`balance-summary__filter-tag${statusFilter === option.value
+              className={`balance-summary__filter-tag${
+                statusFilter === option.value
                   ? " balance-summary__filter-tag--active"
                   : ""
-                }`}
+              }`}
               key={option.value}
               onClick={() => setStatusFilter(option.value)}
               type="button"

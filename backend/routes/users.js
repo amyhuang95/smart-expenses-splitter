@@ -3,7 +3,6 @@ import { Router } from "express";
 import {
   createUser,
   findUserByEmail,
-  listUsers,
   normalizeEmail,
   serializeUser,
 } from "../db/usersCollection.js";
@@ -16,18 +15,8 @@ function readBodyString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-// Get all users (for testing purposes, not exposed in production)
-router.get("/", requireAuth, async (req, res, next) => {
-  try {
-    const users = await listUsers();
-    res.json({ users: users.map(serializeUser) });
-  } catch (error) {
-    next(error);
-  }
-});
-
 // Get current authenticated user
-router.get("/me", (req, res) => {
+router.get("/me", requireAuth, (req, res) => {
   res.json({ user: req.currentUser });
 });
 
@@ -37,8 +26,15 @@ router.post("/register", async (req, res, next) => {
   const email = readBodyString(req.body?.email);
   const password = readBodyString(req.body?.password);
 
+  // Basic validation
   if (!name || !email || !password) {
     res.status(400).json({ error: "Name, email, and password are required." });
+    return;
+  }
+
+  // Basic password strength check (can be enhanced with more rules)
+  if (password.length < 8) {
+    res.status(400).json({ error: "Password must be at least 8 characters." });
     return;
   }
 
@@ -58,8 +54,12 @@ router.post("/register", async (req, res, next) => {
       passwordHash,
     });
 
-    req.session.userId = user._id.toString();
-    res.status(201).json({ user: serializeUser(user) });
+    // Regenerate session to prevent fixation and set userId
+    req.session.regenerate((err) => {
+      if (err) return next(err);
+      req.session.userId = user._id.toString();
+      res.status(201).json({ user: serializeUser(user) });
+    });
   } catch (error) {
     next(error);
   }
@@ -88,15 +88,19 @@ router.post("/login", async (req, res, next) => {
       return;
     }
 
-    req.session.userId = user._id.toString();
-    res.json({ user: serializeUser(user) });
+    // Regenerate session to prevent fixation and set userId
+    req.session.regenerate((err) => {
+      if (err) return next(err);
+      req.session.userId = user._id.toString();
+      res.json({ user: serializeUser(user) });
+    });
   } catch (error) {
     next(error);
   }
 });
 
 // Logout the current user
-router.post("/logout", (req, res, next) => {
+router.post("/logout", requireAuth, (req, res, next) => {
   if (!req.session) {
     res.status(204).end();
     return;

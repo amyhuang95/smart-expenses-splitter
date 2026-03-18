@@ -1,0 +1,26 @@
+import PropTypes from "prop-types";
+import Navbar from "react-bootstrap/Navbar";
+import { Link } from "react-router";
+
+export default function AppNavBar({ children }) {
+  return (
+    <Navbar expand="md" className="startup-page__topbar">
+      <Navbar.Brand as={Link} to="/" className="startup-page__brand">
+        <span className="startup-page__brand-mark" aria-hidden="true">
+          $
+        </span>
+        <span>
+          <span className="startup-page__brand-name">SplitEasy</span>
+          <span className="startup-page__brand-tagline">
+            Split group expenses easily
+          </span>
+        </span>
+      </Navbar.Brand>
+      {children}
+    </Navbar>
+  );
+}
+
+AppNavBar.propTypes = {
+  children: PropTypes.node,
+};

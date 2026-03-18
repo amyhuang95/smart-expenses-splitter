@@ -1,0 +1,39 @@
+import { useUser } from "../../context/useUser.js";
+import "./HomePage.css";
+
+export default function HomePage() {
+  const { user } = useUser();
+
+  return (
+    <section className="home-page">
+      <div className="home-page__hero">
+        <p className="startup-page__auth-kicker">Signed In</p>
+        <h1 className="home-page__title">
+          Welcome back{user?.name ? `, ${user.name}` : ""}.
+        </h1>
+        <p className="home-page__copy">
+          Your group workspace is ready. Open the dashboard to create a group,
+          log shared expenses, and settle balances.
+        </p>
+      </div>
+      <section className="home-page__feature-section" aria-label="Feature overview">
+          <div className="home-page__feature-block">
+            <h2 className="home-page__feature-title">Group Expenses</h2>
+            <ul className="home-page__feature-list">
+              <li>Create groups for trips, roommates, or events.</li>
+              <li>Add members and split shared expenses clearly.</li>
+              <li>Track balances and settle debts in one place.</li>
+            </ul>
+          </div>
+          <div className="home-page__feature-block">
+            <h2 className="home-page__feature-title">Single Expenses</h2>
+            <ul className="home-page__feature-list">
+              <li>...</li>
+              <li>...</li>
+              <li>...</li>
+            </ul>
+          </div>
+      </section>
+    </section>
+  );
+}

@@ -80,6 +80,7 @@ export default function AuthForm() {
   async function handleRegisterSubmit(event) {
     event.preventDefault();
 
+    // Basic validation
     if (
       !registerForm.name.trim() ||
       !registerForm.email.trim() ||
@@ -88,6 +89,15 @@ export default function AuthForm() {
       setFeedback({
         type: "danger",
         message: "Complete name, email, and password to create an account.",
+      });
+      return;
+    }
+
+    // Basic password strength check (can be enhanced with more rules)
+    if (registerForm.password.length < 8) {
+      setFeedback({
+        type: "danger",
+        message: "Password must be at least 8 characters.",
       });
       return;
     }
@@ -108,7 +118,10 @@ export default function AuthForm() {
 
   return (
     <div className="auth-form">
-      <ButtonGroup className="auth-form__mode-switch" aria-label="Authentication mode switch">
+      <ButtonGroup
+        className="auth-form__mode-switch"
+        aria-label="Authentication mode switch"
+      >
         <Button
           className="auth-form__mode-button"
           onClick={() => handleModeChange("login")}
@@ -161,7 +174,12 @@ export default function AuthForm() {
             />
           </Form.Group>
 
-          <Button className="auth-form__submit" disabled={isSubmitting} type="submit" variant="dark">
+          <Button
+            className="auth-form__submit"
+            disabled={isSubmitting}
+            type="submit"
+            variant="dark"
+          >
             {isSubmitting ? (
               <>
                 <Spinner
@@ -206,7 +224,10 @@ export default function AuthForm() {
             />
           </Form.Group>
 
-          <Form.Group className="auth-form__field" controlId="register-password">
+          <Form.Group
+            className="auth-form__field"
+            controlId="register-password"
+          >
             <Form.Label>Password</Form.Label>
             <Form.Control
               autoComplete="new-password"
@@ -219,7 +240,12 @@ export default function AuthForm() {
             />
           </Form.Group>
 
-          <Button className="auth-form__submit" disabled={isSubmitting} type="submit" variant="dark">
+          <Button
+            className="auth-form__submit"
+            disabled={isSubmitting}
+            type="submit"
+            variant="dark"
+          >
             {isSubmitting ? (
               <>
                 <Spinner

@@ -11,9 +11,10 @@ export async function hydrateSessionUser(req, res, next) {
   try {
     const user = await findUserById(req.session.userId);
     if (!user) {
-      req.session.userId = null;
-      req.currentUser = null;
-      next();
+      req.session.destroy(() => {
+        req.currentUser = null;
+        next();
+      });
       return;
     }
 
