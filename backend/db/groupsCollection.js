@@ -28,7 +28,7 @@ export function serializeGroup(group) {
   return {
     _id: group._id.toString(),
     name: group.name,
-    ownerId: group.ownerId,
+    ownerId: group.ownerId?.toString(),
     memberIds: group.memberIds ?? [],
     status: group.status ?? "open",
     debts: (group.debts ?? []).map(serializeDebt),
