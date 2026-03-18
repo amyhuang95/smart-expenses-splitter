@@ -1,60 +1,70 @@
+import { useState } from "react";
 import Button from "react-bootstrap/Button";
-import Card from "react-bootstrap/Card";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import { useUser } from "../context/useUser.js";
+import MyExpenses from "./MyExpenses/MyExpenses.jsx";
 
 export default function BaseTemplate() {
   const { logout, user } = useUser();
+  const [activePage, setActivePage] = useState("groups");
 
   return (
-    <main className="startup-page">
-      <Container className="startup-page__hero">
-        <Navbar className="startup-page__topbar">
-          <Navbar.Brand href="/" className="startup-page__brand">
-            <span className="startup-page__brand-mark" aria-hidden="true">
-              $
-            </span>
-            <span>
-              <span className="startup-page__brand-name">SplitEasy</span>
-              <span className="startup-page__brand-tagline">
-                Split group expenses easily
-              </span>
-            </span>
-          </Navbar.Brand>
-          <div className="startup-page__topbar-actions">
-            <Nav className="startup-page__nav">
-              <Nav.Link href="/groups" className="startup-page__nav-link">
-                Group Expenses
-              </Nav.Link>
-              <Nav.Link href="/single-expenses" className="startup-page__nav-link">
-                Single Expenses
-              </Nav.Link>
+    <main>
+      {/* Top Navigation */}
+      <Navbar bg="dark" variant="dark" className="px-3">
+        <Navbar.Brand
+          style={{ cursor: "pointer" }}
+          onClick={() => setActivePage("groups")}
+        >
+          <span
+            className="badge bg-primary me-2 fs-6"
+            aria-hidden="true"
+          >
+            $
+          </span>
+          SplitEasy
+        </Navbar.Brand>
 
-              <Nav.Link href="/profile" className="startup-page__nav-link">
-                Profile
-              </Nav.Link>
+        <Nav className="me-auto">
+          <Nav.Link
+            active={activePage === "groups"}
+            onClick={() => setActivePage("groups")}
+          >
+            Group Expenses
+          </Nav.Link>
+          <Nav.Link
+            active={activePage === "myexpenses"}
+            onClick={() => setActivePage("myexpenses")}
+          >
+            Single Expenses
+          </Nav.Link>
+        </Nav>
 
-            </Nav>
-            <Button onClick={logout} type="button" variant="outline-dark">
-              Log Out
-            </Button>
-          </div>
-        </Navbar>
+        <div className="d-flex align-items-center gap-2">
+          <span className="text-light small">
+            {user?.name || "User"}
+          </span>
+          <Button onClick={logout} type="button" variant="outline-light" size="sm">
+            Log Out
+          </Button>
+        </div>
+      </Navbar>
 
-        <Card className="startup-page__auth-card">
-          <Card.Body className="startup-page__auth-body">
-            <p className="startup-page__auth-kicker">Signed In</p>
-            <h1 className="startup-page__auth-title">
-              Welcome back{user?.name ? `, ${user.name}` : ""}.
-            </h1>
-            <p className="startup-page__auth-copy">
-              Your auth flow is connected. The next step is replacing this
-              placeholder with the post-login homepage and group list.
+      {/* Page Content */}
+      <Container fluid className="px-4 py-4">
+        {activePage === "myexpenses" ? (
+          <MyExpenses user={user} />
+        ) : (
+          /* Amy's Groups page goes here — replace this placeholder */
+          <div className="text-center py-5">
+            <h2>Group Expenses</h2>
+            <p className="text-secondary">
+              Amy&apos;s group expenses page will go here.
             </p>
-          </Card.Body>
-        </Card>
+          </div>
+        )}
       </Container>
     </main>
   );
