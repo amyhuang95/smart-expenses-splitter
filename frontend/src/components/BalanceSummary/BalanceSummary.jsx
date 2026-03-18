@@ -52,10 +52,7 @@ export default function BalanceSummary({
   return (
     <Card className="balance-summary">
       <Card.Body>
-        <Card.Title>Who Owes Whom</Card.Title>
-        <Card.Text className="text-muted">
-          Current settlement plan for this group.
-        </Card.Text>
+        <Card.Title>Settlement Plan</Card.Title>
         <div
           aria-label="Filter settlements"
           className="balance-summary__filter"
