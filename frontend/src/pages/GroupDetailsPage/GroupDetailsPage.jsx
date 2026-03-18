@@ -11,6 +11,7 @@ import AddExpenseForm from "../../components/AddExpenseForm/AddExpenseForm.jsx";
 import AddMemberForm from "../../components/AddMemberForm/AddMemberForm.jsx";
 import BalanceSummary from "../../components/BalanceSummary/BalanceSummary.jsx";
 import ExpenseList from "../../components/ExpenseList/ExpenseList.jsx";
+import MemberListModal from "../../components/MemberListModal/MemberListModal.jsx";
 import { useUser } from "../../context/useUser.js";
 import {
   addGroupMember,
@@ -34,6 +35,8 @@ const ACTION = {
   DELETE: "delete",
 };
 
+const MEMBER_PREVIEW_LIMIT = 6;
+
 export default function GroupDetailsPage() {
   const { groupId } = useParams();
   const navigate = useNavigate();
@@ -43,6 +46,7 @@ export default function GroupDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isExpenseOpen, setIsExpenseOpen] = useState(false);
   const [isAddMemberOpen, setIsAddMemberOpen] = useState(false);
+  const [isMembersOpen, setIsMembersOpen] = useState(false);
   const [workingActions, setWorkingActions] = useState(new Set());
   const [editingExpense, setEditingExpense] = useState(null);
 
@@ -192,6 +196,11 @@ export default function GroupDetailsPage() {
     ? "Edit Shared Expense"
     : "Add Shared Expense";
   const expenseSubmitLabel = editingExpense ? "Save Changes" : "Save Expense";
+  const previewMembers = group.members.slice(0, MEMBER_PREVIEW_LIMIT);
+  const hiddenMemberCount = Math.max(
+    group.members.length - MEMBER_PREVIEW_LIMIT,
+    0,
+  );
 
   return (
     <section className="group-details-page">
@@ -218,9 +227,6 @@ export default function GroupDetailsPage() {
                 {group.status}
               </Badge>
               <h1>{group.name}</h1>
-              <p className="text-muted">
-                {group.members.length} members, {summary.totalExpenses} expenses
-              </p>
             </div>
             <div className="group-details-page__hero-actions">
               <Button
@@ -260,6 +266,26 @@ export default function GroupDetailsPage() {
                 >
                   {isWorking(ACTION.DELETE) ? "Deleting..." : "Delete Group"}
                 </Button>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="group-details-page__members-section">
+            <div className="group-details-page__members">
+              {previewMembers.map((member) => (
+                <span key={member._id} className="member-tag">
+                  {member.name}
+                  {member._id === group.ownerId ? " (owner)" : ""}
+                </span>
+              ))}
+              {hiddenMemberCount ? (
+                <button
+                  className="group-details-page__members-more"
+                  onClick={() => setIsMembersOpen(true)}
+                  type="button"
+                >
+                  +{hiddenMemberCount} more
+                </button>
               ) : null}
             </div>
           </div>
@@ -318,36 +344,6 @@ export default function GroupDetailsPage() {
         </Col>
       </Row>
 
-      <Row className="g-4">
-        <Col lg={12}>
-          <Card className="group-details-page__panel">
-            <Card.Body>
-              <Card.Title>Members</Card.Title>
-              <div className="group-details-page__members">
-                {group.members.map((member) => (
-                  <span key={member._id} className="member-tag">
-                    {member.name}
-                    {member._id === group.ownerId ? " (owner)" : ""}
-                    {isOwner &&
-                    group.status === "open" &&
-                    member._id !== group.ownerId ? (
-                      <button
-                        aria-label={`Remove ${member.name} from group`}
-                        disabled={isAnyWorking}
-                        onClick={() => handleRemoveMember(member)}
-                        type="button"
-                      >
-                        ×
-                      </button>
-                    ) : null}
-                  </span>
-                ))}
-              </div>
-            </Card.Body>
-          </Card>
-        </Col>
-      </Row>
-
       <AddExpenseForm
         key={editingExpense?._id ?? "new-expense"}
         isOpen={isExpenseOpen}
@@ -386,6 +382,16 @@ export default function GroupDetailsPage() {
           );
           setIsAddMemberOpen(false);
         }}
+      />
+      <MemberListModal
+        groupName={group.name}
+        isOpen={isMembersOpen}
+        isOwner={isOwner && group.status === "open"}
+        isSubmitting={isAnyWorking}
+        members={group.members}
+        onClose={() => setIsMembersOpen(false)}
+        onRemoveMember={handleRemoveMember}
+        ownerId={group.ownerId}
       />
     </section>
   );
