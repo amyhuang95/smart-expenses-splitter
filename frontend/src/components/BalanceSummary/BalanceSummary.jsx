@@ -15,6 +15,7 @@ function currency(value) {
 export default function BalanceSummary({
   currentUserId,
   debts,
+  groupStatus,
   isSubmitting,
   onMarkPaid,
 }) {
@@ -29,7 +30,10 @@ export default function BalanceSummary({
       <ListGroup variant="flush">
         {debts.length ? (
           debts.map((debt) => {
-            const canMarkPaid = !debt.isPaid && currentUserId === debt.senderId;
+            const canMarkPaid =
+              !debt.isPaid &&
+              currentUserId === debt.senderId &&
+              groupStatus !== "open";
 
             return (
               <ListGroup.Item
@@ -87,6 +91,7 @@ BalanceSummary.propTypes = {
       senderId: PropTypes.string.isRequired,
     }),
   ).isRequired,
+  groupStatus: PropTypes.string.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
   onMarkPaid: PropTypes.func.isRequired,
 };

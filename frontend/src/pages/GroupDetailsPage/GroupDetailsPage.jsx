@@ -307,6 +307,7 @@ export default function GroupDetailsPage() {
           <BalanceSummary
             currentUserId={user._id}
             debts={debts}
+            groupStatus={group.status}
             isSubmitting={isWorking(ACTION.MARK_PAID)}
             onMarkPaid={(debtId) =>
               runAction(ACTION.MARK_PAID, () =>
