@@ -4,7 +4,6 @@ import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
-import "./BalanceSummary.css";
 
 const FILTER = {
   ALL: "all",
@@ -51,21 +50,19 @@ export default function BalanceSummary({
       : `No ${statusFilter} balances found.`;
 
   return (
-    <Card className="balance-summary">
+    <Card className="rounded-4 overflow-hidden">
       <Card.Body>
         <Card.Title>Settlement Plan</Card.Title>
         <div
           aria-label="Filter settlements"
-          className="balance-summary__filter"
+          className="d-flex flex-wrap gap-2 mt-3"
           role="group"
         >
           {FILTER_OPTIONS.map((option) => (
             <button
               aria-pressed={statusFilter === option.value}
-              className={`balance-summary__filter-tag${
-                statusFilter === option.value
-                  ? " balance-summary__filter-tag--active"
-                  : ""
+              className={`btn btn-sm rounded-pill ${
+                statusFilter === option.value ? "btn-primary" : "btn-light"
               }`}
               key={option.value}
               onClick={() => setStatusFilter(option.value)}
@@ -76,7 +73,7 @@ export default function BalanceSummary({
           ))}
         </div>
       </Card.Body>
-      <div className="balance-summary__list">
+      <div style={{ maxHeight: "28rem", overflowY: "auto", borderTop: "1px solid rgba(0,0,0,.125)" }}>
         <ListGroup variant="flush">
           {filteredDebts.length ? (
             filteredDebts.map((debt) => {
@@ -90,16 +87,16 @@ export default function BalanceSummary({
               return (
                 <ListGroup.Item
                   key={debt.debtId}
-                  className="balance-summary__item"
+                  className="d-flex align-items-center justify-content-between gap-3"
                 >
                   <div>
                     <strong>{debt.sender?.name ?? "Member"}</strong> →{" "}
                     <strong>{debt.receiver?.name ?? "Member"}</strong>
-                    <div className="balance-summary__meta">
+                    <div className="text-secondary mt-1">
                       {currency(debt.amount)}
                     </div>
                   </div>
-                  <div className="balance-summary__actions">
+                  <div className="d-flex align-items-center gap-3">
                     <Badge bg={debt.isPaid ? "success" : "warning"}>
                       {debt.isPaid ? "Paid" : "Pending"}
                     </Badge>

@@ -25,7 +25,6 @@ import {
   updateGroupExpense,
 } from "../../services/groups.js";
 import { currency } from "../../utils/format.js";
-import "./GroupDetailsPage.css";
 
 const ACTION = {
   EXPENSE: "expense",
@@ -103,11 +102,7 @@ export default function GroupDetailsPage() {
     const didConfirm = window.confirm(
       `Remove ${member.name} from "${groupData.group.name}"?`,
     );
-
-    if (!didConfirm) {
-      return;
-    }
-
+    if (!didConfirm) return;
     await runAction(ACTION.MEMBER, () =>
       removeGroupMember(groupData.group._id, member._id),
     );
@@ -117,11 +112,7 @@ export default function GroupDetailsPage() {
     const didConfirm = window.confirm(
       `Settle up "${groupData.group.name}"? This will lock the group and prevent further edits.`,
     );
-
-    if (!didConfirm) {
-      return;
-    }
-
+    if (!didConfirm) return;
     await runAction(ACTION.SETTLE, () => settleGroup(groupData.group._id));
   }
 
@@ -129,10 +120,7 @@ export default function GroupDetailsPage() {
     const didConfirm = window.confirm(
       `Delete "${groupData.group.name}"? This will permanently remove the group and all of its shared expenses.`,
     );
-
-    if (!didConfirm) {
-      return;
-    }
+    if (!didConfirm) return;
 
     try {
       setWorkingActions((prev) => new Set(prev).add(ACTION.DELETE));
@@ -154,10 +142,7 @@ export default function GroupDetailsPage() {
     const didConfirm = window.confirm(
       `Delete "${expense.name}" from "${groupData.group.name}"? This cannot be undone.`,
     );
-
-    if (!didConfirm) {
-      return;
-    }
+    if (!didConfirm) return;
 
     await runAction(ACTION.EXPENSE, () =>
       deleteGroupExpense(groupData.group._id, expense._id),
@@ -171,7 +156,7 @@ export default function GroupDetailsPage() {
 
   if (isLoading) {
     return (
-      <div className="group-details-page__loading">
+      <div className="d-flex align-items-center justify-content-center" style={{ minHeight: "40vh" }}>
         <Spinner animation="border" role="status" variant="dark" />
       </div>
     );
@@ -179,7 +164,7 @@ export default function GroupDetailsPage() {
 
   if (!groupData) {
     return (
-      <div className="group-details-page__not-found">
+      <div>
         <Alert variant="danger">
           {error || "That group could not be found."}
         </Alert>
@@ -192,49 +177,49 @@ export default function GroupDetailsPage() {
 
   const { debts, expenses, group, summary } = groupData;
   const isOwner = group.currentUserRole === "owner";
-  const expenseFormTitle = editingExpense
-    ? "Edit Shared Expense"
-    : "Add Shared Expense";
+  const expenseFormTitle = editingExpense ? "Edit Shared Expense" : "Add Shared Expense";
   const expenseSubmitLabel = editingExpense ? "Save Changes" : "Save Expense";
   const members = group.members ?? [];
   const previewMembers = members.slice(0, MEMBER_PREVIEW_LIMIT);
-  const hiddenMemberCount = Math.max(
-    members.length - MEMBER_PREVIEW_LIMIT,
-    0,
-  );
+  const hiddenMemberCount = Math.max(members.length - MEMBER_PREVIEW_LIMIT, 0);
+
+  const statusVariant =
+    {
+      settled: "success",
+      settling: "warning",
+      open: "primary",
+    }[group.status] ?? "secondary";
 
   return (
-    <section className="group-details-page">
-      <div className="group-details-page__backlink">
-        <Button as={Link} to="/groups" type="button" variant="link">
+    <section className="d-grid gap-4">
+      <div>
+        <Button as={Link} to="/groups" type="button" variant="link" className="ps-0">
           ← Back To Groups
         </Button>
       </div>
 
-      <Card className="group-details-page__hero">
+      <Card className="rounded-4 overflow-hidden">
         <Card.Body>
-          <div className="group-details-page__hero-top">
+          <div className="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
             <div>
-              <p className="group-details-page__eyebrow">Group Details</p>
-              <div className="group-details-page__title-row">
-                <h1>{group.name}</h1>
-                <Badge
-                  bg={
-                    group.status === "settled"
-                      ? "success"
-                      : group.status === "settling"
-                        ? "warning"
-                        : "primary"
-                  }
-                >
+              <p
+                className="text-secondary mb-1"
+                style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}
+              >
+                Group Details
+              </p>
+              <div className="d-flex flex-wrap align-items-center gap-3">
+                <h1 className="mb-0">{group.name}</h1>
+                <Badge bg={statusVariant} pill>
                   {group.status}
                 </Badge>
               </div>
             </div>
-            <div className="group-details-page__hero-actions">
+            <div className="d-flex flex-column flex-md-row flex-wrap justify-content-end align-items-stretch align-items-md-center gap-2">
               <Button
                 disabled={isWorking(ACTION.EXPENSE) || group.status !== "open"}
                 onClick={() => setIsExpenseOpen(true)}
+                size="sm"
                 type="button"
                 variant="dark"
               >
@@ -244,6 +229,7 @@ export default function GroupDetailsPage() {
                 <Button
                   disabled={isWorking(ACTION.MEMBER) || group.status !== "open"}
                   onClick={() => setIsAddMemberOpen(true)}
+                  size="sm"
                   type="button"
                   variant="outline-dark"
                 >
@@ -254,6 +240,7 @@ export default function GroupDetailsPage() {
                 <Button
                   disabled={isWorking(ACTION.SETTLE) || group.status !== "open"}
                   onClick={handleSettleUp}
+                  size="sm"
                   type="button"
                   variant="outline-dark"
                 >
@@ -264,6 +251,7 @@ export default function GroupDetailsPage() {
                 <Button
                   disabled={isWorking(ACTION.DELETE)}
                   onClick={handleDeleteGroup}
+                  size="sm"
                   type="button"
                   variant="outline-danger"
                 >
@@ -273,8 +261,8 @@ export default function GroupDetailsPage() {
             </div>
           </div>
 
-          <div className="group-details-page__members-section">
-            <div className="group-details-page__members">
+          <div className="d-grid gap-2 mt-3">
+            <div className="d-flex flex-wrap gap-2">
               {previewMembers.map((member) => (
                 <span key={member._id} className="member-tag">
                   {member.name}
@@ -293,26 +281,32 @@ export default function GroupDetailsPage() {
             </div>
           </div>
 
-          <div className="group-details-page__stats">
-            <Card className="group-details-page__stat-card">
-              <Card.Body>
-                <div className="text-muted">Total Spent</div>
-                <strong>{currency(summary.totalSpent)}</strong>
-              </Card.Body>
-            </Card>
-            <Card className="group-details-page__stat-card">
-              <Card.Body>
-                <div className="text-muted">Outstanding</div>
-                <strong>{currency(summary.outstandingDebtAmount)}</strong>
-              </Card.Body>
-            </Card>
-            <Card className="group-details-page__stat-card">
-              <Card.Body>
-                <div className="text-muted">Settled Debts</div>
-                <strong>{summary.settledDebtCount}</strong>
-              </Card.Body>
-            </Card>
-          </div>
+          <Row className="g-3 mt-2">
+            <Col sm={4}>
+              <Card className="rounded-3 overflow-hidden">
+                <Card.Body>
+                  <div className="text-muted">Total Spent</div>
+                  <strong>{currency(summary.totalSpent)}</strong>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col sm={4}>
+              <Card className="rounded-3 overflow-hidden">
+                <Card.Body>
+                  <div className="text-muted">Outstanding</div>
+                  <strong>{currency(summary.outstandingDebtAmount)}</strong>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col sm={4}>
+              <Card className="rounded-3 overflow-hidden">
+                <Card.Body>
+                  <div className="text-muted">Settled Debts</div>
+                  <strong>{summary.settledDebtCount}</strong>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
         </Card.Body>
       </Card>
 
@@ -369,7 +363,6 @@ export default function GroupDetailsPage() {
               createGroupExpense(group._id, payload),
             );
           }
-
           setEditingExpense(null);
           setIsExpenseOpen(false);
         }}
