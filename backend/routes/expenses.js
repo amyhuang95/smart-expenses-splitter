@@ -83,6 +83,7 @@ router.get("/", async (req, res) => {
   }
 });
 
+// ── STATS — Spending statistics for a user ──
 router.get("/stats", async (req, res) => {
   try {
     const col = getExpensesCollection();
@@ -107,7 +108,6 @@ router.get("/stats", async (req, res) => {
         (categoryBreakdown[e.category] || 0) + e.amount;
     });
 
-    // Calculate what user owes and is owed
     let youOwe = 0;
     let owedToYou = 0;
     expenses.forEach((e) => {
@@ -138,6 +138,76 @@ router.get("/stats", async (req, res) => {
   } catch (err) {
     console.error("Error fetching stats:", err);
     res.status(500).json({ error: "Failed to fetch stats" });
+  }
+});
+
+// ══════════════════════════════════════════════════
+// NEW IN COMMIT 5: BALANCES endpoint
+// ══════════════════════════════════════════════════
+
+// ── BALANCES — Per-person balance for current user ──
+router.get("/balances", async (req, res) => {
+  try {
+    const col = getExpensesCollection();
+    const { user } = req.query;
+    if (!user) {
+      return res.status(400).json({ error: "user query required" });
+    }
+
+    const expenses = await col
+      .find({ splitBetween: user, settled: false })
+      .toArray();
+
+    // Calculate per-person balances
+    const personBalances = {};
+
+    expenses.forEach((e) => {
+      if (e.paidBy === user) {
+        // I paid → everyone else owes me their share
+        e.splitBetween.forEach((p) => {
+          if (p === user) return;
+          const theirShare = e.splitDetails?.[p] || 0;
+          if (!e.paidStatus?.[p]) {
+            personBalances[p] = (personBalances[p] || 0) + theirShare;
+          }
+        });
+      } else {
+        // Someone else paid → I owe them my share
+        const myShare = e.splitDetails?.[user] || 0;
+        if (!e.paidStatus?.[user]) {
+          personBalances[e.paidBy] =
+            (personBalances[e.paidBy] || 0) - myShare;
+        }
+      }
+    });
+
+    // Format into array
+    const details = Object.entries(personBalances)
+      .map(([person, amount]) => ({
+        person,
+        amount: Math.round(Math.abs(amount) * 100) / 100,
+        direction: amount > 0 ? "owes_you" : "you_owe",
+      }))
+      .filter((d) => d.amount > 0.01);
+
+    const youOwe = details
+      .filter((d) => d.direction === "you_owe")
+      .reduce((s, d) => s + d.amount, 0);
+    const owedToYou = details
+      .filter((d) => d.direction === "owes_you")
+      .reduce((s, d) => s + d.amount, 0);
+
+    res.json({
+      summary: {
+        youOwe: Math.round(youOwe * 100) / 100,
+        owedToYou: Math.round(owedToYou * 100) / 100,
+        net: Math.round((owedToYou - youOwe) * 100) / 100,
+      },
+      details,
+    });
+  } catch (err) {
+    console.error("Error computing balances:", err);
+    res.status(500).json({ error: "Failed to compute balances" });
   }
 });
 
