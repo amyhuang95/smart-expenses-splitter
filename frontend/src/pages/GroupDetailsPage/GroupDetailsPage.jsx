@@ -158,12 +158,6 @@ export default function GroupDetailsPage() {
           <div className="group-details-page__hero-top">
             <div>
               <p className="groups-page__eyebrow">Group Detail</p>
-              <h1>{group.name}</h1>
-              <p className="text-muted">
-                {group.members.length} members, {summary.totalExpenses} expenses
-              </p>
-            </div>
-            <div className="group-details-page__hero-actions">
               <Badge
                 bg={
                   group.status === "settled"
@@ -175,6 +169,12 @@ export default function GroupDetailsPage() {
               >
                 {group.status}
               </Badge>
+              <h1>{group.name}</h1>
+              <p className="text-muted">
+                {group.members.length} members, {summary.totalExpenses} expenses
+              </p>
+            </div>
+            <div className="group-details-page__hero-actions">
               <Button
                 disabled={isWorking(ACTION.EXPENSE) || group.status !== "open"}
                 onClick={() => setIsExpenseOpen(true)}
