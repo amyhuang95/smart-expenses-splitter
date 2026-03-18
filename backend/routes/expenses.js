@@ -4,7 +4,7 @@ import { getExpensesCollection } from "../db/expensesCollection.js";
 
 const router = express.Router();
 
-// ── CREATE — Add a single expense ──
+// ─── CREATE — Add a new single expense ───
 router.post("/", async (req, res) => {
   try {
     const col = getExpensesCollection();
@@ -24,13 +24,15 @@ router.post("/", async (req, res) => {
     }
 
     const parsedAmount = parseFloat(amount);
+
+    // Auto-calculate equal split
     const share =
       Math.round((parsedAmount / splitBetween.length) * 100) / 100;
     const splitDetails = {};
     const paidStatus = {};
     splitBetween.forEach((userId) => {
       splitDetails[userId] = share;
-      paidStatus[userId] = userId === paidBy;
+      paidStatus[userId] = userId === paidBy; // payer is auto-paid
     });
 
     const newExpense = {
@@ -55,7 +57,7 @@ router.post("/", async (req, res) => {
   }
 });
 
-// ── READ ALL — Get expenses with filters & sorting ──
+// ─── READ ALL — Get expenses I'm involved in (with filters & sort) ───
 router.get("/", async (req, res) => {
   try {
     const col = getExpensesCollection();
@@ -83,7 +85,7 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ── STATS — Spending statistics for a user ──
+// ─── STATS — Spending statistics for a user ───
 router.get("/stats", async (req, res) => {
   try {
     const col = getExpensesCollection();
@@ -108,18 +110,21 @@ router.get("/stats", async (req, res) => {
         (categoryBreakdown[e.category] || 0) + e.amount;
     });
 
+    // Calculate what user owes and is owed
     let youOwe = 0;
     let owedToYou = 0;
     expenses.forEach((e) => {
       if (e.settled) return;
       const myShare = e.splitDetails?.[user] || 0;
       if (e.paidBy === user) {
+        // I paid, others owe me their unpaid shares
         e.splitBetween.forEach((p) => {
           if (p !== user && !e.paidStatus?.[p]) {
             owedToYou += e.splitDetails?.[p] || 0;
           }
         });
       } else {
+        // Someone else paid, I owe them if I haven't paid
         if (!e.paidStatus?.[user]) {
           youOwe += myShare;
         }
@@ -141,11 +146,7 @@ router.get("/stats", async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════
-// NEW IN COMMIT 5: BALANCES endpoint
-// ══════════════════════════════════════════════════
-
-// ── BALANCES — Per-person balance for current user ──
+// ─── BALANCES — Per-person balance breakdown for a user ───
 router.get("/balances", async (req, res) => {
   try {
     const col = getExpensesCollection();
@@ -158,7 +159,6 @@ router.get("/balances", async (req, res) => {
       .find({ splitBetween: user, settled: false })
       .toArray();
 
-    // Calculate per-person balances
     const personBalances = {};
 
     expenses.forEach((e) => {
@@ -166,15 +166,15 @@ router.get("/balances", async (req, res) => {
         // I paid → everyone else owes me their share
         e.splitBetween.forEach((p) => {
           if (p === user) return;
-          const theirShare = e.splitDetails?.[p] || 0;
           if (!e.paidStatus?.[p]) {
+            const theirShare = e.splitDetails?.[p] || 0;
             personBalances[p] = (personBalances[p] || 0) + theirShare;
           }
         });
       } else {
         // Someone else paid → I owe them my share
-        const myShare = e.splitDetails?.[user] || 0;
         if (!e.paidStatus?.[user]) {
+          const myShare = e.splitDetails?.[user] || 0;
           personBalances[e.paidBy] =
             (personBalances[e.paidBy] || 0) - myShare;
         }
@@ -211,15 +211,11 @@ router.get("/balances", async (req, res) => {
   }
 });
 
-// ══════════════════════════════════════════════════
-
-// ── READ ONE ──
+// ─── READ ONE ───
 router.get("/:id", async (req, res) => {
   try {
     const col = getExpensesCollection();
-    const expense = await col.findOne({
-      _id: new ObjectId(req.params.id),
-    });
+    const expense = await col.findOne({ _id: new ObjectId(req.params.id) });
     if (!expense) {
       return res.status(404).json({ error: "Expense not found" });
     }
@@ -230,7 +226,91 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// ── DELETE ──
+// ─── UPDATE — Edit expense details ───
+router.put("/:id", async (req, res) => {
+  try {
+    const col = getExpensesCollection();
+    const { name, description, amount, category, paidBy, splitBetween } =
+      req.body;
+
+    const updateFields = {};
+    if (name !== undefined) updateFields.name = name;
+    if (description !== undefined) updateFields.description = description;
+    if (category !== undefined) updateFields.category = category;
+    if (paidBy !== undefined) updateFields.paidBy = paidBy;
+
+    // If amount or splitBetween changed, recalculate splits
+    if (amount !== undefined || splitBetween !== undefined) {
+      const newAmount =
+        amount !== undefined ? parseFloat(amount) : undefined;
+      if (newAmount !== undefined) updateFields.amount = newAmount;
+
+      if (splitBetween !== undefined) {
+        updateFields.splitBetween = splitBetween;
+      }
+
+      // Recalculate splitDetails if we have both values
+      const finalAmount = newAmount;
+      const finalMembers = splitBetween;
+      if (finalAmount && finalMembers && finalMembers.length > 0) {
+        const share =
+          Math.round((finalAmount / finalMembers.length) * 100) / 100;
+        const splitDetails = {};
+        finalMembers.forEach((userId) => {
+          splitDetails[userId] = share;
+        });
+        updateFields.splitDetails = splitDetails;
+      }
+    }
+
+    const result = await col.findOneAndUpdate(
+      { _id: new ObjectId(req.params.id) },
+      { $set: updateFields },
+      { returnDocument: "after" },
+    );
+    if (!result) {
+      return res.status(404).json({ error: "Expense not found" });
+    }
+    res.json(result);
+  } catch (err) {
+    console.error("Error updating expense:", err);
+    res.status(500).json({ error: "Failed to update expense" });
+  }
+});
+
+// ─── MARK AS PAID — User marks their share as paid ───
+router.put("/:id/paid", async (req, res) => {
+  try {
+    const col = getExpensesCollection();
+    const { user } = req.body;
+    if (!user) {
+      return res.status(400).json({ error: "user is required" });
+    }
+
+    const expense = await col.findOne({ _id: new ObjectId(req.params.id) });
+    if (!expense) {
+      return res.status(404).json({ error: "Expense not found" });
+    }
+
+    const paidStatus = expense.paidStatus || {};
+    paidStatus[user] = true;
+
+    // Check if everyone has paid
+    const allPaid = expense.splitBetween.every((p) => paidStatus[p]);
+
+    const result = await col.findOneAndUpdate(
+      { _id: new ObjectId(req.params.id) },
+      { $set: { paidStatus, settled: allPaid } },
+      { returnDocument: "after" },
+    );
+    res.json(result);
+  } catch (err) {
+    console.error("Error marking paid:", err);
+    res.status(500).json({ error: "Failed to mark as paid" });
+  }
+});
+
+// ─── DELETE ───
 router.delete("/:id", async (req, res) => {
   try {
     const col = getExpensesCollection();
