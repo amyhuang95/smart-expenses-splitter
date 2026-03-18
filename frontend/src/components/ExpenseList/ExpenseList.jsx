@@ -17,7 +17,7 @@ export default function ExpenseList({
   return (
     <Card className="expense-list">
       <Card.Body>
-        <Card.Title>Expense Activity</Card.Title>
+        <Card.Title>Expense Activity ({expenses.length})</Card.Title>
         <Card.Text className="text-muted">
           Recent shared expenses for the group.
         </Card.Text>

@@ -18,6 +18,7 @@ export default function GroupCard({ group }) {
   // than full member objects — full user data is only fetched on the detail
   // page. Fall back gracefully so the card renders in both contexts.
   const memberCount = group.members?.length ?? group.memberIds?.length ?? 0;
+  const expenseCount = group.summary.totalExpenses;
 
   return (
     <Card className="group-card h-100">
@@ -28,7 +29,8 @@ export default function GroupCard({ group }) {
           </Badge>
           <Card.Title className="group-card__title">{group.name}</Card.Title>
           <Card.Subtitle className="text-muted">
-            {memberCount} member{memberCount !== 1 ? "s" : ""}
+            {memberCount} member{memberCount !== 1 ? "s" : ""}, {expenseCount > 999 ? "999+" : expenseCount}{" "}
+            expense{expenseCount !== 1 ? "s" : ""}
           </Card.Subtitle>
         </div>
 
@@ -40,10 +42,6 @@ export default function GroupCard({ group }) {
           <div>
             <dt>Outstanding</dt>
             <dd>{currency(group.summary.outstandingDebtAmount)}</dd>
-          </div>
-          <div>
-            <dt>Expenses</dt>
-            <dd>{group.summary.totalExpenses}</dd>
           </div>
         </dl>
 
