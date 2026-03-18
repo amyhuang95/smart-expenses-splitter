@@ -28,9 +28,9 @@ export default function HomePage() {
           <div className="home-page__feature-block">
             <h2 className="home-page__feature-title">Single Expenses</h2>
             <ul className="home-page__feature-list">
-              <li>...</li>
-              <li>...</li>
-              <li>...</li>
+              <li>Log a one-off expense and split it with anyone.</li>
+              <li>Track who has paid and who still owes.</li>
+              <li>View your personal balance and spending breakdown.</li>
             </ul>
           </div>
       </section>
