@@ -1,0 +1,31 @@
+.member-list-modal__body {
+  display: grid;
+  gap: 1rem;
+}
+
+.member-list-modal__item {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.member-list-modal__name {
+  font-weight: 600;
+}
+
+.member-list-modal__meta {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 767px) {
+  .member-list-modal__item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .member-list-modal__item .btn {
+    width: 100%;
+  }
+}

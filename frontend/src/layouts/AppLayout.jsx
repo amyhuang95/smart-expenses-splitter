@@ -17,10 +17,7 @@ export default function AppLayout() {
               <NavLink to="/groups" className="startup-page__nav-link">
                 Group Expenses
               </NavLink>
-              <NavLink
-                to="/single-expenses"
-                className="startup-page__nav-link"
-              >
+              <NavLink to="/single-expenses" className="startup-page__nav-link">
                 Single Expenses
               </NavLink>
             </Nav>

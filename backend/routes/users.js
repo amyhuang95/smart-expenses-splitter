@@ -6,6 +6,7 @@ import {
   normalizeEmail,
   serializeUser,
 } from "../db/usersCollection.js";
+import { requireAuth } from "../middleware/auth.js";
 
 const router = Router();
 const SALT_ROUNDS = 10;
@@ -15,7 +16,7 @@ function readBodyString(value) {
 }
 
 // Get current authenticated user
-router.get("/me", (req, res) => {
+router.get("/me", requireAuth, (req, res) => {
   res.json({ user: req.currentUser });
 });
 
@@ -33,9 +34,9 @@ router.post("/register", async (req, res, next) => {
 
   // Basic password strength check (can be enhanced with more rules)
   if (password.length < 8) {
-  res.status(400).json({ error: "Password must be at least 8 characters." });
-  return;
-}
+    res.status(400).json({ error: "Password must be at least 8 characters." });
+    return;
+  }
 
   try {
     const existingUser = await findUserByEmail(email);
@@ -99,7 +100,7 @@ router.post("/login", async (req, res, next) => {
 });
 
 // Logout the current user
-router.post("/logout", (req, res, next) => {
+router.post("/logout", requireAuth, (req, res, next) => {
   if (!req.session) {
     res.status(204).end();
     return;
