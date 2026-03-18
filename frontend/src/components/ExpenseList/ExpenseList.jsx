@@ -1,10 +1,14 @@
 import PropTypes from "prop-types";
+import { useState } from "react";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
+import Pagination from "react-bootstrap/Pagination";
 import { currency, formatDate } from "../../utils/format.js";
 import "./ExpenseList.css";
+
+const PAGE_SIZE = 5;
 
 export default function ExpenseList({
   currentUserId,
@@ -14,6 +18,17 @@ export default function ExpenseList({
   onDelete,
   onEdit,
 }) {
+  const [currentPage, setCurrentPage] = useState(1);
+  const totalPages = Math.max(Math.ceil(expenses.length / PAGE_SIZE), 1);
+  const safeCurrentPage = Math.min(currentPage, totalPages);
+  const visibleStart = (safeCurrentPage - 1) * PAGE_SIZE;
+  const visibleExpenses = expenses.slice(
+    visibleStart,
+    visibleStart + PAGE_SIZE,
+  );
+  const visibleRangeStart = expenses.length ? visibleStart + 1 : 0;
+  const visibleRangeEnd = Math.min(visibleStart + PAGE_SIZE, expenses.length);
+
   return (
     <Card className="expense-list">
       <Card.Body>
@@ -24,7 +39,7 @@ export default function ExpenseList({
       </Card.Body>
       <ListGroup variant="flush">
         {expenses.length ? (
-          expenses.map((expense) => (
+          visibleExpenses.map((expense) => (
             <ListGroup.Item key={expense._id} className="expense-list__item">
               <div>
                 <div className="expense-list__title-row">
@@ -78,6 +93,40 @@ export default function ExpenseList({
           <ListGroup.Item>No expenses have been added yet.</ListGroup.Item>
         )}
       </ListGroup>
+      {expenses.length ? (
+        <Card.Footer className="expense-list__footer">
+          <div className="expense-list__summary">
+            Showing {visibleRangeStart}-{visibleRangeEnd} of {expenses.length}
+          </div>
+          {totalPages > 1 ? (
+            <Pagination className="expense-list__pagination">
+              <Pagination.Prev
+                disabled={safeCurrentPage === 1}
+                onClick={() => setCurrentPage((page) => Math.max(page - 1, 1))}
+              />
+              {Array.from({ length: totalPages }, (_, index) => {
+                const pageNumber = index + 1;
+
+                return (
+                  <Pagination.Item
+                    active={pageNumber === safeCurrentPage}
+                    key={pageNumber}
+                    onClick={() => setCurrentPage(pageNumber)}
+                  >
+                    {pageNumber}
+                  </Pagination.Item>
+                );
+              })}
+              <Pagination.Next
+                disabled={safeCurrentPage === totalPages}
+                onClick={() =>
+                  setCurrentPage((page) => Math.min(page + 1, totalPages))
+                }
+              />
+            </Pagination>
+          ) : null}
+        </Card.Footer>
+      ) : null}
     </Card>
   );
 }

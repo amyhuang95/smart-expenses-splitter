@@ -31,3 +31,28 @@
   gap: 0.5rem;
   margin-top: 0.75rem;
 }
+
+.expense-list__footer {
+  align-items: center;
+  background: transparent;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: space-between;
+}
+
+.expense-list__summary {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.expense-list__pagination {
+  margin-bottom: 0;
+}
+
+@media (max-width: 767px) {
+  .expense-list__footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
