@@ -1,96 +1,150 @@
 import PropTypes from "prop-types";
+import { useState } from "react";
+import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
+import Card from "react-bootstrap/Card";
+import ListGroup from "react-bootstrap/ListGroup";
+import "./BalanceSummary.css";
 
-export default function BalanceSummary({ balances }) {
-  if (!balances) {
-    return (
-      <div className="card">
-        <div className="card-body text-secondary small">Loading balances...</div>
-      </div>
-    );
-  }
+const FILTER = {
+  ALL: "all",
+  PAID: "paid",
+  PENDING: "pending",
+};
 
-  const { summary, details } = balances;
+const FILTER_OPTIONS = [
+  { label: "All", value: FILTER.ALL },
+  { label: "Pending", value: FILTER.PENDING },
+  { label: "Paid", value: FILTER.PAID },
+];
+
+function currency(value) {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(value ?? 0);
+}
+
+export default function BalanceSummary({
+  currentUserId,
+  debts,
+  groupStatus,
+  groupOwnerId,
+  isSubmitting,
+  onMarkPaid,
+}) {
+  const [statusFilter, setStatusFilter] = useState(FILTER.ALL);
+  const filteredDebts = debts.filter((debt) => {
+    if (statusFilter === FILTER.PAID) {
+      return debt.isPaid;
+    }
+
+    if (statusFilter === FILTER.PENDING) {
+      return !debt.isPaid;
+    }
+
+    return true;
+  });
+  const emptyLabel =
+    statusFilter === FILTER.ALL
+      ? "No balances to settle."
+      : `No ${statusFilter} balances found.`;
 
   return (
-    <div className="card">
-      <div className="card-body">
-        <h6 className="fw-bold mb-3">My Balance</h6>
-
-        {/* Net summary */}
-        <div className="d-flex justify-content-between mb-3 pb-2 border-bottom">
-          <div className="text-center">
-            <small className="text-secondary d-block">You Owe</small>
-            <span className="fw-bold text-danger">${summary.youOwe.toFixed(2)}</span>
-          </div>
-          <div className="text-center">
-            <small className="text-secondary d-block">Owed to You</small>
-            <span className="fw-bold text-success">${summary.owedToYou.toFixed(2)}</span>
-          </div>
-          <div className="text-center">
-            <small className="text-secondary d-block">Net</small>
-            <span className={`fw-bold ${summary.net >= 0 ? "text-success" : "text-danger"}`}>
-              {summary.net >= 0 ? "+" : ""}${summary.net.toFixed(2)}
-            </span>
-          </div>
+    <Card className="balance-summary">
+      <Card.Body>
+        <Card.Title>Settlement Plan</Card.Title>
+        <div
+          aria-label="Filter settlements"
+          className="balance-summary__filter"
+          role="group"
+        >
+          {FILTER_OPTIONS.map((option) => (
+            <button
+              aria-pressed={statusFilter === option.value}
+              className={`balance-summary__filter-tag${statusFilter === option.value
+                  ? " balance-summary__filter-tag--active"
+                  : ""
+                }`}
+              key={option.value}
+              onClick={() => setStatusFilter(option.value)}
+              type="button"
+            >
+              {option.label}
+            </button>
+          ))}
         </div>
+      </Card.Body>
+      <div className="balance-summary__list">
+        <ListGroup variant="flush">
+          {filteredDebts.length ? (
+            filteredDebts.map((debt) => {
+              const canMarkPaid =
+                !debt.isPaid &&
+                (currentUserId === debt.senderId ||
+                  currentUserId === debt.receiverId ||
+                  currentUserId === groupOwnerId) &&
+                groupStatus !== "open";
 
-        {/* Per-person breakdown */}
-        {details.length === 0 ? (
-          <div className="text-center py-2">
-            <span className="badge bg-success fs-6 mb-1">✓</span>
-            <p className="text-success fw-bold mb-0 small">All settled up!</p>
-          </div>
-        ) : (
-          <div className="d-flex flex-column gap-2">
-            {details.map((d) => (
-              <div
-                key={d.person}
-                className="d-flex align-items-center justify-content-between bg-light rounded p-2"
-              >
-                <span className="small">
-                  {d.direction === "owes_you" ? (
-                    <>
-                      <span className="fw-bold">{d.person}</span>
-                      <span className="text-secondary"> owes you</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-secondary">You owe </span>
-                      <span className="fw-bold">{d.person}</span>
-                    </>
-                  )}
-                </span>
-                <span
-                  className={`fw-bold small ${d.direction === "owes_you" ? "text-success" : "text-danger"}`}
+              return (
+                <ListGroup.Item
+                  key={debt.debtId}
+                  className="balance-summary__item"
                 >
-                  {d.direction === "owes_you" ? "+" : "-"}${d.amount.toFixed(2)}
-                </span>
-              </div>
-            ))}
-          </div>
-        )}
+                  <div>
+                    <strong>{debt.sender?.name ?? "Member"}</strong> →{" "}
+                    <strong>{debt.receiver?.name ?? "Member"}</strong>
+                    <div className="balance-summary__meta">
+                      {currency(debt.amount)}
+                    </div>
+                  </div>
+                  <div className="balance-summary__actions">
+                    <Badge bg={debt.isPaid ? "success" : "warning"}>
+                      {debt.isPaid ? "Paid" : "Pending"}
+                    </Badge>
+                    {canMarkPaid ? (
+                      <Button
+                        disabled={isSubmitting}
+                        onClick={() => onMarkPaid(debt.debtId)}
+                        size="sm"
+                        type="button"
+                        variant="outline-dark"
+                      >
+                        Mark Paid
+                      </Button>
+                    ) : null}
+                  </div>
+                </ListGroup.Item>
+              );
+            })
+          ) : (
+            <ListGroup.Item>{emptyLabel}</ListGroup.Item>
+          )}
+        </ListGroup>
       </div>
-    </div>
+    </Card>
   );
 }
 
 BalanceSummary.propTypes = {
-  balances: PropTypes.shape({
-    summary: PropTypes.shape({
-      youOwe: PropTypes.number.isRequired,
-      owedToYou: PropTypes.number.isRequired,
-      net: PropTypes.number.isRequired,
-    }).isRequired,
-    details: PropTypes.arrayOf(
-      PropTypes.shape({
-        person: PropTypes.string.isRequired,
-        amount: PropTypes.number.isRequired,
-        direction: PropTypes.string.isRequired,
+  currentUserId: PropTypes.string.isRequired,
+  debts: PropTypes.arrayOf(
+    PropTypes.shape({
+      amount: PropTypes.number.isRequired,
+      debtId: PropTypes.string.isRequired,
+      isPaid: PropTypes.bool.isRequired,
+      receiver: PropTypes.shape({
+        name: PropTypes.string,
       }),
-    ).isRequired,
-  }),
-};
-
-BalanceSummary.defaultProps = {
-  balances: null,
+      receiverId: PropTypes.string.isRequired,
+      sender: PropTypes.shape({
+        name: PropTypes.string,
+      }),
+      senderId: PropTypes.string.isRequired,
+    }),
+  ).isRequired,
+  groupStatus: PropTypes.string.isRequired,
+  groupOwnerId: PropTypes.string.isRequired,
+  isSubmitting: PropTypes.bool.isRequired,
+  onMarkPaid: PropTypes.func.isRequired,
 };
