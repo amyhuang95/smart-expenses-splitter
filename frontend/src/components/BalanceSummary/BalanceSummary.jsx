@@ -1,9 +1,22 @@
 import PropTypes from "prop-types";
+import { useState } from "react";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
 import "./BalanceSummary.css";
+
+const FILTER = {
+  ALL: "all",
+  PAID: "paid",
+  PENDING: "pending",
+};
+
+const FILTER_OPTIONS = [
+  { label: "All", value: FILTER.ALL },
+  { label: "Pending", value: FILTER.PENDING },
+  { label: "Paid", value: FILTER.PAID },
+];
 
 function currency(value) {
   return new Intl.NumberFormat("en-US", {
@@ -19,57 +32,97 @@ export default function BalanceSummary({
   isSubmitting,
   onMarkPaid,
 }) {
+  const [statusFilter, setStatusFilter] = useState(FILTER.ALL);
+  const filteredDebts = debts.filter((debt) => {
+    if (statusFilter === FILTER.PAID) {
+      return debt.isPaid;
+    }
+
+    if (statusFilter === FILTER.PENDING) {
+      return !debt.isPaid;
+    }
+
+    return true;
+  });
+  const emptyLabel =
+    statusFilter === FILTER.ALL
+      ? "No balances to settle."
+      : `No ${statusFilter} balances found.`;
+
   return (
     <Card className="balance-summary">
       <Card.Body>
         <Card.Title>Who Owes Whom</Card.Title>
         <Card.Text className="text-muted">
-          Review the current settlement plan for this group.
+          Current settlement plan for this group.
         </Card.Text>
+        <div
+          aria-label="Filter settlements"
+          className="balance-summary__filter"
+          role="group"
+        >
+          {FILTER_OPTIONS.map((option) => (
+            <button
+              aria-pressed={statusFilter === option.value}
+              className={`balance-summary__filter-tag${
+                statusFilter === option.value
+                  ? " balance-summary__filter-tag--active"
+                  : ""
+              }`}
+              key={option.value}
+              onClick={() => setStatusFilter(option.value)}
+              type="button"
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
       </Card.Body>
-      <ListGroup variant="flush">
-        {debts.length ? (
-          debts.map((debt) => {
-            const canMarkPaid =
-              !debt.isPaid &&
-              currentUserId === debt.senderId &&
-              groupStatus !== "open";
+      <div className="balance-summary__list">
+        <ListGroup variant="flush">
+          {filteredDebts.length ? (
+            filteredDebts.map((debt) => {
+              const canMarkPaid =
+                !debt.isPaid &&
+                currentUserId === debt.senderId &&
+                groupStatus !== "open";
 
-            return (
-              <ListGroup.Item
-                key={debt.debtId}
-                className="balance-summary__item"
-              >
-                <div>
-                  <strong>{debt.sender?.name ?? "Member"}</strong> owes{" "}
-                  <strong>{debt.receiver?.name ?? "Member"}</strong>
-                  <div className="balance-summary__meta">
-                    {currency(debt.amount)}
+              return (
+                <ListGroup.Item
+                  key={debt.debtId}
+                  className="balance-summary__item"
+                >
+                  <div>
+                    <strong>{debt.sender?.name ?? "Member"}</strong> owes{" "}
+                    <strong>{debt.receiver?.name ?? "Member"}</strong>
+                    <div className="balance-summary__meta">
+                      {currency(debt.amount)}
+                    </div>
                   </div>
-                </div>
-                <div className="balance-summary__actions">
-                  <Badge bg={debt.isPaid ? "success" : "warning"}>
-                    {debt.isPaid ? "Paid" : "Pending"}
-                  </Badge>
-                  {canMarkPaid ? (
-                    <Button
-                      disabled={isSubmitting}
-                      onClick={() => onMarkPaid(debt.debtId)}
-                      size="sm"
-                      type="button"
-                      variant="outline-dark"
-                    >
-                      Mark Paid
-                    </Button>
-                  ) : null}
-                </div>
-              </ListGroup.Item>
-            );
-          })
-        ) : (
-          <ListGroup.Item>No balances to settle.</ListGroup.Item>
-        )}
-      </ListGroup>
+                  <div className="balance-summary__actions">
+                    <Badge bg={debt.isPaid ? "success" : "warning"}>
+                      {debt.isPaid ? "Paid" : "Pending"}
+                    </Badge>
+                    {canMarkPaid ? (
+                      <Button
+                        disabled={isSubmitting}
+                        onClick={() => onMarkPaid(debt.debtId)}
+                        size="sm"
+                        type="button"
+                        variant="outline-dark"
+                      >
+                        Mark Paid
+                      </Button>
+                    ) : null}
+                  </div>
+                </ListGroup.Item>
+              );
+            })
+          ) : (
+            <ListGroup.Item>{emptyLabel}</ListGroup.Item>
+          )}
+        </ListGroup>
+      </div>
     </Card>
   );
 }
