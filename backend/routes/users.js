@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import { Router } from "express";
+import passport from "../config/passport.js";
 import {
   createUser,
   findUserByEmail,
@@ -17,7 +18,7 @@ function readBodyString(value) {
 
 // Get current authenticated user
 router.get("/me", requireAuth, (req, res) => {
-  res.json({ user: req.currentUser });
+  res.json({ user: req.user });
 });
 
 // Register a new user
@@ -54,11 +55,23 @@ router.post("/register", async (req, res, next) => {
       passwordHash,
     });
 
-    // Regenerate session to prevent fixation and set userId
+    // Regenerate session to prevent fixation before establishing the login session.
     req.session.regenerate((err) => {
-      if (err) return next(err);
-      req.session.userId = user._id.toString();
-      res.status(201).json({ user: serializeUser(user) });
+      if (err) {
+        next(err);
+        return;
+      }
+
+      // Pass the raw DB document so passport.serializeUser receives the
+      // original user object, not one that has already been serialized.
+      req.login(user, (loginError) => {
+        if (loginError) {
+          next(loginError);
+          return;
+        }
+
+        res.status(201).json({ user: serializeUser(user) });
+      });
     });
   } catch (error) {
     next(error);
@@ -66,7 +79,7 @@ router.post("/register", async (req, res, next) => {
 });
 
 // Login an existing user
-router.post("/login", async (req, res, next) => {
+router.post("/login", (req, res, next) => {
   const email = readBodyString(req.body?.email);
   const password = readBodyString(req.body?.password);
 
@@ -75,38 +88,43 @@ router.post("/login", async (req, res, next) => {
     return;
   }
 
-  try {
-    const user = await findUserByEmail(email);
+  // Authenticate first, then regenerate the session before writing to it.
+  // Regenerating before authenticate causes req.login to write into a stale
+  // session reference, which silently drops the session on the next request.
+  passport.authenticate("local", (authError, user, info) => {
+    if (authError) {
+      next(authError);
+      return;
+    }
+
     if (!user) {
-      res.status(401).json({ error: "Invalid email or password." });
+      res.status(401).json({ error: info?.message ?? "Login failed." });
       return;
     }
 
-    const isValidPassword = await bcrypt.compare(password, user.passwordHash);
-    if (!isValidPassword) {
-      res.status(401).json({ error: "Invalid email or password." });
-      return;
-    }
+    req.session.regenerate((regenerateError) => {
+      if (regenerateError) {
+        next(regenerateError);
+        return;
+      }
 
-    // Regenerate session to prevent fixation and set userId
-    req.session.regenerate((err) => {
-      if (err) return next(err);
-      req.session.userId = user._id.toString();
-      res.json({ user: serializeUser(user) });
+      // Pass the raw DB document so passport.serializeUser receives the
+      // original user object, not one that has already been serialized.
+      req.login(user, (loginError) => {
+        if (loginError) {
+          next(loginError);
+          return;
+        }
+
+        res.json({ user: serializeUser(user) });
+      });
     });
-  } catch (error) {
-    next(error);
-  }
+  })(req, res, next);
 });
 
 // Logout the current user
 router.post("/logout", requireAuth, (req, res, next) => {
-  if (!req.session) {
-    res.status(204).end();
-    return;
-  }
-
-  req.session.destroy((error) => {
+  req.logout((error) => {
     if (error) {
       next(error);
       return;
