@@ -1,154 +1,183 @@
 # Smart Expenses Splitter
 
-## Project Objective
+SplitEasy is a full-stack expense sharing application for roommates, travel groups, and other small groups who need a clearer way to track shared costs. It supports both recurring group workflows and quick one-off expense splits, with balance summaries that show who owes whom.
 
-**SplitEasy** is a full-stack web application designed to simplify shared expense tracking among roommates, friends, and travel groups.
+- Deployment: https://spliteasy-4q1v.onrender.com
 
-The application is composed of two main features:
-1. Track single expenses shared among multiple people: the expense title, who paid for it, who to split with, and whether the expenses are settled or still working in progress.
-2. Track multiple expenses among a group of people related to one event.
+## Features
 
-* Screenshot
-* Deployment Link
+- User registration, login, logout, and session-based authentication
 
-## Technology Stack
+### Group Expenses
+
+Track multiple group expenses in one place for trips, apartments, and events.
+
+- Create a group and invite members by email
+- Add shared expenses to a group
+- Review members, balances, debts, and expense history in one detail page
+- Settle a group to freeze outstanding debts
+- Mark settlement debts as paid
+- Delete expenses or entire groups with confirmation safeguards
+
+### Single Expenses
+
+Track single expenses in one place for ad hoc splits.
+
+- Create one-off expenses without creating a group
+- Filter expenses by category and payer
+- Sort expenses by date, amount, or category
+- View quick stats, balance summaries, and category spending charts
+- Edit, delete, and mark expenses as paid
+
+## Screenshots
+
+| Landing Page | Home Page |
+| --- | --- |
+| ![Landing Page](screenshots/index-page.png) | ![Home Page](screenshots/home-page.png) |
+| Group Dashboard | Group Details |
+| ![Group Dashboard](screenshots/group-expense-list.png) | ![Group Details](screenshots/group-expense-detail.png) |
+| Single Expenses | Single Expense Details |
+| ![Single Expenses](screenshots/single-expense-list.png) | ![Single Expense Details](screenshots/single-expense-detail.png) |
+
+
+## Tech Stack
 
 ### Frontend
 
-* React
-* React Hooks (`useState`, `useEffect`, `useContext`)
-* `react-router` for routing frontend pages
-* `react-dom` 
-* Fetch API
-* `react-bootstrap`
-* CSS Modules / Component CSS
-* PropTypes
-* Development tools: vite
+- React + Vite
+- React Router
+- React Bootstrap
+- Recharts
+- `passport-local`
 
 ### Backend
 
-* Node.js
-* Express (use middleware for authenticated content)
-* MongoDB Atlas
-* `bcrypt` and `express-session` for user authentication
-* Development tools: nodemon
+- Node.js
+- Express
+- MongoDB
 
-## Repository Structure
+## Project Structure
 
-The repository is organized into separate frontend, backend, and design workspaces.
-
-```
+```text
 smart-expenses-splitter/
-├── AGENTS.md
 ├── README.md
+├── LICENSE
 ├── design/
 │   ├── DESIGN.md
 │   └── mockups/
 ├── frontend/
 │   ├── package.json
-│   ├── index.html
 │   ├── vite.config.js
+│   ├── index.html
 │   └── src/
 │       ├── components/
 │       ├── context/
 │       ├── layouts/
 │       ├── pages/
 │       ├── services/
-│       ├── styles/
+│       ├── utils/
 │       ├── App.jsx
 │       └── index.jsx
 └── backend/
     ├── .env.example
-    ├── eslint.config.js
     ├── package.json
-    ├── package-lock.json
     ├── server.js
     ├── config/
-    │   └── index.js
     ├── db/
-    │   ├── connection.js
-    │   ├── groupExpensesCollection.js
-    │   ├── groupsCollection.js
-    │   ├── seed.js
-    │   └── usersCollection.js
     ├── middleware/
-    │   ├── auth.js
-    │   └── requestLogger.js
     ├── routes/
-    │   ├── expenses.js
-    │   ├── groups.js
-    │   └── users.js
     └── utils/
 ```
 
-## API Notes
-
-* Group dashboard and settlement workflows use `/api/groups`
-* Group expense-specific endpoints are nested under `/api/groups/:groupId/expenses`
-
-## Build and Run
+## Local Development
 
 ### Prerequisites
 
-* Node.js 18+ and npm
-* A MongoDB Atlas connection string
+- Node.js 18 or newer
+- npm
+- A MongoDB connection string
 
-### Environment Setup
+### Environment Variables
 
-1. Create `backend/.env` and include variables defined in [backend/.env.example](backend/.env.example).
+Create `backend/.env` using `backend/.env.example` as the starting point.
+
+Required values:
+
+- `MONGODB_URI`
+- `SESSION_SECRET`
+
+Optional values:
+
+- `PORT` default: `3000`
+- `DB_NAME` default: `spliteasy`
 
 ### Install Dependencies
 
-Run these commands from the project root:
-
 ```bash
-cd backend && npm install
-cd ../frontend && npm install
+cd backend
+npm install
+cd ../frontend
+npm install
 ```
 
 ### Run in Development
 
-1. Start the backend server:
+In one terminal:
 
 ```bash
 cd backend
 npm run dev
 ```
 
-2. In a second terminal, start the frontend dev server:
+In a second terminal:
 
 ```bash
 cd frontend
 npm run dev
 ```
 
-3. Open the frontend at `http://localhost:5173`.
+The frontend runs at [http://localhost:5173](http://localhost:5173).
+The backend runs at [http://localhost:3000](http://localhost:3000).
+Vite proxies `/api` requests to the backend during local development.
 
-The Vite dev server proxies `/api` requests to `http://localhost:3000`, so the backend should be running before you use the app locally.
+### Build for Production
 
-### Build the App
-
-Build the frontend bundle with:
+Build the frontend bundle:
 
 ```bash
 cd frontend
 npm run build
 ```
 
-This outputs the production frontend files to `frontend/dist`.
-
-### Run the Built App
-
-After building the frontend, start the backend server:
+Then start the backend server:
 
 ```bash
 cd backend
 npm start
 ```
 
-The backend serves the built frontend from `frontend/dist`, so the full app will be available at `http://localhost:3000`.
+The Express server serves the built frontend from `frontend/dist`.
+
+## Available Scripts
+
+### Frontend
+
+- `npm run dev`: start the Vite development server
+- `npm run build`: create a production build
+- `npm run preview`: preview the built frontend locally
+- `npm run lint`: run ESLint
+- `npm run format`: run Prettier on `src/`
+
+### Backend
+
+- `npm start`: start the Express server
+- `npm run dev`: start the backend with Nodemon
+- `npm run lint`: run ESLint
+- `npm run format`: run Prettier
 
 ---
-_This project was developed as part of the course CS 5610 Web Development taught by Professor John Alexis Guerra Gomez at Northeastern University (Oakland)._
-* Authors: Panta Huang, Amy Huang
-* Class Link: https://johnguerra.co/classes/webDevelopment_online_spring_2026/
+
+_This project was developed for CS 5610 Web Development at Northeastern University (Oakland)._
+
+- Authors: Pangta Huang, Amy Huang
+- Course page: [johnguerra.co/classes/webDevelopment_online_spring_2026](https://johnguerra.co/classes/webDevelopment_online_spring_2026/)
