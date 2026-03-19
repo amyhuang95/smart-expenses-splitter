@@ -26,8 +26,7 @@ router.post("/", async (req, res) => {
     const parsedAmount = parseFloat(amount);
 
     // Auto-calculate equal split
-    const share =
-      Math.round((parsedAmount / splitBetween.length) * 100) / 100;
+    const share = Math.round((parsedAmount / splitBetween.length) * 100) / 100;
     const splitDetails = {};
     const paidStatus = {};
     splitBetween.forEach((userId) => {
@@ -175,8 +174,7 @@ router.get("/balances", async (req, res) => {
         // Someone else paid → I owe them my share
         if (!e.paidStatus?.[user]) {
           const myShare = e.splitDetails?.[user] || 0;
-          personBalances[e.paidBy] =
-            (personBalances[e.paidBy] || 0) - myShare;
+          personBalances[e.paidBy] = (personBalances[e.paidBy] || 0) - myShare;
         }
       }
     });
@@ -241,8 +239,7 @@ router.put("/:id", async (req, res) => {
 
     // If amount or splitBetween changed, recalculate splits
     if (amount !== undefined || splitBetween !== undefined) {
-      const newAmount =
-        amount !== undefined ? parseFloat(amount) : undefined;
+      const newAmount = amount !== undefined ? parseFloat(amount) : undefined;
       if (newAmount !== undefined) updateFields.amount = newAmount;
 
       if (splitBetween !== undefined) {

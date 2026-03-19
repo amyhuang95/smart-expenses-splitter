@@ -1,4 +1,7 @@
 .startup-page__topbar {
+  align-items: center;
+  gap: 1rem;
+  justify-content: space-between;
   margin-bottom: 56px;
   padding: 0;
 }

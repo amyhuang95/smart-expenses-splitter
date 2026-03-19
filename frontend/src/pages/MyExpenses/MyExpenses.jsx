@@ -206,6 +206,7 @@ export default function MyExpenses() {
             onClick={(e) => e.stopPropagation()}
           >
             <ExpenseForm
+              key={editingExpense?._id ?? `new-expense-${userName}`}
               expense={editingExpense}
               currentUser={userName}
               onSubmit={editingExpense ? handleUpdate : handleCreate}

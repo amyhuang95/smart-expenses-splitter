@@ -5,36 +5,44 @@ import "./ExpenseForm.css";
 
 const CATEGORIES = ["food", "transport", "utilities", "entertainment", "other"];
 
+function getInitialFormState(expense, currentUser) {
+  if (expense) {
+    return {
+      name: expense.name,
+      description: expense.description || "",
+      amount: expense.amount.toString(),
+      category: expense.category,
+      paidBy: expense.paidBy,
+      splitBetween: expense.splitBetween || [],
+    };
+  }
+
+  return {
+    name: "",
+    description: "",
+    amount: "",
+    category: "food",
+    paidBy: currentUser,
+    splitBetween: [currentUser],
+  };
+}
+
 export default function ExpenseForm({
   expense,
   currentUser,
   onSubmit,
   onCancel,
 }) {
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
-  const [amount, setAmount] = useState("");
-  const [category, setCategory] = useState("food");
-  const [paidBy, setPaidBy] = useState("");
-  const [splitBetween, setSplitBetween] = useState([]);
+  const initialState = getInitialFormState(expense, currentUser);
+  const [name, setName] = useState(initialState.name);
+  const [description, setDescription] = useState(initialState.description);
+  const [amount, setAmount] = useState(initialState.amount);
+  const [category, setCategory] = useState(initialState.category);
+  const [paidBy, setPaidBy] = useState(initialState.paidBy);
+  const [splitBetween, setSplitBetween] = useState(initialState.splitBetween);
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
-
-  // Populate form for editing or set defaults for new
-  useEffect(() => {
-    if (expense) {
-      setName(expense.name);
-      setDescription(expense.description || "");
-      setAmount(expense.amount.toString());
-      setCategory(expense.category);
-      setPaidBy(expense.paidBy);
-      setSplitBetween(expense.splitBetween || []);
-    } else {
-      setPaidBy(currentUser);
-      setSplitBetween([currentUser]);
-    }
-  }, [expense, currentUser]);
 
   // Search users as they type — uses GET /api/users/search?q=xxx
   useEffect(() => {
