@@ -3,8 +3,9 @@ import session from "express-session";
 import { dirname, join } from "path";
 import { fileURLToPath } from "url";
 import { config } from "./config/index.js";
+import passport from "./config/passport.js";
 import { closeDB, connectDB } from "./db/connection.js";
-import { hydrateSessionUser } from "./middleware/auth.js";
+import { attachCurrentUser } from "./middleware/auth.js";
 import { requestLogger } from "./middleware/requestLogger.js";
 import expensesRouter from "./routes/expenses.js";
 import groupsRouter from "./routes/groups.js";
@@ -33,7 +34,9 @@ app.use(
     },
   }),
 );
-app.use(hydrateSessionUser);
+app.use(passport.initialize());
+app.use(passport.session());
+app.use(attachCurrentUser);
 
 app.use("/api/users", usersRouter);
 app.use("/api/groups", groupsRouter);
