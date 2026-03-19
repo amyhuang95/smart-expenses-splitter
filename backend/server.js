@@ -18,6 +18,7 @@ const distPath = join(__dirname, "..", "frontend", "dist");
 
 const app = express();
 
+app.set("trust proxy", 1);
 app.use(requestLogger);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
