@@ -1,0 +1,47 @@
+.group-details-page__modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1060;
+}
+
+.group-details-page__member-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  background: rgba(13, 110, 253, 0.1);
+  color: #0d6efd;
+  border: 1px solid rgba(13, 110, 253, 0.3);
+}
+
+.group-details-page__member-tag button {
+  background: none;
+  border: none;
+  color: #0d6efd;
+  cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
+}
+
+.group-details-page__members-more {
+  background: rgba(33, 37, 41, 0.08);
+  border: 1px dashed rgba(33, 37, 41, 0.2);
+  border-radius: 999px;
+  color: #212529;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.75rem;
+}
+
+.group-details-page__members-more:hover,
+.group-details-page__members-more:focus {
+  background: rgba(33, 37, 41, 0.12);
+}

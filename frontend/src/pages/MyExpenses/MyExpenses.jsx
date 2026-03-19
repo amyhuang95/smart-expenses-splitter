@@ -15,6 +15,7 @@ import {
   markExpensePaid,
   deleteExpense,
 } from "../../services/expenses.js";
+import "./MyExpenses.css";
 
 
 export default function MyExpenses() {
@@ -193,7 +194,7 @@ export default function MyExpenses() {
       {/* Add/Edit Modal */}
       {(showForm || editingExpense) && (
         <div
-          className="modal-backdrop-custom"
+          className="my-expenses__modal-backdrop"
           onClick={() => {
             setShowForm(false);
             setEditingExpense(null);
@@ -220,7 +221,7 @@ export default function MyExpenses() {
       {/* Delete Confirmation */}
       {confirmDelete && (
         <div
-          className="modal-backdrop-custom"
+          className="my-expenses__modal-backdrop"
           onClick={() => setConfirmDelete(null)}
         >
           <div

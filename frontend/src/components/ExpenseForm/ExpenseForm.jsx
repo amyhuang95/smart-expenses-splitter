@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import { searchUsers } from "../../services/expenses.js";
+import "./ExpenseForm.css";
 
 const CATEGORIES = ["food", "transport", "utilities", "entertainment", "other"];
 
@@ -209,7 +210,7 @@ export default function ExpenseForm({
         {splitBetween.length > 0 && (
           <div className="d-flex flex-wrap gap-2 mt-2">
             {splitBetween.map((p) => (
-              <span key={p} className="member-tag">
+              <span key={p} className="expense-form__member-tag">
                 {p === currentUser ? `${p} (You)` : p}
                 {p !== currentUser && (
                   <button onClick={() => handleRemoveUser(p)} type="button">

@@ -4,6 +4,7 @@ import Nav from "react-bootstrap/Nav";
 import { NavLink, Outlet } from "react-router";
 import AppNavBar from "../components/AppNavBar/AppNavBar";
 import { useUser } from "../context/useUser.js";
+import "./AppLayout.css";
 
 export default function AppLayout() {
   const { logout } = useUser();

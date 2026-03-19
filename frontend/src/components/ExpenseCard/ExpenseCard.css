@@ -1,0 +1,19 @@
+.expense-card__category--food {
+  color: #ff6b6b;
+}
+
+.expense-card__category--transport {
+  color: #4ecdc4;
+}
+
+.expense-card__category--utilities {
+  color: #ffd93d;
+}
+
+.expense-card__category--entertainment {
+  color: #a855f7;
+}
+
+.expense-card__category--other {
+  color: #6b7280;
+}
