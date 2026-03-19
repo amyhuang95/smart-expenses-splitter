@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import Navbar from "react-bootstrap/Navbar";
 import { Link } from "react-router";
+import "./AppNavBar.css";
 
 export default function AppNavBar({ children }) {
   return (

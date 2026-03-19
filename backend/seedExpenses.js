@@ -77,7 +77,9 @@ const randDate = () => {
   const now = new Date();
   const past = new Date(now);
   past.setMonth(past.getMonth() - 6);
-  return new Date(past.getTime() + Math.random() * (now.getTime() - past.getTime()));
+  return new Date(
+    past.getTime() + Math.random() * (now.getTime() - past.getTime()),
+  );
 };
 
 const descFor = (c) => {
@@ -97,7 +99,9 @@ const amtFor = (c) => {
 };
 
 async function seedExpenses() {
-  const client = new MongoClient(process.env.MONGODB_URI || process.env.MONGO_URI);
+  const client = new MongoClient(
+    process.env.MONGODB_URI || process.env.MONGO_URI,
+  );
   try {
     await client.connect();
     const db = client.db("spliteasy");
@@ -119,7 +123,8 @@ async function seedExpenses() {
       // Random 2-4 participants (always includes payer)
       const others = NAMES.filter((n) => n !== paidBy);
       const shuffled = others.sort(() => Math.random() - 0.5);
-      const numOthers = 1 + Math.floor(Math.random() * Math.min(3, others.length));
+      const numOthers =
+        1 + Math.floor(Math.random() * Math.min(3, others.length));
       const splitBetween = [paidBy, ...shuffled.slice(0, numOthers)];
 
       // Calculate equal split
@@ -154,7 +159,9 @@ async function seedExpenses() {
     // Print summary
     const perUser = {};
     NAMES.forEach((name) => {
-      perUser[name] = expenses.filter((e) => e.splitBetween.includes(name)).length;
+      perUser[name] = expenses.filter((e) =>
+        e.splitBetween.includes(name),
+      ).length;
     });
     console.log("Expenses per user:");
     Object.entries(perUser).forEach(([name, count]) => {

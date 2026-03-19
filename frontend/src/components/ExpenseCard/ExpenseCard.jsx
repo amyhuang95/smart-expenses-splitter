@@ -1,4 +1,5 @@
 import PropTypes from "prop-types";
+import "./ExpenseCard.css";
 
 const ICONS = {
   food: "🍔",
@@ -32,7 +33,7 @@ export default function ExpenseCard({ expense, currentUser, onEdit, onDelete, on
             <small className="text-secondary">
               Paid by <strong>{isPayer ? "You" : expense.paidBy}</strong>
               {" · "}
-              <span className={`category-${expense.category}`}>{expense.category}</span>
+              <span className={`expense-card__category--${expense.category}`}>{expense.category}</span>
               {" · "}
               {date}
               {expense.settled && <span className="badge bg-success ms-2">Settled</span>}

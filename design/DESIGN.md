@@ -107,7 +107,7 @@ SplitEasy solves this problem by providing a simple, centralized platform where 
 ## Mockup
 Link: https://excalidraw.com/#room=d0e905ee7d25efadaa40,3_SXWqsJVJVCZQAcikCCQQ
 
-![mockup](./mockups/mockup-0316.png)
+![mockup](./mockups/mockup.png)
 
 ## API
 
