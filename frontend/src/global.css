@@ -1,6 +1,59 @@
+/* ============================================================
+   Color Palette
+   Primary: Vivid Blue #3D8EE8  |  Teal (accent): #13C4BC
+   Slate bg: #F4F6F8            |  Crimson (danger): #E03040
+   Emerald (success): #10C27A
+   ============================================================ */
+:root {
+  /* Core palette */
+  --color-primary:        #3D8EE8;  /* vivid blue */
+  --color-primary-hover:  #1E6FCC;  /* deeper vivid blue */
+  --color-primary-light:  #D6EAFF;  /* blue tint */
+  --color-secondary:      #13C4BC;  /* bright teal — decorative accent only */
+  --color-accent:         #13C4BC;  /* bright teal accent */
+  --color-accent-light:   #C8F5F3;  /* teal tint */
+
+  /* Backgrounds */
+  --color-bg:             #F4F6F8;  /* soft slate — neutral, finance-appropriate */
+  --color-surface:        #FFFFFF;
+  --color-surface-alt:    #EAEEF2;  /* deeper slate */
+
+  /* Text */
+  --color-text:           #1a2a35;  /* near-black */
+  --color-text-muted:     #4a6070;  /* muted blue-grey */
+  --color-text-subtle:    #7a96a8;  /* subtle hint text */
+
+  /* Borders */
+  --color-border:         rgba(61, 142, 232, 0.15);
+  --color-border-strong:  rgba(61, 142, 232, 0.30);
+
+  /* Status — each state has a distinct color */
+  --color-success:        #10C27A;  /* bright emerald — settled / paid */
+  --color-success-bg:     #C8F5E2;  /* emerald tint */
+  --color-warning:        #F59B00;  /* vivid amber — unpaid / settling */
+  --color-warning-bg:     #FFF0CC;
+  --color-danger:         #E03040;  /* vivid red — danger / error only */
+  --color-danger-bg:      #FFD6DA;  /* red tint */
+
+  /* Shadows */
+  --shadow-sm:  0 2px 8px rgba(61, 142, 232, 0.10);
+  --shadow-md:  0 8px 24px rgba(61, 142, 232, 0.14);
+  --shadow-lg:  0 12px 36px rgba(61, 142, 232, 0.18);
+
+  /* Bootstrap text utility variables — redefining these lets .text-secondary
+     and .text-muted pick up our values through Bootstrap's own cascade,
+     removing the need for !important on those rules. */
+  --bs-secondary-color:     #4a6070;
+  --bs-secondary-color-rgb: 74, 96, 112;
+  --bs-tertiary-color:      #7a96a8;
+  --bs-tertiary-color-rgb:  122, 150, 168;
+}
+
 /* Base font for the entire app */
 body {
   font-family: 'Noto Sans', sans-serif;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 /* Ensure form elements inherit instead of defaulting to browser system font */
@@ -9,4 +62,81 @@ input,
 select,
 textarea {
   font-family: inherit;
+}
+
+/* Bootstrap overrides — wire Bootstrap tokens to our palette */
+.btn-primary,
+.btn-dark {
+  --bs-btn-bg:              var(--color-primary);
+  --bs-btn-border-color:    var(--color-primary);
+  --bs-btn-hover-bg:        var(--color-primary-hover);
+  --bs-btn-hover-border-color: var(--color-primary-hover);
+  --bs-btn-active-bg:       var(--color-primary-hover);
+  --bs-btn-color:           #fff;
+  --bs-btn-hover-color:     #fff;
+}
+
+.btn-light {
+  --bs-btn-bg:           var(--color-surface-alt);
+  --bs-btn-border-color: var(--color-border);
+  --bs-btn-color:        var(--color-text);
+  --bs-btn-hover-bg:     var(--color-primary-light);
+  --bs-btn-hover-color:  var(--color-primary);
+}
+
+.btn-outline-success {
+  --bs-btn-color:              var(--color-success);
+  --bs-btn-border-color:       var(--color-success);
+  --bs-btn-hover-bg:           var(--color-success);
+  --bs-btn-hover-border-color: var(--color-success);
+  --bs-btn-hover-color:        #fff;
+}
+
+.btn-outline-secondary {
+  --bs-btn-color:        var(--color-text-muted);
+  --bs-btn-border-color: var(--color-border-strong);
+  --bs-btn-hover-bg:     var(--color-surface-alt);
+  --bs-btn-hover-color:  var(--color-text);
+}
+
+/* Badge overrides — redefine Bootstrap's per-element color variables so the
+   cascade wins naturally. Bootstrap's .bg-* utility reads --bs-{color}-bg and
+   applies it via background-color; overriding the variable on the element beats
+   the utility class without needing !important. */
+.badge.bg-primary {
+  --bs-primary-rgb: 61, 142, 232;
+  background-color: var(--color-primary);
+  color: #fff;
+}
+.badge.bg-success {
+  --bs-success-rgb: 16, 194, 122;
+  background-color: var(--color-success);
+  color: #fff;
+}
+.badge.bg-warning {
+  --bs-warning-rgb: 245, 155, 0;
+  background-color: var(--color-warning);
+  color: #fff;
+}
+.badge.bg-danger {
+  --bs-danger-rgb: 224, 48, 64;
+  background-color: var(--color-danger);
+  color: #fff;
+}
+
+.card {
+  border-color: var(--color-border);
+  background-color: var(--color-surface);
+}
+
+.form-control {
+  border-color: var(--color-border-strong);
+}
+.form-control:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 0.2rem rgba(61, 142, 232, 0.22);
+}
+
+.list-group-item {
+  border-color: var(--color-border);
 }

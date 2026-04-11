@@ -23,6 +23,8 @@
   border-radius: 12px;
   font-size: 1.35rem;
   font-weight: 700;
+  background-color: var(--color-primary) !important;
+  color: #fff !important;
 }
 
 .startup-page__brand-name,

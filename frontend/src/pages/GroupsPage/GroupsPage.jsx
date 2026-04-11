@@ -140,7 +140,7 @@ export default function GroupsPage() {
           onClick={() => setIsCreateOpen(true)}
           type="button"
         >
-          + Create Group
+          + Add Group
         </Button>
       </div>
 

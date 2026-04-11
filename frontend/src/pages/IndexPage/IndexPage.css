@@ -1,8 +1,8 @@
 .startup-page {
   min-height: 100vh;
   padding: 24px;
-  background: #f6f4ef; /* warm off-white — intentional, bg-light is too cool */
-  color: #1f2933;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
 .startup-page__hero {
@@ -10,8 +10,8 @@
   margin: 0 auto;
   border-radius: 20px;
   padding: 32px;
-  background: #ffffff;
-  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.06);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
 }
 
 .startup-page__content {
@@ -41,7 +41,7 @@
 .startup-page__auth-card {
   width: min(100%, 380px);
   border-radius: 18px;
-  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+  box-shadow: var(--shadow-md);
 }
 
 .startup-page__auth-body {
@@ -53,7 +53,7 @@
   font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: #8896a4;
+  color: var(--color-text-subtle);
   margin-bottom: 1rem;
 }
 

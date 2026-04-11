@@ -30,7 +30,7 @@ export default function IndexPage() {
             >
               <Card.Body className="startup-page__auth-body">
                 <p className="startup-page__auth-kicker">
-                  Login or create an account to manage your group expenses
+                  Login or create an account
                 </p>
                 <AuthForm />
               </Card.Body>
