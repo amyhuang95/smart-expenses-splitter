@@ -38,7 +38,7 @@ const MEMBER_PREVIEW_LIMIT = 6;
 
 function ConfirmModal({ title, message, confirmLabel = "Confirm", confirmVariant = "danger", onConfirm, onCancel }) {
   return (
-    <div className="group-details-page__modal-backdrop" onClick={onCancel}>
+    <div className="modal-backdrop-custom" onClick={onCancel}>
       <div
         className="bg-white rounded-3 p-4 shadow text-center"
         style={{ maxWidth: 400, width: "100%" }}
@@ -234,11 +234,9 @@ export default function GroupDetailsPage() {
 
   return (
     <section className="d-grid gap-4">
-      <div>
-        <Button as={Link} to="/groups" type="button" variant="link" className="ps-0">
-          ← Back To Groups
-        </Button>
-      </div>
+      <Link to="/groups" className="group-details-page__back-link">
+        ← Back to Groups
+      </Link>
 
       <Card className="rounded-4 overflow-hidden">
         <Card.Body>
@@ -290,7 +288,7 @@ export default function GroupDetailsPage() {
           <div className="d-grid gap-2 mt-3">
             <div className="d-flex flex-wrap gap-2 align-items-center">
               {previewMembers.map((member) => (
-                <span key={member._id} className="group-details-page__member-tag">
+                <span key={member._id} className="member-tag">
                   {member.name}
                   {member._id === group.ownerId ? " (owner)" : ""}
                 </span>

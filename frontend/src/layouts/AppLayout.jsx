@@ -1,4 +1,3 @@
-import Button from "react-bootstrap/Button";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import { NavLink, Outlet } from "react-router";
@@ -22,9 +21,9 @@ export default function AppLayout() {
                 Single Expenses
               </NavLink>
             </Nav>
-            <Button onClick={logout} type="button" variant="outline-dark">
+            <button onClick={logout} type="button" className="startup-page__logout-btn">
               Log Out
-            </Button>
+            </button>
           </div>
         </AppNavBar>
 

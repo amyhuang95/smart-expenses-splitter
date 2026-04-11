@@ -127,39 +127,44 @@ export default function GroupsPage() {
 
   return (
     <section className="d-grid gap-4">
-      <div className="d-flex flex-column flex-sm-row gap-3">
-        <Form.Control
-          aria-label="Search groups"
-          onChange={(event) => setQuery(event.target.value)}
-          placeholder="Search groups by name"
-          type="search"
-          value={query}
-        />
-        <Button
-          className="flex-shrink-0"
-          onClick={() => setIsCreateOpen(true)}
-          type="button"
-        >
-          + Add Group
-        </Button>
-      </div>
-
-      <div
-        aria-label="Filter groups by status"
-        className="d-flex flex-wrap gap-2"
-        role="group"
-      >
-        {STATUS_FILTERS.map((status) => (
-          <button
-            aria-pressed={statusFilter === status}
-            className={`btn btn-sm rounded-pill ${statusFilter === status ? "btn-dark" : "btn-light"}`}
-            key={status}
-            onClick={() => setStatusFilter(status)}
+      <div className="d-flex flex-column gap-3">
+        <div className="d-flex align-items-center justify-content-between">
+          <h2 className="mb-0 page-title">My Groups</h2>
+          <Button
+            className="flex-shrink-0"
+            onClick={() => setIsCreateOpen(true)}
             type="button"
           >
-            {status.charAt(0).toUpperCase() + status.slice(1)}
-          </button>
-        ))}
+            + New Group
+          </Button>
+        </div>
+        <div className="d-flex align-items-center gap-3">
+          <Form.Control
+            aria-label="Search groups"
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search groups by name"
+            style={{ maxWidth: "20rem", width: "20rem" }}
+            type="search"
+            value={query}
+          />
+          <div
+            aria-label="Filter groups by status"
+            className="d-flex flex-wrap gap-2 ms-auto"
+            role="group"
+          >
+            {STATUS_FILTERS.map((status) => (
+              <button
+                aria-pressed={statusFilter === status}
+                className={`btn btn-sm rounded-pill ${statusFilter === status ? "btn-dark" : "btn-light"}`}
+                key={status}
+                onClick={() => setStatusFilter(status)}
+                type="button"
+              >
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {error ? <Alert variant="danger">{error}</Alert> : null}

@@ -1,4 +1,4 @@
-.startup-page__topbar {
+.app-navbar__topbar {
   align-items: center;
   gap: 1rem;
   justify-content: space-between;
@@ -6,7 +6,7 @@
   padding: 0;
 }
 
-.startup-page__brand {
+.app-navbar__brand {
   display: flex;
   align-items: center;
   gap: 14px;
@@ -14,7 +14,7 @@
   color: inherit;
 }
 
-.startup-page__brand-mark {
+.app-navbar__brand-mark {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -23,30 +23,31 @@
   border-radius: 12px;
   font-size: 1.35rem;
   font-weight: 700;
-  background-color: var(--color-primary) !important;
-  color: #fff !important;
+  background-color: var(--color-primary);
+  color: #fff;
 }
 
-.startup-page__brand-name,
-.startup-page__brand-tagline {
+.app-navbar__brand-name,
+.app-navbar__brand-tagline {
   margin: 0;
 }
 
-.startup-page__brand .startup-page__brand-name {
+.app-navbar__brand .app-navbar__brand-name {
   display: block;
   font-size: 1.2rem;
   font-weight: 700;
   font-family: 'Ruluko', sans-serif;
   letter-spacing: 0.02em;
+  color: var(--color-primary);
 }
 
-.startup-page__brand-tagline {
+.app-navbar__brand-tagline {
   display: block;
   font-size: 0.92rem;
 }
 
 @media (max-width: 900px) {
-  .startup-page__topbar {
+  .app-navbar__topbar {
     align-items: flex-start;
     margin-bottom: 36px;
   }

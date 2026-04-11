@@ -15,6 +15,12 @@
   font-weight: 700;
 }
 
+/* inactive tab (variant="light") — text matches the active tab's background */
+.auth-form__mode-button.btn-light {
+  --bs-btn-color:       var(--color-primary);
+  --bs-btn-hover-color: var(--color-primary-hover);
+}
+
 .auth-form__feedback {
   margin: 18px 0 0;
   border-radius: 12px;
@@ -44,7 +50,7 @@
 
 .auth-form__field .form-control:focus {
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 0.2rem rgba(123, 162, 193, 0.22);
+  box-shadow: 0 0 0 0.2rem rgba(61, 142, 232, 0.22);
 }
 
 .auth-form__submit {

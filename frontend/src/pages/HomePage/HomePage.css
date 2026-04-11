@@ -4,17 +4,19 @@
 }
 
 .home-page__hero {
-  border: 1px solid var(--color-border);
   border-radius: 18px;
   padding: 1.75rem;
-  background: linear-gradient(180deg, #ffffff 0%, #F4F6F8 100%);
 }
 
 .home-page__title {
   margin: 0.35rem 0 0;
   font-size: clamp(2rem, 4vw, 3rem);
+  color: var(--color-primary);
+  font-family: 'Ruluko', sans-serif;
   line-height: 1.05;
   letter-spacing: -0.03em;
+  padding-left: 0;
+  margin-left: -0.05em;
 }
 
 .home-page__copy {
@@ -35,7 +37,7 @@
   border: 1px solid var(--color-border);
   border-radius: 18px;
   padding: 1.25rem;
-  background: #F9FAFB;
+  background: linear-gradient(180deg, transparent 0%, rgba(214, 234, 255, 0.7) 100%);
 }
 
 .home-page__feature-title {

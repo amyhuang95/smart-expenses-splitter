@@ -23,11 +23,30 @@
 
 .startup-page__nav-link:hover,
 .startup-page__nav-link:focus {
-  color: var(--color-text);
+  color: var(--color-primary);
 }
 
 .startup-page__nav-link.active {
   border-bottom-color: var(--color-primary);
   color: var(--color-primary);
   font-weight: 600;
+}
+
+.startup-page__logout-btn {
+  background: transparent;
+  border: 1px solid var(--color-primary);
+  border-radius: 6px;
+  color: var(--color-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 0.35rem 0.85rem;
+  text-decoration: none;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+
+.startup-page__logout-btn:hover,
+.startup-page__logout-btn:focus {
+  background: var(--color-primary-hover);
+  border-color: var(--color-primary-hover);
+  color: #fff;
 }

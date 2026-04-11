@@ -7,13 +7,11 @@ export default function HomePage() {
   return (
     <section className="home-page">
       <div className="home-page__hero">
-        <p className="startup-page__auth-kicker">Signed In</p>
         <h1 className="home-page__title">
           Welcome back{user?.name ? `, ${user.name}` : ""}.
         </h1>
         <p className="home-page__copy">
-          Your group workspace is ready. Open the dashboard to create a group,
-          log shared expenses, and settle balances.
+          Start logging shared expenses and settling balances...
         </p>
       </div>
       <section className="home-page__feature-section" aria-label="Feature overview">

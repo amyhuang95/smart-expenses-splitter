@@ -45,7 +45,7 @@
 }
 
 .add-expense-form__members-summary {
-  color: #6c757d;
+  color: var(--color-text-muted);
   font-size: 0.9rem;
 }
 
@@ -71,7 +71,7 @@
 }
 
 .add-expense-form__empty {
-  color: #6c757d;
+  color: var(--color-text-muted);
   grid-column: 1 / -1;
   margin: 0;
 }

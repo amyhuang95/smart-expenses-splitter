@@ -135,7 +135,7 @@ export default function MyExpenses() {
     <div>
       {/* Header */}
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-0">My Expenses</h2>
+        <h2 className="mb-0 page-title">My Expenses</h2>
         <button
           className="btn btn-primary"
           onClick={() => setShowForm(true)}
@@ -194,7 +194,7 @@ export default function MyExpenses() {
       {/* Add/Edit Modal */}
       {(showForm || editingExpense) && (
         <div
-          className="my-expenses__modal-backdrop"
+          className="modal-backdrop-custom"
           onClick={() => {
             setShowForm(false);
             setEditingExpense(null);
@@ -222,7 +222,7 @@ export default function MyExpenses() {
       {/* Delete Confirmation */}
       {confirmDelete && (
         <div
-          className="my-expenses__modal-backdrop"
+          className="modal-backdrop-custom"
           onClick={() => setConfirmDelete(null)}
         >
           <div

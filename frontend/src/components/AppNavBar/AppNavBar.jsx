@@ -5,14 +5,14 @@ import "./AppNavBar.css";
 
 export default function AppNavBar({ children }) {
   return (
-    <Navbar expand="md" className="startup-page__topbar">
-      <Navbar.Brand as={Link} to="/" className="startup-page__brand">
-        <span className="startup-page__brand-mark bg-dark text-white" aria-hidden="true">
+    <Navbar expand="md" className="app-navbar__topbar">
+      <Navbar.Brand as={Link} to="/" className="app-navbar__brand">
+        <span className="app-navbar__brand-mark" aria-hidden="true">
           $
         </span>
         <span>
-          <span className="startup-page__brand-name">SplitEasy</span>
-          <span className="startup-page__brand-tagline text-secondary">
+          <span className="app-navbar__brand-name">SplitEasy</span>
+          <span className="app-navbar__brand-tagline text-secondary">
             Split group expenses easily
           </span>
         </span>

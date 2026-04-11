@@ -28,6 +28,7 @@
   font-family: 'Ruluko', sans-serif;
   line-height: 1.08;
   letter-spacing: -0.03em;
+  color: var(--color-primary);
 }
 
 .startup-page__description {
