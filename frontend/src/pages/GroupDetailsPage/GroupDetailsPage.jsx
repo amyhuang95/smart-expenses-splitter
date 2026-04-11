@@ -244,17 +244,11 @@ export default function GroupDetailsPage() {
         <Card.Body>
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
             <div>
-              <p
-                className="text-secondary mb-1"
-                style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}
-              >
-                Group Details
-              </p>
+              <Badge bg={statusVariant} pill>
+                  {group.status}
+              </Badge>
               <div className="d-flex flex-wrap align-items-center gap-3">
                 <h1 className="mb-0">{group.name}</h1>
-                <Badge bg={statusVariant} pill>
-                  {group.status}
-                </Badge>
               </div>
             </div>
             <div className="d-flex flex-column flex-md-row flex-wrap justify-content-end align-items-stretch align-items-md-center gap-2">
