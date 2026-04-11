@@ -1,0 +1,12 @@
+/* Base font for the entire app */
+body {
+  font-family: 'Noto Sans', sans-serif;
+}
+
+/* Ensure form elements inherit instead of defaulting to browser system font */
+button,
+input,
+select,
+textarea {
+  font-family: inherit;
+}

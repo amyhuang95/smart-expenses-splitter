@@ -30,10 +30,11 @@
   margin: 0;
 }
 
-.startup-page__brand-name {
+.startup-page__brand .startup-page__brand-name {
   display: block;
   font-size: 1.2rem;
   font-weight: 700;
+  font-family: 'Ruluko', sans-serif;
   letter-spacing: 0.02em;
 }
 

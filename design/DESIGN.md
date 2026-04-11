@@ -54,6 +54,18 @@ SplitEasy addresses this by centralizing:
 - Update: As a user, I want to click an "Edit" icon on any expense card to reopen the form modal pre-filled with the current data, so I can correct the amount, change the category, or update the split if I made a mistake when logging the receipt.
 - Delete: As a user, I want to click a "Delete" icon on any expense card to remove an expense that was entered by mistake. The app will show a confirmation dialog before deleting to prevent accidental removals.
 
+## Typography
+
+The app uses two Google Fonts loaded via `<link>` tags in `index.html`.
+
+### Font assignments
+
+| Context | Font | Rationale |
+|---|---|---|
+| App body (all pages) | Noto Sans | Neutral, highly legible sans-serif for UI text, labels, and form elements |
+| Index page — title & description | Ruluko | Distinct display font that gives the landing page a branded, editorial feel |
+| Logo / brand name (AppNavBar) | Ruluko | Ties the navbar brand identity to the landing page's visual tone |
+
 ## Mockup
 
 ![mockup](./mockups/mockup.png)
