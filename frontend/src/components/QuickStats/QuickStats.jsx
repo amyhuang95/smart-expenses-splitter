@@ -1,30 +1,28 @@
 import PropTypes from "prop-types";
-
+import "./QuickStats.css";
 
 export default function QuickStats({ stats }) {
   const items = [
-    ["Total Spent", `$${stats.totalSpending.toLocaleString("en-US", { minimumFractionDigits: 2 })}`],
-    ["Avg Expense", `$${stats.avgExpense.toFixed(2)}`],
-    ["Expenses", stats.expenseCount],
-    ["You Owe", `$${stats.youOwe.toFixed(2)}`],
-    ["Owed to You", `$${stats.owedToYou.toFixed(2)}`],
+    { label: "Total Spent", value: `$${stats.totalSpending.toLocaleString("en-US", { minimumFractionDigits: 2 })}`, colorClass: "" },
+    { label: "Avg Expense", value: `$${stats.avgExpense.toFixed(2)}`, colorClass: "" },
+    { label: "Expenses", value: stats.expenseCount, colorClass: "" },
+    { label: "You Owe", value: `$${stats.youOwe.toFixed(2)}`, colorClass: stats.youOwe > 0 ? "text-danger" : "" },
+    { label: "Owed to You", value: `$${stats.owedToYou.toFixed(2)}`, colorClass: stats.owedToYou > 0 ? "text-success" : "" },
   ];
 
   return (
-    <div className="row g-3 mb-4">
-      {items.map(([label, val]) => (
+    <dl className="row g-3 mb-4" role="region" aria-label="Quick spending statistics">
+      {items.map(({ label, value, colorClass }) => (
         <div key={label} className="col">
           <div className="card">
             <div className="card-body py-2 text-center">
-              <small className="text-secondary text-uppercase" style={{ fontSize: "0.7rem" }}>
-                {label}
-              </small>
-              <div className="fw-bold fs-5">{val}</div>
+              <dt className="quick-stats__label">{label}</dt>
+              <dd className={`quick-stats__value ${colorClass}`}>{value}</dd>
             </div>
           </div>
         </div>
       ))}
-    </div>
+    </dl>
   );
 }
 

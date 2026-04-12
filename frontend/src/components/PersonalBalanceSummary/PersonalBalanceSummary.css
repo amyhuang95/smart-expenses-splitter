@@ -1,0 +1,7 @@
+/* Color legend hint */
+.balance-summary__legend {
+  font-size: 0.65rem;
+  color: var(--bs-secondary, #6c757d);
+  margin-bottom: 0.75rem;
+  opacity: 0.8;
+}

@@ -1,21 +1,26 @@
+/* Member tag — custom pill for selected participants */
 .expense-form__member-tag {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.85rem;
-  background: rgba(13, 110, 253, 0.1);
-  color: #0d6efd;
-  border: 1px solid rgba(13, 110, 253, 0.3);
+  gap: 0.3rem;
+  background: var(--bs-primary-bg-subtle, #cfe2ff);
+  color: var(--bs-primary, #0d6efd);
+  padding: 0.2rem 0.6rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 500;
 }
 
 .expense-form__member-tag button {
   background: none;
   border: none;
-  color: #0d6efd;
-  cursor: pointer;
+  color: inherit;
   font-size: 1rem;
+  cursor: pointer;
   padding: 0;
+  line-height: 1;
 }
 
+.expense-form__member-tag button:hover {
+  color: var(--bs-danger, #dc3545);
+}

@@ -1,0 +1,5 @@
+/* Sort button — prevent text wrapping */
+.expense-filter__sort-btn {
+  white-space: nowrap;
+  font-size: 0.75rem;
+}

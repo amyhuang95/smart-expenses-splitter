@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useUser } from "../../context/useUser.js";
 import QuickStats from "../../components/QuickStats/QuickStats.jsx";
 import ExpenseFilter from "../../components/ExpenseFilter/ExpenseFilter.jsx";
@@ -17,7 +17,6 @@ import {
 } from "../../services/expenses.js";
 import "./MyExpenses.css";
 
-
 export default function MyExpenses() {
   const { user } = useUser();
   const [expenses, setExpenses] = useState([]);
@@ -34,7 +33,33 @@ export default function MyExpenses() {
     sortOrder: "desc",
   });
 
+  const modalRef = useRef(null);
+  const deleteModalRef = useRef(null);
   const userName = user?.name;
+
+  // Escape key closes modals
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === "Escape") {
+        if (confirmDelete) setConfirmDelete(null);
+        else if (showForm || editingExpense) {
+          setShowForm(false);
+          setEditingExpense(null);
+        }
+      }
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    return () => document.removeEventListener("keydown", handleKeyDown);
+  }, [showForm, editingExpense, confirmDelete]);
+
+  // Auto-focus modal on open
+  useEffect(() => {
+    if ((showForm || editingExpense) && modalRef.current) modalRef.current.focus();
+  }, [showForm, editingExpense]);
+
+  useEffect(() => {
+    if (confirmDelete && deleteModalRef.current) deleteModalRef.current.focus();
+  }, [confirmDelete]);
 
   const loadExpenses = useCallback(async () => {
     if (!userName) return;
@@ -79,7 +104,6 @@ export default function MyExpenses() {
     refreshAll();
   }, [refreshAll]);
 
-  // CREATE
   const handleCreate = async (data) => {
     try {
       await createExpense(data);
@@ -90,7 +114,6 @@ export default function MyExpenses() {
     }
   };
 
-  // UPDATE
   const handleUpdate = async (data) => {
     try {
       await updateExpense(editingExpense._id, data);
@@ -101,7 +124,6 @@ export default function MyExpenses() {
     }
   };
 
-  // MARK PAID
   const handleMarkPaid = async (expenseId) => {
     try {
       await markExpensePaid(expenseId, userName);
@@ -111,7 +133,6 @@ export default function MyExpenses() {
     }
   };
 
-  // DELETE
   const handleDelete = async (id) => {
     try {
       await deleteExpense(id);
@@ -122,98 +143,124 @@ export default function MyExpenses() {
     }
   };
 
-  // Collect all people from expenses for filter dropdown
   const allPeople = [
     ...new Set(expenses.flatMap((e) => e.splitBetween || [])),
   ].sort();
 
   if (!userName) {
-    return <p className="text-center text-secondary py-5">Loading...</p>;
+    return (
+      <main aria-busy="true" className="text-center text-secondary py-5">
+        <div className="spinner-border spinner-border-sm me-2" role="status">
+          <span className="visually-hidden">Loading</span>
+        </div>
+        Loading...
+      </main>
+    );
   }
 
   return (
-    <div>
+    <main aria-label="Single Expenses Tracker">
       {/* Header */}
-      <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-0 page-title">My Expenses</h2>
+      <header className="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
+        <div>
+          <h1 className="h2 fw-bold mb-1">My Expenses</h1>
+          <p className="text-secondary small mb-0">
+            Track one-off expenses, see who owes you, and mark payments as settled.
+          </p>
+        </div>
         <button
-          className="btn btn-primary"
+          className="btn btn-primary fw-semibold"
           onClick={() => setShowForm(true)}
+          aria-label="Add a new expense"
         >
           + New Expense
         </button>
-      </div>
+      </header>
 
       {/* Quick Stats */}
-      {stats && <QuickStats stats={stats} />}
+      {stats && (
+        <section aria-label="Spending statistics">
+          <QuickStats stats={stats} />
+        </section>
+      )}
 
       {/* Filter */}
-      <ExpenseFilter
-        filters={filters}
-        onFilterChange={setFilters}
-        people={allPeople}
-      />
+      <section aria-label="Filter and sort expenses">
+        <ExpenseFilter
+          filters={filters}
+          onFilterChange={setFilters}
+          people={allPeople}
+        />
+      </section>
 
       <div className="row g-4">
         {/* Left: Expense List */}
-        <div className="col-lg-8">
+        <section className="col-lg-8" aria-label="Expense list">
           {loading ? (
-            <p className="text-center text-secondary py-4">Loading...</p>
+            <div className="text-center text-secondary py-4" aria-busy="true">
+              <div className="spinner-border spinner-border-sm me-2" role="status">
+                <span className="visually-hidden">Loading</span>
+              </div>
+              Loading expenses...
+            </div>
           ) : expenses.length === 0 ? (
-            <div className="text-center text-secondary py-5">
-              <p className="mb-2">No expenses yet.</p>
-              <p className="small">
-                Click &quot;+ New Expense&quot; to add your first one!
+            <div className="my-expenses__empty text-center py-5" role="status">
+              <p className="fs-1 mb-2">💸</p>
+              <p className="fw-semibold mb-1">No expenses yet</p>
+              <p className="text-secondary small">
+                Click <strong>&quot;+ New Expense&quot;</strong> above to log
+                your first expense. You can split it with any registered user.
               </p>
             </div>
           ) : (
-            expenses.map((exp) => (
-              <ExpenseCard
-                key={exp._id}
-                expense={exp}
-                currentUser={userName}
-                onEdit={() => setEditingExpense(exp)}
-                onDelete={() => setConfirmDelete(exp)}
-                onMarkPaid={() => handleMarkPaid(exp._id)}
-              />
-            ))
+            <ol className="list-unstyled" aria-label="Expenses">
+              {expenses.map((exp) => (
+                <li key={exp._id} className="mb-2">
+                  <ExpenseCard
+                    expense={exp}
+                    currentUser={userName}
+                    onEdit={() => setEditingExpense(exp)}
+                    onDelete={() => setConfirmDelete(exp)}
+                    onMarkPaid={() => handleMarkPaid(exp._id)}
+                  />
+                </li>
+              ))}
+            </ol>
           )}
-        </div>
+        </section>
 
         {/* Right: Sidebar */}
-        <div className="col-lg-4">
+        <aside className="col-lg-4" aria-label="Balance and spending summary">
           <PersonalBalanceSummary balances={balances} />
           {stats && stats.categoryBreakdown && (
             <div className="mt-3">
               <SpendingChart categoryBreakdown={stats.categoryBreakdown} />
             </div>
           )}
-        </div>
+        </aside>
       </div>
 
       {/* Add/Edit Modal */}
       {(showForm || editingExpense) && (
         <div
-          className="modal-backdrop-custom"
-          onClick={() => {
-            setShowForm(false);
-            setEditingExpense(null);
-          }}
+          className="my-expenses__modal-backdrop"
+          onClick={() => { setShowForm(false); setEditingExpense(null); }}
+          role="dialog"
+          aria-modal="true"
+          aria-label={editingExpense ? "Edit expense" : "Add new expense"}
         >
           <div
-            className="bg-white rounded-3 p-4 shadow"
-            style={{ width: 480, maxHeight: "90vh", overflowY: "auto" }}
+            className="my-expenses__modal-content bg-white rounded-3 p-4 shadow"
             onClick={(e) => e.stopPropagation()}
+            ref={modalRef}
+            tabIndex={-1}
           >
             <ExpenseForm
               key={editingExpense?._id ?? `new-expense-${userName}`}
               expense={editingExpense}
               currentUser={userName}
               onSubmit={editingExpense ? handleUpdate : handleCreate}
-              onCancel={() => {
-                setShowForm(false);
-                setEditingExpense(null);
-              }}
+              onCancel={() => { setShowForm(false); setEditingExpense(null); }}
             />
           </div>
         </div>
@@ -222,36 +269,35 @@ export default function MyExpenses() {
       {/* Delete Confirmation */}
       {confirmDelete && (
         <div
-          className="modal-backdrop-custom"
+          className="my-expenses__modal-backdrop"
           onClick={() => setConfirmDelete(null)}
+          role="alertdialog"
+          aria-modal="true"
+          aria-label="Confirm delete expense"
         >
           <div
             className="bg-white rounded-3 p-4 shadow text-center"
-            style={{ maxWidth: 400 }}
+            style={{ maxWidth: 400, width: "100%" }}
             onClick={(e) => e.stopPropagation()}
+            ref={deleteModalRef}
+            tabIndex={-1}
           >
-            <h5>Delete Expense?</h5>
+            <h2 className="h5 text-danger fw-bold">Delete Expense?</h2>
             <p className="text-secondary small">
-              Delete &quot;{confirmDelete.name}&quot; ($
-              {confirmDelete.amount.toFixed(2)})?
+              This will permanently remove &quot;{confirmDelete.name}&quot; ($
+              {confirmDelete.amount.toFixed(2)}). This action cannot be undone.
             </p>
             <div className="d-flex justify-content-center gap-2">
-              <button
-                className="btn btn-secondary"
-                onClick={() => setConfirmDelete(null)}
-              >
+              <button className="btn btn-secondary" onClick={() => setConfirmDelete(null)}>
                 Cancel
               </button>
-              <button
-                className="btn btn-danger"
-                onClick={() => handleDelete(confirmDelete._id)}
-              >
+              <button className="btn btn-danger" onClick={() => handleDelete(confirmDelete._id)}>
                 Delete
               </button>
             </div>
           </div>
         </div>
       )}
-    </div>
+    </main>
   );
 }

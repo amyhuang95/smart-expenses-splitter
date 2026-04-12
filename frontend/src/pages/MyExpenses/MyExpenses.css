@@ -1,12 +1,28 @@
+/* Modal backdrop — Bootstrap doesn't provide a standalone backdrop utility */
 .my-expenses__modal-backdrop {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1060;
+  z-index: 1050;
+  padding: 1rem;
+}
+
+/* Modal content sizing */
+.my-expenses__modal-content {
+  width: 480px;
+  max-width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  outline: none;
+}
+
+/* Empty state — dashed border effect not in Bootstrap */
+.my-expenses__empty {
+  background: var(--bs-light, #f8f9fa);
+  border: 2px dashed var(--bs-border-color, #dee2e6);
+  border-radius: 0.75rem;
+  padding: 2.5rem 1rem;
 }

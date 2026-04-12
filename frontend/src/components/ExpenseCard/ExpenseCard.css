@@ -1,19 +1,44 @@
-.expense-card__category--food {
-  color: #ff6b6b;
+/* Settled state — creative fade effect */
+.expense-card--settled {
+  opacity: 0.5;
+  filter: grayscale(30%);
+  transition: opacity 0.2s ease;
 }
 
-.expense-card__category--transport {
-  color: #4ecdc4;
+/* Hover lift — subtle card interaction */
+.expense-card {
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
 }
 
-.expense-card__category--utilities {
-  color: #ffd93d;
+.expense-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
 }
 
-.expense-card__category--entertainment {
-  color: #a855f7;
+/* Category label colors — inherits font from parent */
+.expense-card__category--food { color: var(--bs-danger, #dc3545); }
+.expense-card__category--transport { color: var(--bs-info, #0dcaf0); }
+.expense-card__category--utilities { color: var(--bs-warning, #ffc107); }
+.expense-card__category--entertainment { color: #7c3aed; }
+.expense-card__category--other { color: var(--bs-secondary, #6c757d); }
+
+/* Small badge sizing */
+.expense-card__badge {
+  font-size: 0.6rem;
+  padding: 0.15rem 0.4rem;
 }
 
-.expense-card__category--other {
-  color: #6b7280;
+/* Mark paid button sizing */
+.expense-card__mark-btn {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.5rem;
+}
+
+/* Hint text for payment logic */
+.expense-card__hint {
+  font-size: 0.65rem;
+  color: var(--bs-secondary, #6c757d);
+  font-style: italic;
+  margin: 0 0 0.25rem;
+  opacity: 0.7;
 }

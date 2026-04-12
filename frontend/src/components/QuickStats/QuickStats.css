@@ -1,0 +1,16 @@
+/* Stats label — smaller uppercase */
+.quick-stats__label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--bs-secondary, #6c757d);
+  margin: 0;
+}
+
+/* Stats value — larger bold number */
+.quick-stats__value {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0.1rem 0 0;
+}

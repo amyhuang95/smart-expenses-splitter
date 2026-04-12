@@ -2,47 +2,71 @@ import PropTypes from "prop-types";
 import "./ExpenseCard.css";
 
 const ICONS = {
-  food: "🍔",
-  transport: "🚗",
-  utilities: "💡",
-  entertainment: "🎬",
-  other: "📦",
+  food: "\uD83C\uDF54",
+  transport: "\uD83D\uDE97",
+  utilities: "\uD83D\uDCA1",
+  entertainment: "\uD83C\uDFAC",
+  other: "\uD83D\uDCE6",
 };
 
-export default function ExpenseCard({ expense, currentUser, onEdit, onDelete, onMarkPaid }) {
+const CATEGORY_LABELS = {
+  food: "Food",
+  transport: "Transport",
+  utilities: "Utilities",
+  entertainment: "Entertainment",
+  other: "Other",
+};
+
+export default function ExpenseCard({
+  expense,
+  currentUser,
+  onEdit,
+  onDelete,
+  onMarkPaid,
+}) {
   const date = new Date(expense.dateCreated).toLocaleDateString("en-US", {
     month: "short",
     day: "numeric",
+    year: "numeric",
   });
-  const icon = ICONS[expense.category] || "📦";
+  const icon = ICONS[expense.category] || ICONS.other;
+  const categoryLabel = CATEGORY_LABELS[expense.category] || "Other";
   const isPayer = expense.paidBy === currentUser;
   const myPaid = expense.paidStatus?.[currentUser] || false;
   const canMarkPaid = !expense.settled && !isPayer && !myPaid;
 
   return (
-    <div className={`card mb-2 ${expense.settled ? "opacity-50" : ""}`}>
+    <article
+      className={`card expense-card ${expense.settled ? "expense-card--settled" : ""}`}
+      aria-label={`${expense.name}, $${expense.amount.toFixed(2)}, ${categoryLabel}`}
+    >
       <div className="card-body py-2">
-        {/* Top row: icon + name + amount */}
+        {/* Top row */}
         <div className="d-flex align-items-center gap-3 mb-2">
-          <span className="fs-4">{icon}</span>
-          <div className="flex-grow-1">
-            <div className="d-flex justify-content-between">
-              <strong>{expense.name}</strong>
-              <span className="fw-bold">${expense.amount.toFixed(2)}</span>
+          <span className="fs-4" aria-hidden="true">{icon}</span>
+          <div className="flex-grow-1 min-width-0">
+            <div className="d-flex justify-content-between align-items-baseline">
+              <h3 className="fs-6 fw-bold mb-0 text-truncate">{expense.name}</h3>
+              <span className="fw-bold text-nowrap">${expense.amount.toFixed(2)}</span>
             </div>
-            <small className="text-secondary">
+            <p className="small text-secondary mb-0">
               Paid by <strong>{isPayer ? "You" : expense.paidBy}</strong>
-              {" · "}
-              <span className={`expense-card__category--${expense.category}`}>{expense.category}</span>
-              {" · "}
-              {date}
-              {expense.settled && <span className="badge bg-success ms-2">Settled</span>}
-            </small>
+              <span aria-hidden="true"> &middot; </span>
+              <span className={`expense-card__category--${expense.category}`}>{categoryLabel}</span>
+              <span aria-hidden="true"> &middot; </span>
+              <time dateTime={expense.dateCreated}>{date}</time>
+              {expense.settled && (
+                <span className="badge bg-success ms-2">Settled</span>
+              )}
+            </p>
           </div>
         </div>
 
-        {/* Per-person split details */}
+        {/* Per-person split */}
         <div className="ms-5 mb-2">
+          <p className="expense-card__hint">
+            Only the person who owes can mark their own share as paid.
+          </p>
           {expense.splitBetween
             .filter((p) => p !== expense.paidBy)
             .map((person) => {
@@ -51,22 +75,21 @@ export default function ExpenseCard({ expense, currentUser, onEdit, onDelete, on
               const isMe = person === currentUser;
 
               return (
-                <div key={person} className="d-flex align-items-center gap-2 small">
+                <div key={person} className="d-flex align-items-center gap-2 small mb-1">
                   <span className={paid ? "text-success" : "text-danger"}>
                     {isMe ? "You" : person}
                   </span>
                   <span className="text-secondary">${share.toFixed(2)}</span>
                   {paid ? (
-                    <span className="badge bg-success" style={{ fontSize: "0.65rem" }}>Paid ✓</span>
+                    <span className="badge bg-success expense-card__badge">Paid</span>
                   ) : (
-                    <span className="badge bg-warning text-dark" style={{ fontSize: "0.65rem" }}>Unpaid</span>
+                    <span className="badge bg-warning text-dark expense-card__badge">Unpaid</span>
                   )}
-                  {/* Show Mark Paid button only for current user's own unpaid share */}
                   {isMe && canMarkPaid && (
                     <button
-                      className="btn btn-outline-success btn-sm py-0 px-2 ms-1"
-                      style={{ fontSize: "0.7rem" }}
+                      className="btn btn-outline-success btn-sm expense-card__mark-btn"
                       onClick={onMarkPaid}
+                      aria-label={`Mark your $${share.toFixed(2)} share as paid`}
                     >
                       Mark Paid
                     </button>
@@ -76,25 +99,25 @@ export default function ExpenseCard({ expense, currentUser, onEdit, onDelete, on
             })}
         </div>
 
-        {/* Action buttons */}
-        <div className="d-flex justify-content-end gap-1">
+        {/* Actions */}
+        <div className="d-flex justify-content-end gap-2 border-top pt-2">
           <button
-            className="btn btn-sm btn-outline-secondary py-0 px-2"
+            className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
             onClick={onEdit}
-            title="Edit"
+            aria-label={`Edit ${expense.name}`}
           >
-            ✏️
+            <span aria-hidden="true">&#9998;</span> Edit
           </button>
           <button
-            className="btn btn-sm btn-outline-danger py-0 px-2"
+            className="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
             onClick={onDelete}
-            title="Delete"
+            aria-label={`Delete ${expense.name}`}
           >
-            🗑️
+            <span aria-hidden="true">&#128465;</span> Delete
           </button>
         </div>
       </div>
-    </div>
+    </article>
   );
 }
 
