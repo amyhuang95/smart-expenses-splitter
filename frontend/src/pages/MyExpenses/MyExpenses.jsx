@@ -6,6 +6,7 @@ import ExpenseCard from "../../components/ExpenseCard/ExpenseCard.jsx";
 import ExpenseForm from "../../components/ExpenseForm/ExpenseForm.jsx";
 import PersonalBalanceSummary from "../../components/PersonalBalanceSummary/PersonalBalanceSummary.jsx";
 import SpendingChart from "../../components/SpendingChart/SpendingChart.jsx";
+import HelpTooltip from "../../components/HelpTooltip/HelpTooltip.jsx";
 import {
   fetchExpenses,
   fetchExpenseStats,
@@ -163,7 +164,21 @@ export default function MyExpenses() {
       {/* Header */}
       <header className="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
         <div>
-          <h1 className="h2 fw-bold mb-1">My Expenses</h1>
+          <h1 className="h2 fw-bold mb-1">
+            My Expenses{" "}
+            <HelpTooltip
+              content={
+                <>
+                  <strong>How to use Single Expenses:</strong>
+                  <br />1. Click &quot;+ New Expense&quot; to log a bill
+                  <br />2. Search and add people to split with
+                  <br />3. Use filters to find specific expenses
+                  <br />4. Check &quot;My Balance&quot; on the right to see who owes you
+                  <br />5. Click &quot;Mark Paid&quot; when someone pays their share
+                </>
+              }
+            />
+          </h1>
           <p className="text-secondary small mb-0">
             Track one-off expenses, see who owes you, and mark payments as settled.
           </p>
@@ -180,12 +195,24 @@ export default function MyExpenses() {
       {/* Quick Stats */}
       {stats && (
         <section aria-label="Spending statistics">
+          <div className="d-flex align-items-center gap-2 mb-2">
+            <h2 className="h6 fw-bold mb-0">Quick Stats</h2>
+            <HelpTooltip
+              content="Overview of your spending. 'You Owe' = total you haven't paid back. 'Owed to You' = total others haven't paid you."
+            />
+          </div>
           <QuickStats stats={stats} />
         </section>
       )}
 
       {/* Filter */}
       <section aria-label="Filter and sort expenses">
+        <div className="d-flex align-items-center gap-2 mb-2">
+          <h2 className="h6 fw-bold mb-0">Filters</h2>
+          <HelpTooltip
+            content="Narrow your expense list by category or payer. Use the sort button to reorder by date, amount, or category."
+          />
+        </div>
         <ExpenseFilter
           filters={filters}
           onFilterChange={setFilters}

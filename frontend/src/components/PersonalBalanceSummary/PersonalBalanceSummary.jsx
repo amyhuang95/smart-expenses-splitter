@@ -1,7 +1,8 @@
 import PropTypes from "prop-types";
+import HelpTooltip from "../HelpTooltip/HelpTooltip.jsx";
 import "./PersonalBalanceSummary.css";
 
-export default function PersonalBalanceSummary({ balances }) {
+export default function PersonalBalanceSummary({ balances = null }) {
   if (!balances) {
     return (
       <section className="card" aria-label="Balance summary" aria-busy="true">
@@ -15,7 +16,12 @@ export default function PersonalBalanceSummary({ balances }) {
   return (
     <section className="card" aria-label="Personal balance summary">
       <div className="card-body">
-        <h3 className="h6 fw-bold mb-1">My Balance</h3>
+        <h3 className="h6 fw-bold mb-1">
+          My Balance{" "}
+          <HelpTooltip
+            content="Your net balance across all unsettled expenses. Green = someone owes you. Red = you owe someone. When everyone marks paid, the expense auto-settles."
+          />
+        </h3>
         <p className="balance-summary__legend">
           <span className="text-success">Green</span> = owed to you &middot;{" "}
           <span className="text-danger">Red</span> = you owe
@@ -83,8 +89,4 @@ PersonalBalanceSummary.propTypes = {
       }),
     ).isRequired,
   }),
-};
-
-PersonalBalanceSummary.defaultProps = {
-  balances: null,
 };

@@ -11,18 +11,18 @@ export default function QuickStats({ stats }) {
   ];
 
   return (
-    <dl className="row g-3 mb-4" role="region" aria-label="Quick spending statistics">
+    <div className="row g-3 mb-4" role="region" aria-label="Quick spending statistics">
       {items.map(({ label, value, colorClass }) => (
         <div key={label} className="col">
           <div className="card">
-            <div className="card-body py-2 text-center">
+            <dl className="card-body py-2 text-center mb-0">
               <dt className="quick-stats__label">{label}</dt>
               <dd className={`quick-stats__value ${colorClass}`}>{value}</dd>
-            </div>
+            </dl>
           </div>
         </div>
       ))}
-    </dl>
+    </div>
   );
 }
 

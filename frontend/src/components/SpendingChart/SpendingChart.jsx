@@ -1,5 +1,6 @@
 import PropTypes from "prop-types";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import HelpTooltip from "../HelpTooltip/HelpTooltip.jsx";
 import "./SpendingChart.css";
 
 const COLORS = {
@@ -22,7 +23,12 @@ export default function SpendingChart({ categoryBreakdown }) {
   return (
     <section className="card" aria-label="Spending breakdown by category">
       <div className="card-body">
-        <h3 className="spending-chart__title">Spending by Category</h3>
+        <h3 className="spending-chart__title">
+          Spending by Category{" "}
+          <HelpTooltip
+            content="Hover over each slice to see the dollar amount. The chart shows all your expenses, not just filtered ones."
+          />
+        </h3>
         <ResponsiveContainer width="100%" height={220}>
           <PieChart>
             <Pie
