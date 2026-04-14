@@ -9,6 +9,13 @@ export async function fetchGroups() {
   return data.groups ?? [];
 }
 
+export async function lookupUserByEmail(email) {
+  return request(
+    `/api/users/lookup?email=${encodeURIComponent(email)}`,
+    { method: "GET" },
+  );
+}
+
 export async function createGroup(payload) {
   return request("/api/groups", {
     method: "POST",

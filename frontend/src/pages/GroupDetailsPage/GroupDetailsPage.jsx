@@ -408,7 +408,7 @@ export default function GroupDetailsPage() {
         isOwner={isOwner && group.status === "open"}
         isSubmitting={isAnyWorking}
         members={members}
-        onAddMember={async (email) => {
+        onAddMember={async ({ email }) => {
           try {
             setWorkingActions((prev) => new Set(prev).add(ACTION.MEMBER));
             const nextData = await addGroupMember(group._id, email);
