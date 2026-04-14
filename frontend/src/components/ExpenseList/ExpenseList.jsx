@@ -3,6 +3,7 @@ import { useMemo, useState } from "react";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
+import HelpTooltip from "../HelpTooltip/HelpTooltip.jsx";
 import ListGroup from "react-bootstrap/ListGroup";
 import Pagination from "react-bootstrap/Pagination";
 import { currency, formatDate } from "../../utils/format.js";
@@ -81,10 +82,26 @@ export default function ExpenseList({
     (expense.paidBy === currentUserId || groupOwnerId === currentUserId);
 
   return (
-    <Card className="rounded-4 overflow-hidden">
+    <Card className="rounded-4" style={{ overflow: "visible" }}>
       <Card.Body>
         <div className="d-flex justify-content-between align-items-center">
-          <Card.Title className="mb-0">Expense Activity</Card.Title>
+          <div className="d-flex align-items-center gap-2">
+            <Card.Title className="mb-0">Expense Activity</Card.Title>
+            <HelpTooltip
+              position="right"
+              content={
+                <>
+                  <strong>How expenses work:</strong>
+                  <br />
+                  1. Any group member can add a shared expense.
+                  <br />
+                  2. Use the category dropdown to filter expenses.
+                  <br />
+                  3. The person who paid or the group owner can edit or delete an expense.
+                </>
+              }
+            />
+          </div>
           {onAddExpense ? (
             <Button
               disabled={!canAddExpense}
@@ -133,6 +150,9 @@ export default function ExpenseList({
                     {formatCategoryLabel(expense.category)}
                   </Badge>
                 </div>
+                {expense.description ? (
+                  <div className="small mt-1">{expense.description}</div>
+                ) : null}
                 <div className="text-secondary small mt-1">
                   Paid by {expense.paidByUser?.name ?? "Member"} on{" "}
                   {formatDate(expense.dateCreated)}
@@ -140,6 +160,21 @@ export default function ExpenseList({
                 <div className="text-secondary small mt-1">
                   Split with {formatSplitMembers(expense.splitBetweenUsers)}
                 </div>
+                {expense.splitDetails && expense.splitBetweenUsers?.length ? (
+                  <div className="mt-2 pt-2 border-top">
+                    <div className="text-secondary small fw-semibold mb-1">Split Breakdown</div>
+                    {expense.splitBetweenUsers.map((member) => (
+                      <div
+                        key={member._id}
+                        className="d-flex justify-content-between small"
+                        style={{ maxWidth: 250 }}
+                      >
+                        <span>{member.name}</span>
+                        <span>{currency(expense.splitDetails[member._id] ?? 0)}</span>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
               </div>
               <div className="d-flex flex-column align-items-end gap-2 flex-shrink-0">
                 <strong>{currency(expense.amount)}</strong>
@@ -165,7 +200,7 @@ export default function ExpenseList({
                 ) : null}
               </div>
             </ListGroup.Item>
-          ))
+          )))
         ) : (
           <ListGroup.Item>
             {categoryFilter === ALL
@@ -224,6 +259,7 @@ ExpenseList.propTypes = {
       dateCreated: PropTypes.string.isRequired,
       description: PropTypes.string,
       name: PropTypes.string.isRequired,
+      splitDetails: PropTypes.object,
       paidBy: PropTypes.string.isRequired,
       paidByUser: PropTypes.shape({
         name: PropTypes.string,
