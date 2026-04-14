@@ -332,7 +332,6 @@ export default function GroupDetailsPage() {
             groupStatus={group.status}
             onAddExpense={() => setIsExpenseOpen(true)}
             canAddExpense={!isWorking(ACTION.EXPENSE) && group.status === "open"}
-            onDelete={handleDeleteExpense}
             onEdit={(expense) => {
               setEditingExpense(expense);
               setIsExpenseOpen(true);
@@ -368,6 +367,7 @@ export default function GroupDetailsPage() {
           setEditingExpense(null);
           setIsExpenseOpen(false);
         }}
+        onDelete={editingExpense ? () => handleDeleteExpense(editingExpense) : undefined}
         onSubmit={async (payload) => {
           if (editingExpense) {
             await runAction(ACTION.EXPENSE, async () => {

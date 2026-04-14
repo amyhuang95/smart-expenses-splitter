@@ -7,7 +7,6 @@ import HelpTooltip from "../HelpTooltip/HelpTooltip.jsx";
 import ListGroup from "react-bootstrap/ListGroup";
 import Modal from "react-bootstrap/Modal";
 import Pagination from "react-bootstrap/Pagination";
-import DeleteButton from "../DeleteButton/DeleteButton.jsx";
 import EditButton from "../EditButton/EditButton.jsx";
 import { currency, formatDate } from "../../utils/format.js";
 
@@ -32,7 +31,6 @@ export default function ExpenseList({
   groupOwnerId,
   groupStatus,
   onAddExpense,
-  onDelete,
   onEdit,
 }) {
   const [categoryFilter, setCategoryFilter] = useState(ALL);
@@ -170,18 +168,10 @@ export default function ExpenseList({
               <div className="d-flex flex-column align-items-end gap-2 flex-shrink-0">
                 <strong>{currency(expense.amount)}</strong>
                 {canEdit(expense) ? (
-                  <div className="d-flex gap-1">
-                    <EditButton
-                      compact
-                      label={`Edit ${expense.name}`}
-                      onClick={() => onEdit(expense)}
-                    />
-                    <DeleteButton
-                      compact
-                      label={`Delete ${expense.name}`}
-                      onClick={() => onDelete(expense)}
-                    />
-                  </div>
+                  <EditButton
+                    label={`Edit ${expense.name}`}
+                    onClick={() => onEdit(expense)}
+                  />
                 ) : (
                   <button
                     className="btn btn-sm btn-outline-secondary py-0 px-2"
@@ -290,6 +280,5 @@ ExpenseList.propTypes = {
   groupOwnerId: PropTypes.string.isRequired,
   groupStatus: PropTypes.string.isRequired,
   onAddExpense: PropTypes.func,
-  onDelete: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
 };

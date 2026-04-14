@@ -4,6 +4,7 @@ import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
+import DeleteButton from "../DeleteButton/DeleteButton.jsx";
 import "./AddExpenseForm.css";
 
 const CATEGORIES = [
@@ -49,6 +50,7 @@ export default function AddExpenseForm({
   initialValues,
   members,
   onClose,
+  onDelete,
   onSubmit,
   submitLabel = "Save Expense",
   title = "Add Shared Expense",
@@ -303,18 +305,26 @@ export default function AddExpenseForm({
             </div>
           </div>
         </Modal.Body>
-        <Modal.Footer>
-          <Button
-            disabled={isSubmitting}
-            onClick={onClose}
-            type="button"
-            variant="outline-secondary"
-          >
-            Cancel
-          </Button>
-          <Button disabled={isSubmitting} type="submit" variant="dark">
-            {isSubmitting ? "Saving..." : submitLabel}
-          </Button>
+        <Modal.Footer className="d-flex">
+          {onDelete ? (
+            <DeleteButton
+              label="Delete this expense"
+              onClick={onDelete}
+            />
+          ) : null}
+          <div className="ms-auto d-flex gap-2">
+            <Button
+              disabled={isSubmitting}
+              onClick={onClose}
+              type="button"
+              variant="outline-secondary"
+            >
+              Cancel
+            </Button>
+            <Button disabled={isSubmitting} type="submit" variant="dark">
+              {isSubmitting ? "Saving..." : submitLabel}
+            </Button>
+          </div>
         </Modal.Footer>
       </Form>
     </Modal>
@@ -338,6 +348,7 @@ AddExpenseForm.propTypes = {
     }),
   ).isRequired,
   onClose: PropTypes.func.isRequired,
+  onDelete: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   submitLabel: PropTypes.string,
   title: PropTypes.string,
