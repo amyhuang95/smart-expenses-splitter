@@ -35,14 +35,3 @@
   font-weight: 600;
   margin: 0;
 }
-
-.group-card__link {
-  font-size: 0.85rem;
-  font-weight: 500;
-  color: var(--color-text-muted);
-  text-decoration: none;
-}
-
-.group-card__link:hover {
-  color: var(--color-primary);
-}

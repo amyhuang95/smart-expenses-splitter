@@ -142,7 +142,7 @@ export default function GroupsPage() {
                   <br />
                   1. Click &quot;+ New Group&quot; to create a new group and add members to split expenses with.
                   <br />
-                  2. Find the newly created group in the list and click &quot;Open Group&quot; to open the group details page where you can add expenses and track balances.
+                  2. Find the newly created group in the list and click the group card to open the group details page where you can add expenses and track balances.
                   <br />
                   3. Use filters to find groups that are still open, being settled, or fully settled.
                 </>
