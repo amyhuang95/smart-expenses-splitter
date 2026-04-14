@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
 import { useState } from "react";
 import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
 import HelpTooltip from "../HelpTooltip/HelpTooltip.jsx";
@@ -29,8 +30,11 @@ export default function BalanceSummary({
   debts,
   groupStatus,
   groupOwnerId,
+  isOwner,
+  isSettling,
   isSubmitting,
   onMarkPaid,
+  onSettleUp,
 }) {
   const [statusFilter, setStatusFilter] = useState(FILTER.ALL);
   const filteredDebts = debts.filter((debt) => {
@@ -52,9 +56,10 @@ export default function BalanceSummary({
   return (
     <Card className="rounded-4" style={{ overflow: "visible" }}>
       <Card.Body>
-        <div className="d-flex align-items-center gap-2">
-          <Card.Title className="mb-0">Settlement Plan</Card.Title>
-          <HelpTooltip
+        <div className="d-flex justify-content-between align-items-center">
+          <div className="d-flex align-items-center gap-2">
+            <Card.Title className="mb-0">Settlement Plan</Card.Title>
+            <HelpTooltip
             position="right"
             content={
               <>
@@ -67,7 +72,19 @@ export default function BalanceSummary({
                 3. Once settling, the sender, receiver, or group owner can click &quot;Mark Paid&quot; to confirm a payment.
               </>
             }
-          />
+            />
+          </div>
+          {isOwner && onSettleUp ? (
+            <Button
+              disabled={isSettling || groupStatus !== "open"}
+              onClick={onSettleUp}
+              size="sm"
+              type="button"
+              variant="primary"
+            >
+              {isSettling ? "Settling\u2026" : "Settle Up"}
+            </Button>
+          ) : null}
         </div>
         <div
           aria-label="Filter settlements"
@@ -159,6 +176,9 @@ BalanceSummary.propTypes = {
   ).isRequired,
   groupStatus: PropTypes.string.isRequired,
   groupOwnerId: PropTypes.string.isRequired,
+  isOwner: PropTypes.bool,
+  isSettling: PropTypes.bool,
   isSubmitting: PropTypes.bool.isRequired,
   onMarkPaid: PropTypes.func.isRequired,
+  onSettleUp: PropTypes.func,
 };

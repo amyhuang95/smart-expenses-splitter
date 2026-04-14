@@ -1,6 +1,7 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
 import Pagination from "react-bootstrap/Pagination";
@@ -8,29 +9,41 @@ import { currency, formatDate } from "../../utils/format.js";
 
 const PAGE_SIZE = 5;
 const SPLIT_MEMBER_PREVIEW_LIMIT = 6;
-const CATEGORY_FILTER_ALL = "all";
-const CATEGORY_ORDER = ["food", "transport", "utilities", "entertainment", "other"];
+const ALL = "all";
+const CATEGORY_ORDER = [
+  "food",
+  "transport",
+  "utilities",
+  "entertainment",
+  "accommodation",
+  "health",
+  "shopping",
+  "other",
+];
 
 export default function ExpenseList({
+  canAddExpense,
   currentUserId,
   expenses,
   groupOwnerId,
   groupStatus,
+  onAddExpense,
   onDelete,
   onEdit,
 }) {
-  const [categoryFilter, setCategoryFilter] = useState(CATEGORY_FILTER_ALL);
+  const [categoryFilter, setCategoryFilter] = useState(ALL);
   const [currentPage, setCurrentPage] = useState(1);
-  const categoryOptions = [
-    CATEGORY_FILTER_ALL,
-    ...CATEGORY_ORDER.filter((cat) =>
-      expenses.some((expense) => expense.category === cat)
-    ),
-  ];
+
+  const categoryOptions = useMemo(
+    () => CATEGORY_ORDER.filter((cat) => expenses.some((e) => e.category === cat)),
+    [expenses],
+  );
+
   const filteredExpenses =
-    categoryFilter === CATEGORY_FILTER_ALL
+    categoryFilter === ALL
       ? expenses
-      : expenses.filter((expense) => expense.category === categoryFilter);
+      : expenses.filter((e) => e.category === categoryFilter);
+
   const totalPages = Math.max(Math.ceil(filteredExpenses.length / PAGE_SIZE), 1);
   const safeCurrentPage = Math.min(currentPage, totalPages);
   const visibleStart = (safeCurrentPage - 1) * PAGE_SIZE;
@@ -70,28 +83,40 @@ export default function ExpenseList({
   return (
     <Card className="rounded-4 overflow-hidden">
       <Card.Body>
-        <Card.Title>Expense Activity ({expenses.length})</Card.Title>
-        <div
-          aria-label="Filter expenses by category"
-          className="d-flex flex-wrap gap-2 mt-3"
-          role="group"
-        >
-          {categoryOptions.map((category) => (
-            <button
-              aria-pressed={categoryFilter === category}
-              className={`btn btn-sm rounded-pill ${
-                categoryFilter === category ? "btn-primary" : "btn-light"
-              }`}
-              key={category}
-              onClick={() => {
-                setCategoryFilter(category);
-                setCurrentPage(1);
-              }}
+        <div className="d-flex justify-content-between align-items-center">
+          <Card.Title className="mb-0">Expense Activity</Card.Title>
+          {onAddExpense ? (
+            <Button
+              disabled={!canAddExpense}
+              onClick={onAddExpense}
+              size="sm"
               type="button"
+              variant="primary"
             >
-              {category === CATEGORY_FILTER_ALL ? "All" : formatCategoryLabel(category)}
-            </button>
-          ))}
+              + New Expense
+            </Button>
+          ) : null}
+        </div>
+        <div className="d-flex flex-wrap gap-2 mt-3">
+          <label htmlFor="expense-category" className="visually-hidden">
+            Filter by category
+          </label>
+          <select
+            id="expense-category"
+            className="form-select form-select-sm w-auto"
+            value={categoryFilter}
+            onChange={(e) => {
+              setCategoryFilter(e.target.value);
+              setCurrentPage(1);
+            }}
+          >
+            <option value={ALL}>All Categories</option>
+            {categoryOptions.map((cat) => (
+              <option key={cat} value={cat}>
+                {formatCategoryLabel(cat)}
+              </option>
+            ))}
+          </select>
         </div>
       </Card.Body>
       <ListGroup variant="flush">
@@ -143,9 +168,9 @@ export default function ExpenseList({
           ))
         ) : (
           <ListGroup.Item>
-            {categoryFilter === CATEGORY_FILTER_ALL
+            {categoryFilter === ALL
               ? "No expenses have been added yet."
-              : `No ${categoryFilter} expenses found.`}
+              : "No expenses match the selected filter."}
           </ListGroup.Item>
         )}
       </ListGroup>
@@ -189,6 +214,7 @@ export default function ExpenseList({
 }
 
 ExpenseList.propTypes = {
+  canAddExpense: PropTypes.bool,
   currentUserId: PropTypes.string.isRequired,
   expenses: PropTypes.arrayOf(
     PropTypes.shape({
@@ -212,6 +238,7 @@ ExpenseList.propTypes = {
   ).isRequired,
   groupOwnerId: PropTypes.string.isRequired,
   groupStatus: PropTypes.string.isRequired,
+  onAddExpense: PropTypes.func,
   onDelete: PropTypes.func.isRequired,
   onEdit: PropTypes.func.isRequired,
 };

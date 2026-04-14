@@ -249,29 +249,8 @@ export default function GroupDetailsPage() {
                 <h1 className="mb-0">{group.name}</h1>
               </div>
             </div>
-            <div className="d-flex flex-column flex-md-row flex-wrap justify-content-end align-items-stretch align-items-md-center gap-2">
-              <Button
-                disabled={isWorking(ACTION.EXPENSE) || group.status !== "open"}
-                onClick={() => setIsExpenseOpen(true)}
-                size="sm"
-                type="button"
-                variant="outline-dark"
-              >
-                Add Expense
-              </Button>
-
-              {isOwner ? (
-                <Button
-                  disabled={isWorking(ACTION.SETTLE) || group.status !== "open"}
-                  onClick={handleSettleUp}
-                  size="sm"
-                  type="button"
-                  variant="outline-success"
-                >
-                  {isWorking(ACTION.SETTLE) ? "Settling…" : "Settle Up"}
-                </Button>
-              ) : null}
-              {isOwner ? (
+            {isOwner ? (
+              <div className="d-flex flex-wrap justify-content-end align-items-center gap-2">
                 <Button
                   disabled={isWorking(ACTION.DELETE)}
                   onClick={handleDeleteGroup}
@@ -281,8 +260,8 @@ export default function GroupDetailsPage() {
                 >
                   {isWorking(ACTION.DELETE) ? "Deleting..." : "Delete Group"}
                 </Button>
-              ) : null}
-            </div>
+              </div>
+            ) : null}
           </div>
 
           <div className="d-grid gap-2 mt-3">
@@ -351,6 +330,8 @@ export default function GroupDetailsPage() {
             expenses={expenses}
             groupOwnerId={group.ownerId}
             groupStatus={group.status}
+            onAddExpense={() => setIsExpenseOpen(true)}
+            canAddExpense={!isWorking(ACTION.EXPENSE) && group.status === "open"}
             onDelete={handleDeleteExpense}
             onEdit={(expense) => {
               setEditingExpense(expense);
@@ -364,12 +345,15 @@ export default function GroupDetailsPage() {
             debts={debts}
             groupStatus={group.status}
             groupOwnerId={group.ownerId}
+            isOwner={isOwner}
+            isSettling={isWorking(ACTION.SETTLE)}
             isSubmitting={isWorking(ACTION.MARK_PAID)}
             onMarkPaid={(debtId) =>
               runAction(ACTION.MARK_PAID, () =>
                 markDebtAsPaid(group._id, debtId),
               )
             }
+            onSettleUp={handleSettleUp}
           />
         </Col>
       </Row>
