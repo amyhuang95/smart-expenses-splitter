@@ -6,6 +6,7 @@ import Form from "react-bootstrap/Form";
 import ListGroup from "react-bootstrap/ListGroup";
 import Modal from "react-bootstrap/Modal";
 import AddMemberForm from "../AddMemberForm/AddMemberForm.jsx";
+import DeleteButton from "../DeleteButton/DeleteButton.jsx";
 import { useUser } from "../../context/useUser.js";
 import "./CreateGroupForm.css";
 
@@ -97,15 +98,11 @@ export default function CreateGroupForm({
                     {member.email}
                   </div>
                 </div>
-                <Button
-                  disabled={isSubmitting}
+                <DeleteButton
+                  compact
+                  label={`Remove ${member.name}`}
                   onClick={() => handleRemoveMember(member.email)}
-                  size="sm"
-                  type="button"
-                  variant="outline-danger"
-                >
-                  ❌
-                </Button>
+                />
               </ListGroup.Item>
             ))}
           </ListGroup>

@@ -1,8 +1,8 @@
 import PropTypes from "prop-types";
-import Button from "react-bootstrap/Button";
 import ListGroup from "react-bootstrap/ListGroup";
 import Modal from "react-bootstrap/Modal";
 import AddMemberForm from "../AddMemberForm/AddMemberForm.jsx";
+import DeleteButton from "../DeleteButton/DeleteButton.jsx";
 import "./MemberListModal.css";
 
 export default function MemberListModal({
@@ -38,15 +38,11 @@ export default function MemberListModal({
                   </div>
                 </div>
                 {isOwner && !isGroupOwner ? (
-                  <Button
-                    disabled={isSubmitting}
+                  <DeleteButton
+                    compact
+                    label={`Remove ${member.name}`}
                     onClick={() => onRemoveMember(member)}
-                    size="sm"
-                    type="button"
-                    variant="outline-danger"
-                  >
-                    ❌
-                  </Button>
+                  />
                 ) : null}
               </ListGroup.Item>
             );

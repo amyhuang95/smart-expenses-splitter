@@ -213,8 +213,6 @@ export default function GroupsPage() {
         </div>
       ) : filteredGroups.length ? (
         <>
-          <p className="text-secondary mb-0">{resultsLabel}</p>
-
           <Row className="g-4">
             {paginatedGroups.map((group) => (
               <Col key={group._id} lg={6} xl={4}>
@@ -222,6 +220,8 @@ export default function GroupsPage() {
               </Col>
             ))}
           </Row>
+
+          <p className="text-secondary mb-0">{resultsLabel}</p>
 
           {totalPages > 1 ? (
             <Pagination className="justify-content-end mb-0">
