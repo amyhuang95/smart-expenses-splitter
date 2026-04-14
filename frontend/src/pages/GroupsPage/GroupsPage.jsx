@@ -8,6 +8,7 @@ import Row from "react-bootstrap/Row";
 import Spinner from "react-bootstrap/Spinner";
 import CreateGroupForm from "../../components/CreateGroupForm/CreateGroupForm.jsx";
 import GroupCard from "../../components/GroupCard/GroupCard.jsx";
+import HelpTooltip from "../../components/HelpTooltip/HelpTooltip.jsx";
 import { createGroup, fetchGroups } from "../../services/groups.js";
 
 const GROUPS_PER_PAGE = 9;
@@ -55,8 +56,10 @@ export default function GroupsPage() {
     const normalizedQuery = query.trim().toLowerCase();
 
     return groups.filter((group) => {
-      const matchesQuery = !normalizedQuery || group.name.toLowerCase().includes(normalizedQuery);
-      const matchesStatus = statusFilter === "all" || group.status === statusFilter;
+      const matchesQuery =
+        !normalizedQuery || group.name.toLowerCase().includes(normalizedQuery);
+      const matchesStatus =
+        statusFilter === "all" || group.status === statusFilter;
       return matchesQuery && matchesStatus;
     });
   }, [groups, query, statusFilter]);
@@ -129,7 +132,23 @@ export default function GroupsPage() {
     <section className="d-grid gap-4">
       <div className="d-flex flex-column gap-3">
         <div className="d-flex align-items-center justify-content-between">
-          <h2 className="mb-0 page-title">My Groups</h2>
+          <div className="d-flex align-items-center gap-2">
+            <h2 className="mb-0 page-title">My Groups</h2>
+            <HelpTooltip
+              position="right"
+              content={
+                <>
+                  <strong>How to use Group Expenses:</strong>
+                  <br />
+                  1. Click &quot;+ New Group&quot; to create a new group and add members to split expenses with.
+                  <br />
+                  2. Find the newly created group in the list and click &quot;Open Group&quot; to open the group details page where you can add expenses and track balances.
+                  <br />
+                  3. Use filters to find groups that are still open, being settled, or fully settled.
+                </>
+              }
+            />
+          </div>
           <Button
             className="flex-shrink-0"
             onClick={() => setIsCreateOpen(true)}
@@ -147,22 +166,38 @@ export default function GroupsPage() {
             type="search"
             value={query}
           />
-          <div
-            aria-label="Filter groups by status"
-            className="d-flex flex-wrap gap-2 ms-auto"
-            role="group"
-          >
-            {STATUS_FILTERS.map((status) => (
-              <button
-                aria-pressed={statusFilter === status}
-                className={`btn btn-sm rounded-pill ${statusFilter === status ? "btn-dark" : "btn-light"}`}
-                key={status}
-                onClick={() => setStatusFilter(status)}
-                type="button"
-              >
-                {status.charAt(0).toUpperCase() + status.slice(1)}
-              </button>
-            ))}
+          <div className="d-flex align-items-center gap-2 ms-auto">
+            <div
+              aria-label="Filter groups by status"
+              className="d-flex flex-wrap gap-2"
+              role="group"
+            >
+              {STATUS_FILTERS.map((status) => (
+                <button
+                  aria-pressed={statusFilter === status}
+                  className={`btn btn-sm rounded-pill ${statusFilter === status ? "btn-dark" : "btn-light"}`}
+                  key={status}
+                  onClick={() => setStatusFilter(status)}
+                  type="button"
+                >
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                </button>
+              ))}
+            </div>
+            <HelpTooltip
+              position="bottom"
+              content={
+                <>
+                  <strong>Group statuses:</strong>
+                  <br />
+                  <strong>Open</strong> — Members can add, edit, and delete expenses.
+                  <br />
+                  <strong>Settling</strong> — The owner has initiated settlement. Members can mark debts as paid, but expenses are locked.
+                  <br />
+                  <strong>Settled</strong> — All debts have been paid and the group is fully resolved.
+                </>
+              }
+            />
           </div>
         </div>
       </div>
@@ -170,7 +205,10 @@ export default function GroupsPage() {
       {error ? <Alert variant="danger">{error}</Alert> : null}
 
       {isLoading ? (
-        <div className="d-flex align-items-center justify-content-center" style={{ minHeight: "16rem" }}>
+        <div
+          className="d-flex align-items-center justify-content-center"
+          style={{ minHeight: "16rem" }}
+        >
           <Spinner animation="border" role="status" variant="dark" />
         </div>
       ) : filteredGroups.length ? (
@@ -207,7 +245,8 @@ export default function GroupsPage() {
                   {pageNumber}
                 </Pagination.Item>
               ))}
-              {visiblePageNumbers[visiblePageNumbers.length - 1] < totalPages ? (
+              {visiblePageNumbers[visiblePageNumbers.length - 1] <
+              totalPages ? (
                 <Pagination.Ellipsis disabled />
               ) : null}
               <Pagination.Next
@@ -224,10 +263,17 @@ export default function GroupsPage() {
       ) : (
         <div
           className="d-grid align-items-center justify-items-center text-center p-5 rounded-4"
-          style={{ minHeight: "16rem", border: "1px dashed rgba(33,37,41,0.15)" }}
+          style={{
+            minHeight: "16rem",
+            border: "1px dashed rgba(33,37,41,0.15)",
+          }}
         >
           <div>
-            <h2>{query.trim() || statusFilter !== "all" ? "No matching groups" : "No groups yet"}</h2>
+            <h2>
+              {query.trim() || statusFilter !== "all"
+                ? "No matching groups"
+                : "No groups yet"}
+            </h2>
             <p className="text-secondary mb-0">
               {query.trim() || statusFilter !== "all"
                 ? "Try a different search term or filter."

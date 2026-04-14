@@ -3,6 +3,7 @@ import { useState } from "react";
 import Badge from "react-bootstrap/Badge";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
+import HelpTooltip from "../HelpTooltip/HelpTooltip.jsx";
 
 const FILTER = {
   ALL: "all",
@@ -49,9 +50,25 @@ export default function BalanceSummary({
       : `No ${statusFilter} balances found.`;
 
   return (
-    <Card className="rounded-4 overflow-hidden">
+    <Card className="rounded-4" style={{ overflow: "visible" }}>
       <Card.Body>
-        <Card.Title>Settlement Plan</Card.Title>
+        <div className="d-flex align-items-center gap-2">
+          <Card.Title className="mb-0">Settlement Plan</Card.Title>
+          <HelpTooltip
+            position="right"
+            content={
+              <>
+                <strong>How settlements work:</strong>
+                <br />
+                1. Each row shows who owes whom and how much.
+                <br />
+                2. The group owner must click &quot;Settle Up&quot; before debts can be marked as paid.
+                <br />
+                3. Once settling, the sender, receiver, or group owner can click &quot;Mark Paid&quot; to confirm a payment.
+              </>
+            }
+          />
+        </div>
         <div
           aria-label="Filter settlements"
           className="d-flex flex-wrap gap-2 mt-3"
@@ -72,7 +89,7 @@ export default function BalanceSummary({
           ))}
         </div>
       </Card.Body>
-      <div style={{ maxHeight: "28rem", overflowY: "auto", borderTop: "1px solid rgba(0,0,0,.125)" }}>
+      <div style={{ maxHeight: "28rem", overflowY: "auto", borderTop: "1px solid rgba(0,0,0,.125)", borderRadius: "0 0 var(--bs-card-border-radius) var(--bs-card-border-radius)" }}>
         <ListGroup variant="flush">
           {filteredDebts.length ? (
             filteredDebts.map((debt) => {
