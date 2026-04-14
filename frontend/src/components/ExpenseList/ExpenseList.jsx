@@ -5,7 +5,10 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import HelpTooltip from "../HelpTooltip/HelpTooltip.jsx";
 import ListGroup from "react-bootstrap/ListGroup";
+import Modal from "react-bootstrap/Modal";
 import Pagination from "react-bootstrap/Pagination";
+import DeleteButton from "../DeleteButton/DeleteButton.jsx";
+import EditButton from "../EditButton/EditButton.jsx";
 import { currency, formatDate } from "../../utils/format.js";
 
 const PAGE_SIZE = 5;
@@ -34,9 +37,11 @@ export default function ExpenseList({
 }) {
   const [categoryFilter, setCategoryFilter] = useState(ALL);
   const [currentPage, setCurrentPage] = useState(1);
+  const [detailExpense, setDetailExpense] = useState(null);
 
   const categoryOptions = useMemo(
-    () => CATEGORY_ORDER.filter((cat) => expenses.some((e) => e.category === cat)),
+    () =>
+      CATEGORY_ORDER.filter((cat) => expenses.some((e) => e.category === cat)),
     [expenses],
   );
 
@@ -45,7 +50,10 @@ export default function ExpenseList({
       ? expenses
       : expenses.filter((e) => e.category === categoryFilter);
 
-  const totalPages = Math.max(Math.ceil(filteredExpenses.length / PAGE_SIZE), 1);
+  const totalPages = Math.max(
+    Math.ceil(filteredExpenses.length / PAGE_SIZE),
+    1,
+  );
   const safeCurrentPage = Math.min(currentPage, totalPages);
   const visibleStart = (safeCurrentPage - 1) * PAGE_SIZE;
   const visibleExpenses = filteredExpenses.slice(
@@ -97,7 +105,8 @@ export default function ExpenseList({
                   <br />
                   2. Use the category dropdown to filter expenses.
                   <br />
-                  3. The person who paid or the group owner can edit or delete an expense.
+                  3. The person who paid or the group owner can edit or delete
+                  an expense.
                 </>
               }
             />
@@ -150,9 +159,6 @@ export default function ExpenseList({
                     {formatCategoryLabel(expense.category)}
                   </Badge>
                 </div>
-                {expense.description ? (
-                  <div className="small mt-1">{expense.description}</div>
-                ) : null}
                 <div className="text-secondary small mt-1">
                   Paid by {expense.paidByUser?.name ?? "Member"} on{" "}
                   {formatDate(expense.dateCreated)}
@@ -160,47 +166,35 @@ export default function ExpenseList({
                 <div className="text-secondary small mt-1">
                   Split with {formatSplitMembers(expense.splitBetweenUsers)}
                 </div>
-                {expense.splitDetails && expense.splitBetweenUsers?.length ? (
-                  <div className="mt-2 pt-2 border-top">
-                    <div className="text-secondary small fw-semibold mb-1">Split Breakdown</div>
-                    {expense.splitBetweenUsers.map((member) => (
-                      <div
-                        key={member._id}
-                        className="d-flex justify-content-between small"
-                        style={{ maxWidth: 250 }}
-                      >
-                        <span>{member.name}</span>
-                        <span>{currency(expense.splitDetails[member._id] ?? 0)}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
               </div>
               <div className="d-flex flex-column align-items-end gap-2 flex-shrink-0">
                 <strong>{currency(expense.amount)}</strong>
                 {canEdit(expense) ? (
                   <div className="d-flex gap-1">
-                    <button
-                      className="btn btn-sm btn-outline-secondary py-0 px-2"
+                    <EditButton
+                      compact
+                      label={`Edit ${expense.name}`}
                       onClick={() => onEdit(expense)}
-                      title="Edit"
-                      type="button"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      className="btn btn-sm btn-outline-danger py-0 px-2"
+                    />
+                    <DeleteButton
+                      compact
+                      label={`Delete ${expense.name}`}
                       onClick={() => onDelete(expense)}
-                      title="Delete"
-                      type="button"
-                    >
-                      🗑️
-                    </button>
+                    />
                   </div>
-                ) : null}
+                ) : (
+                  <button
+                    className="btn btn-sm btn-outline-secondary py-0 px-2"
+                    onClick={() => setDetailExpense(expense)}
+                    title="View Details"
+                    type="button"
+                  >
+                    Details
+                  </button>
+                )}
               </div>
             </ListGroup.Item>
-          )))
+          ))
         ) : (
           <ListGroup.Item>
             {categoryFilter === ALL
@@ -244,6 +238,27 @@ export default function ExpenseList({
           ) : null}
         </Card.Footer>
       ) : null}
+      <Modal
+        show={!!detailExpense}
+        onHide={() => setDetailExpense(null)}
+        centered
+      >
+        {detailExpense ? (
+          <>
+            <Modal.Header closeButton>
+              <Modal.Title>{detailExpense.name}</Modal.Title>
+            </Modal.Header>
+            <Modal.Body style={{ maxHeight: "60vh", overflowY: "auto" }}>
+              <div className="mb-3">
+                <h6>Description</h6>
+                <p className="mb-0">
+                  {detailExpense.description || "No description provided."}
+                </p>
+              </div>
+            </Modal.Body>
+          </>
+        ) : null}
+      </Modal>
     </Card>
   );
 }
