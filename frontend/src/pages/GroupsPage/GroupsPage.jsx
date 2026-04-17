@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import "./GroupsPage.css";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Col from "react-bootstrap/Col";
@@ -214,6 +215,18 @@ export default function GroupsPage() {
       ) : filteredGroups.length ? (
         <>
           <Row className="g-4">
+            {currentPage === 1 && !query.trim() && statusFilter === "all" ? (
+              <Col lg={6} xl={4}>
+                <button
+                  className="groups-page__add-card"
+                  onClick={() => setIsCreateOpen(true)}
+                  type="button"
+                >
+                  <span className="groups-page__add-card-icon">+</span>
+                  <span>New Group</span>
+                </button>
+              </Col>
+            ) : null}
             {paginatedGroups.map((group) => (
               <Col key={group._id} lg={6} xl={4}>
                 <GroupCard group={group} />
