@@ -1,5 +1,5 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Badge from "react-bootstrap/Badge";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
@@ -37,6 +37,48 @@ export default function BalanceSummary({
   onSettleUp,
 }) {
   const [statusFilter, setStatusFilter] = useState(FILTER.ALL);
+  const [pendingPaid, setPendingPaid] = useState(new Map()); // debtId -> countdown seconds
+  const timersRef = useRef(new Map()); // debtId -> { timeoutId, intervalId }
+
+  function handleMarkPaidClick(debtId) {
+    setPendingPaid((prev) => new Map(prev).set(debtId, 5));
+
+    const intervalId = setInterval(() => {
+      setPendingPaid((prev) => {
+        const next = new Map(prev);
+        const current = next.get(debtId);
+        if (current !== undefined) next.set(debtId, current - 1);
+        return next;
+      });
+    }, 1000);
+
+    const timeoutId = setTimeout(() => {
+      clearInterval(intervalId);
+      timersRef.current.delete(debtId);
+      setPendingPaid((prev) => {
+        const next = new Map(prev);
+        next.delete(debtId);
+        return next;
+      });
+      onMarkPaid(debtId);
+    }, 5000);
+
+    timersRef.current.set(debtId, { timeoutId, intervalId });
+  }
+
+  function handleUndo(debtId) {
+    const timers = timersRef.current.get(debtId);
+    if (timers) {
+      clearTimeout(timers.timeoutId);
+      clearInterval(timers.intervalId);
+      timersRef.current.delete(debtId);
+    }
+    setPendingPaid((prev) => {
+      const next = new Map(prev);
+      next.delete(debtId);
+      return next;
+    });
+  }
   const filteredDebts = debts.filter((debt) => {
     if (statusFilter === FILTER.PAID) {
       return debt.isPaid;
@@ -133,11 +175,20 @@ export default function BalanceSummary({
                     {debt.isPaid ? (
                       <Badge bg="success">Paid</Badge>
                     ) : null}
-                    {canMarkPaid ? (
+                    {canMarkPaid && pendingPaid.has(debt.debtId) ? (
+                      <button
+                        className="btn btn-warning btn-sm py-0 px-2 ms-1"
+                        onClick={() => handleUndo(debt.debtId)}
+                        style={{ fontSize: "0.7rem", whiteSpace: "nowrap" }}
+                        type="button"
+                      >
+                        Undo ({pendingPaid.get(debt.debtId)}s)
+                      </button>
+                    ) : canMarkPaid ? (
                       <button
                         className="btn btn-outline-success btn-sm py-0 px-2 ms-1"
                         disabled={isSubmitting}
-                        onClick={() => onMarkPaid(debt.debtId)}
+                        onClick={() => handleMarkPaidClick(debt.debtId)}
                         style={{ fontSize: "0.7rem", whiteSpace: "nowrap" }}
                         type="button"
                       >
