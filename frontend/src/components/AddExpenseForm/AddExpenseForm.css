@@ -3,6 +3,16 @@
   gap: 1rem;
 }
 
+.add-expense-form .form-control,
+.add-expense-form .form-select {
+  border-color: var(--color-surface-alt);
+}
+
+.add-expense-form .form-control:focus,
+.add-expense-form .form-select:focus {
+  border-color: var(--color-primary);
+}
+
 .add-expense-form__layout {
   display: grid;
   gap: 1rem;
@@ -68,6 +78,23 @@
   border: 1px solid rgba(33, 37, 41, 0.12);
   border-radius: 0.75rem;
   padding: 0.75rem 0.75rem 0.75rem 2.5rem;
+}
+
+
+.add-expense-form__clear-btn.btn-link {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.add-expense-form__clear-btn.btn-link:hover {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.add-expense-form__cancel-btn:hover {
+  border-color: var(--color-danger);
+  color: var(--color-danger);
+  background-color: transparent;
 }
 
 .add-expense-form__empty {

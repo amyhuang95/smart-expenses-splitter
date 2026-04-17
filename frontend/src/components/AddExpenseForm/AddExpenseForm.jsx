@@ -239,31 +239,36 @@ export default function AddExpenseForm({
                     {selectedMemberIds.length} of {memberIds.length} selected
                   </div>
                   <div className="add-expense-form__member-actions">
-                    <Button
-                      disabled={isSubmitting}
-                      onClick={() => handleSelectMembers(memberIds)}
-                      size="sm"
-                      type="button"
-                      variant="outline-dark"
-                    >
-                      Select all
-                    </Button>
-                    <Button
-                      disabled={isSubmitting}
-                      onClick={() => handleSelectMembers([])}
-                      size="sm"
-                      type="button"
-                      variant="outline-secondary"
-                    >
-                      Clear all
-                    </Button>
+                    {!hasMemberQuery ? (
+                      <Button
+                        disabled={isSubmitting}
+                        onClick={() => handleSelectMembers(memberIds)}
+                        size="sm"
+                        type="button"
+                        variant="outline-primary"
+                      >
+                        Select all
+                      </Button>
+                    ) : null}
+                    {!hasMemberQuery ? (
+                      <Button
+                        disabled={isSubmitting}
+                        onClick={() => handleSelectMembers([])}
+                        size="sm"
+                        type="button"
+                        variant="link"
+                        className="add-expense-form__clear-btn"
+                      >
+                        Clear all
+                      </Button>
+                    ) : null}
                     {hasMemberQuery ? (
                       <Button
                         disabled={isSubmitting || !visibleMemberIds.length}
                         onClick={handleSelectVisible}
                         size="sm"
                         type="button"
-                        variant="outline-dark"
+                        variant="outline-primary"
                       >
                         Select visible
                       </Button>
@@ -274,7 +279,8 @@ export default function AddExpenseForm({
                         onClick={handleClearVisible}
                         size="sm"
                         type="button"
-                        variant="outline-secondary"
+                        variant="link"
+                        className="add-expense-form__clear-btn"
                       >
                         Clear visible
                       </Button>
@@ -314,6 +320,7 @@ export default function AddExpenseForm({
           ) : null}
           <div className="ms-auto d-flex gap-2">
             <Button
+              className="add-expense-form__cancel-btn"
               disabled={isSubmitting}
               onClick={onClose}
               type="button"
