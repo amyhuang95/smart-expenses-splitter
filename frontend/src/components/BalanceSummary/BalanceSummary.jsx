@@ -65,7 +65,7 @@ export default function BalanceSummary({
               <>
                 <strong>How settlements work:</strong>
                 <br />
-                1. Each row shows who owes whom and how much.
+                1. We figure out who's up and who's down across all expenses, then generate the fewest possible payments to zero everything out.
                 <br />
                 2. The group owner must click &quot;Settle Up&quot; before debts can be marked as paid.
                 <br />
