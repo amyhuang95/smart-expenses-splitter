@@ -38,3 +38,26 @@
   - Status badges (`span.badge.bg-primary`, `span.badge.bg-warning`, `span.badge.bg-success`)
   - Group card links and `<dt>` labels (`a.group-card`, `dt`)
   - These are largely inherited from Bootstrap's default component styling (badge backgrounds, button colors) where white text on the themed background colors falls slightly below the WCAG AA 4.5:1 threshold. The core page content — body text, headings, form labels — all pass contrast requirements comfortably
+
+### Feature: Group Editing Capability
+
+- Add an `Edit Group` button so that group owner can edit the name of the group. 
+- Move edit member component into edit group modal for consistency.
+
+### Bug Fixes & UX Improvements
+
+#### Bug Fixes
+
+- **[Group Card] Expense count stuck at 0** — Fixed bug where the expense count on group cards was not updating; it now reflects the actual number of expenses logged to the group.
+- **[Add Group Expense] Error on 2-decimal amounts** — Fixed error thrown when users entered amounts with two decimal places (e.g., `12.50`).
+
+#### Improvements
+
+- **[Group Settlement] Debt allocation instructions** — Added instructions to the Settlement Plan to clarify how debts are calculated and allocated.
+- **[Group Settlement] Settle Up button clarification** — Added a confirmation popup on the Settle Up button explaining that it will lock group expenses.
+- **[Group Settlement] Revert paid debt** — Added the ability to undo marking a debt as paid.
+- **[Group Card] Easier group navigation** — The entire group card is now clickable to enter the group detail, replacing the small "Open Group" button.
+- **[Group List] Add New Group discoverability** — When not searching or filtering, the first item in the group list is now the "Add New Group" option, replacing the small button.
+- **[Group Detail] Expense edit permissions hint** — Added instructions to the expense list clarifying that only the group owner and the expense logger can edit an expense.
+- **[Group List] Status filter explanation** — Added an instruction tooltip explaining what the status tag filters do.
+- **[Group Detail] Outstanding value explanation** — Added a tooltip clarifying what the "Outstanding" dashboard value represents.

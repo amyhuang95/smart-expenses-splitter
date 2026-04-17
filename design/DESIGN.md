@@ -186,6 +186,7 @@ All group routes require an authenticated session.
 - `GET /api/groups`: list the current user's group summaries
 - `POST /api/groups`: create a group from a name and optional `memberEmails`
 - `GET /api/groups/:groupId`: fetch one group's full detail payload
+- `PATCH /api/groups/:groupId`: rename a group as the owner
 - `DELETE /api/groups/:groupId`: delete a group as the owner
 - `POST /api/groups/:groupId/members`: add a member by email
 - `DELETE /api/groups/:groupId/members/:memberId`: remove a member
