@@ -1,4 +1,5 @@
 import { useUser } from "../../context/useUser.js";
+import { Link } from "react-router";
 import "./HomePage.css";
 
 export default function HomePage() {
@@ -15,22 +16,24 @@ export default function HomePage() {
         </p>
       </div>
       <section className="home-page__feature-section" aria-label="Feature overview">
-        <div className="home-page__feature-block">
+        <Link to="/groups" className="home-page__feature-block home-page__feature-block--link">
           <h2 className="home-page__feature-title">Group Expenses</h2>
           <ul className="home-page__feature-list">
             <li>Create groups for trips, roommates, or events.</li>
             <li>Add members and split shared expenses clearly.</li>
             <li>Track balances and settle debts in one place.</li>
           </ul>
-        </div>
-        <div className="home-page__feature-block">
+          <span className="home-page__feature-cta">Go to Groups →</span>
+        </Link>
+        <Link to="/single-expenses" className="home-page__feature-block home-page__feature-block--link">
           <h2 className="home-page__feature-title">Single Expenses</h2>
           <ul className="home-page__feature-list">
             <li>Log a one-off expense and split it with anyone.</li>
             <li>Track who has paid and who still owes.</li>
             <li>View your personal balance and spending breakdown.</li>
           </ul>
-        </div>
+          <span className="home-page__feature-cta">Go to My Expenses →</span>
+        </Link>
       </section>
     </section>
   );
