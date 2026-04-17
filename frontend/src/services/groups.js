@@ -29,6 +29,13 @@ export async function fetchGroupDetails(groupId) {
   });
 }
 
+export async function updateGroup(groupId, payload) {
+  return request(`/api/groups/${groupId}`, {
+    method: "PATCH",
+    body: JSON.stringify(payload),
+  });
+}
+
 export async function deleteGroup(groupId) {
   return request(`/api/groups/${groupId}`, {
     method: "DELETE",

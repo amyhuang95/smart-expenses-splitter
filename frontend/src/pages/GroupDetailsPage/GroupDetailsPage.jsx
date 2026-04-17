@@ -9,6 +9,7 @@ import Spinner from "react-bootstrap/Spinner";
 import { Link, useNavigate, useParams } from "react-router";
 import AddExpenseForm from "../../components/AddExpenseForm/AddExpenseForm.jsx";
 import BalanceSummary from "../../components/BalanceSummary/BalanceSummary.jsx";
+import EditGroupModal from "../../components/EditGroupModal/EditGroupModal.jsx";
 import ExpenseList from "../../components/ExpenseList/ExpenseList.jsx";
 import HelpTooltip from "../../components/HelpTooltip/HelpTooltip.jsx";
 import MemberListModal from "../../components/MemberListModal/MemberListModal.jsx";
@@ -22,6 +23,7 @@ import {
   markDebtAsPaid,
   removeGroupMember,
   settleGroup,
+  updateGroup,
   updateGroupExpense,
 } from "../../services/groups.js";
 import { currency } from "../../utils/format.js";
@@ -33,6 +35,7 @@ const ACTION = {
   SETTLE: "settle",
   MARK_PAID: "markPaid",
   DELETE: "delete",
+  RENAME: "rename",
 };
 
 const MEMBER_PREVIEW_LIMIT = 6;
@@ -56,7 +59,7 @@ function ConfirmModal({
         <p className="text-secondary small mb-4">{message}</p>
         <div className="d-flex justify-content-center gap-2">
           <button
-            className="btn btn-outline-danger"
+            className="btn btn-outline-secondary"
             onClick={onCancel}
             type="button"
           >
@@ -84,6 +87,8 @@ export default function GroupDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isExpenseOpen, setIsExpenseOpen] = useState(false);
   const [isMembersOpen, setIsMembersOpen] = useState(false);
+  const [isEditGroupOpen, setIsEditGroupOpen] = useState(false);
+  const [editGroupError, setEditGroupError] = useState("");
   const [workingActions, setWorkingActions] = useState(new Set());
   const [editingExpense, setEditingExpense] = useState(null);
 
@@ -147,9 +152,17 @@ export default function GroupDetailsPage() {
       confirmVariant: "danger",
       onConfirm: async () => {
         setConfirm(null);
-        await runAction(ACTION.MEMBER, () =>
-          removeGroupMember(groupData.group._id, member._id),
-        );
+        try {
+          setEditGroupError("");
+          await runAction(ACTION.MEMBER, () =>
+            removeGroupMember(groupData.group._id, member._id),
+          );
+        } catch (removeError) {
+          if (isEditGroupOpen) {
+            setEditGroupError(removeError.message);
+            setError("");
+          }
+        }
       },
     });
   }
@@ -272,6 +285,16 @@ export default function GroupDetailsPage() {
             </div>
             {isOwner ? (
               <div className="d-flex flex-wrap justify-content-end align-items-center gap-2">
+                {group.status === "open" ? (
+                  <Button
+                    onClick={() => setIsEditGroupOpen(true)}
+                    size="sm"
+                    type="button"
+                    variant="outline-secondary"
+                  >
+                    Edit Group
+                  </Button>
+                ) : null}
                 <Button
                   disabled={isWorking(ACTION.DELETE)}
                   onClick={handleDeleteGroup}
@@ -299,17 +322,9 @@ export default function GroupDetailsPage() {
                   onClick={() => setIsMembersOpen(true)}
                   type="button"
                 >
-                  +{hiddenMemberCount} more
+                  Show all ({members.length})
                 </button>
-              ) : (
-                <button
-                  className="group-details-page__members-more"
-                  onClick={() => setIsMembersOpen(true)}
-                  type="button"
-                >
-                  {isOwner && group.status === "open" ? "✏️" : "View All"}
-                </button>
-              )}
+              ) : null}
             </div>
           </div>
 
@@ -426,7 +441,18 @@ export default function GroupDetailsPage() {
       <MemberListModal
         groupName={group.name}
         isOpen={isMembersOpen}
-        isOwner={isOwner && group.status === "open"}
+        isOwner={false}
+        isSubmitting={isAnyWorking}
+        members={members}
+        onAddMember={async () => {}}
+        onClose={() => setIsMembersOpen(false)}
+        onRemoveMember={() => {}}
+        ownerId={group.ownerId}
+      />
+
+      <EditGroupModal
+        groupName={group.name}
+        isOpen={isEditGroupOpen}
         isSubmitting={isAnyWorking}
         members={members}
         onAddMember={async ({ email }) => {
@@ -442,8 +468,18 @@ export default function GroupDetailsPage() {
             });
           }
         }}
-        onClose={() => setIsMembersOpen(false)}
+        memberError={editGroupError}
+        onClearMemberError={() => setEditGroupError("")}
+        onClose={() => {
+          setIsEditGroupOpen(false);
+          setEditGroupError("");
+        }}
         onRemoveMember={handleRemoveMember}
+        onRenameGroup={async (nextName) => {
+          await runAction(ACTION.RENAME, () =>
+            updateGroup(group._id, { name: nextName }),
+          );
+        }}
         ownerId={group.ownerId}
       />
 

@@ -152,6 +152,22 @@ export async function removeMemberFromGroup(groupId, memberId) {
   return findGroupById(groupId);
 }
 
+export async function updateGroupName(groupId, name) {
+  if (!ObjectId.isValid(groupId)) {
+    logger.warn("[groups] updateGroupName — invalid groupId", { groupId });
+    return null;
+  }
+
+  logger.debug("[groups] updateOne name", { groupId });
+  await getGroupsCollection().updateOne(
+    { _id: ObjectId.createFromHexString(groupId) },
+    { $set: { name: name.trim() } },
+  );
+  logger.debug("[groups] updateOne name OK", { groupId });
+
+  return findGroupById(groupId);
+}
+
 export async function updateGroupSettlement(groupId, { debts, status }) {
   if (!ObjectId.isValid(groupId)) {
     logger.warn("[groups] updateGroupSettlement — invalid groupId", {

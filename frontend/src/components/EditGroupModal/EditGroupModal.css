@@ -1,0 +1,36 @@
+.edit-group-modal__body {
+  display: grid;
+  gap: 1.25rem;
+}
+
+.edit-group-modal__section-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.edit-group-modal__item {
+  align-items: center;
+  display: flex;
+  gap: 1rem;
+  justify-content: space-between;
+}
+
+.edit-group-modal__name {
+  font-weight: 600;
+}
+
+.edit-group-modal__meta {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+@media (max-width: 767px) {
+  .edit-group-modal__item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .edit-group-modal__item .btn {
+    width: 100%;
+  }
+}
