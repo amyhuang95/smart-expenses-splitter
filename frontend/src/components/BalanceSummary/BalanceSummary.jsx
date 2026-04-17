@@ -5,6 +5,7 @@ import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
 import HelpTooltip from "../HelpTooltip/HelpTooltip.jsx";
+import "./BalanceSummary.css";
 
 const FILTER = {
   ALL: "all",
@@ -148,7 +149,7 @@ export default function BalanceSummary({
           ))}
         </div>
       </Card.Body>
-      <div style={{ maxHeight: "28rem", overflowY: "auto", borderTop: "1px solid rgba(0,0,0,.125)", borderRadius: "0 0 var(--bs-card-border-radius) var(--bs-card-border-radius)" }}>
+      <div className="balance-summary__list">
         <ListGroup variant="flush">
           {filteredDebts.length ? (
             filteredDebts.map((debt) => {
