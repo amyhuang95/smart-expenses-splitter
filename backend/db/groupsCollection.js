@@ -221,10 +221,12 @@ export async function listGroupSummariesByMember(userId) {
       {
         $lookup: {
           from: "groupExpenses",
-          localField: "_id",
-          foreignField: "groupId",
+          let: { groupId: { $toString: "$_id" } },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$groupId", "$$groupId"] } } },
+            { $project: { amount: 1 } },
+          ],
           as: "_expenseDocs",
-          pipeline: [{ $project: { amount: 1 } }],
         },
       },
       {
