@@ -150,7 +150,7 @@ export default function GroupsPage() {
             />
           </div>
           <Button
-            className="flex-shrink-0"
+            className="flex-shrink-0 fw-semibold"
             onClick={() => setIsCreateOpen(true)}
             type="button"
           >

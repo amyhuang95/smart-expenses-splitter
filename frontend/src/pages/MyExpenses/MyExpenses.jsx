@@ -164,7 +164,7 @@ export default function MyExpenses() {
       {/* Header */}
       <header className="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
         <div>
-          <h1 className="h2 fw-bold mb-1">
+          <h1 className="h2 page-title mb-1">
             My Expenses{" "}
             <HelpTooltip
               content={
