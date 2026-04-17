@@ -10,6 +10,7 @@ import { Link, useNavigate, useParams } from "react-router";
 import AddExpenseForm from "../../components/AddExpenseForm/AddExpenseForm.jsx";
 import BalanceSummary from "../../components/BalanceSummary/BalanceSummary.jsx";
 import ExpenseList from "../../components/ExpenseList/ExpenseList.jsx";
+import HelpTooltip from "../../components/HelpTooltip/HelpTooltip.jsx";
 import MemberListModal from "../../components/MemberListModal/MemberListModal.jsx";
 import { useUser } from "../../context/useUser.js";
 import {
@@ -36,7 +37,14 @@ const ACTION = {
 
 const MEMBER_PREVIEW_LIMIT = 6;
 
-function ConfirmModal({ title, message, confirmLabel = "Confirm", confirmVariant = "danger", onConfirm, onCancel }) {
+function ConfirmModal({
+  title,
+  message,
+  confirmLabel = "Confirm",
+  confirmVariant = "danger",
+  onConfirm,
+  onCancel,
+}) {
   return (
     <div className="modal-backdrop-custom" onClick={onCancel}>
       <div
@@ -47,10 +55,18 @@ function ConfirmModal({ title, message, confirmLabel = "Confirm", confirmVariant
         <h5 className="mb-2">{title}</h5>
         <p className="text-secondary small mb-4">{message}</p>
         <div className="d-flex justify-content-center gap-2">
-          <button className="btn btn-secondary" onClick={onCancel} type="button">
+          <button
+            className="btn btn-secondary"
+            onClick={onCancel}
+            type="button"
+          >
             Cancel
           </button>
-          <button className={`btn btn-${confirmVariant}`} onClick={onConfirm} type="button">
+          <button
+            className={`btn btn-${confirmVariant}`}
+            onClick={onConfirm}
+            type="button"
+          >
             {confirmLabel}
           </button>
         </div>
@@ -198,7 +214,10 @@ export default function GroupDetailsPage() {
 
   if (isLoading) {
     return (
-      <div className="d-flex align-items-center justify-content-center" style={{ minHeight: "40vh" }}>
+      <div
+        className="d-flex align-items-center justify-content-center"
+        style={{ minHeight: "40vh" }}
+      >
         <Spinner animation="border" role="status" variant="dark" />
       </div>
     );
@@ -219,7 +238,9 @@ export default function GroupDetailsPage() {
 
   const { debts, expenses, group, summary } = groupData;
   const isOwner = group.currentUserRole === "owner";
-  const expenseFormTitle = editingExpense ? "Edit Shared Expense" : "Add Shared Expense";
+  const expenseFormTitle = editingExpense
+    ? "Edit Shared Expense"
+    : "Add Shared Expense";
   const expenseSubmitLabel = editingExpense ? "Save Changes" : "Save Expense";
   const members = group.members ?? [];
   const previewMembers = members.slice(0, MEMBER_PREVIEW_LIMIT);
@@ -238,12 +259,12 @@ export default function GroupDetailsPage() {
         ← Back to Groups
       </Link>
 
-      <Card className="rounded-4 overflow-hidden">
+      <Card className="rounded-4">
         <Card.Body>
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
             <div>
               <Badge bg={statusVariant} pill>
-                  {group.status}
+                {group.status}
               </Badge>
               <div className="d-flex flex-wrap align-items-center gap-3">
                 <h1 className="mb-0">{group.name}</h1>
@@ -294,7 +315,7 @@ export default function GroupDetailsPage() {
 
           <Row className="g-3 mt-2">
             <Col sm={4}>
-              <Card className="rounded-3 overflow-hidden">
+              <Card className="rounded-3">
                 <Card.Body>
                   <div className="text-muted">Total Spent</div>
                   <strong>{currency(summary.totalSpent)}</strong>
@@ -302,17 +323,29 @@ export default function GroupDetailsPage() {
               </Card>
             </Col>
             <Col sm={4}>
-              <Card className="rounded-3 overflow-hidden">
+              <Card className="rounded-3">
                 <Card.Body>
-                  <div className="text-muted">Outstanding</div>
+                  <div className="text-muted d-flex align-items-center gap-1">
+                    Outstanding
+                    <HelpTooltip
+                      content="The total amount still owed between members that hasn't been paid back yet."
+                      position="right"
+                    />
+                  </div>
                   <strong>{currency(summary.outstandingDebtAmount)}</strong>
                 </Card.Body>
               </Card>
             </Col>
             <Col sm={4}>
-              <Card className="rounded-3 overflow-hidden">
+              <Card className="rounded-3">
                 <Card.Body>
-                  <div className="text-muted">Settled Debts</div>
+                  <div className="text-muted d-flex align-items-center gap-1">
+                    Settled Debts
+                    <HelpTooltip
+                      content="The number of individual debts that have been marked as paid during settlement."
+                      position="right"
+                    />
+                  </div>
                   <strong>{summary.settledDebtCount}</strong>
                 </Card.Body>
               </Card>
@@ -331,7 +364,9 @@ export default function GroupDetailsPage() {
             groupOwnerId={group.ownerId}
             groupStatus={group.status}
             onAddExpense={() => setIsExpenseOpen(true)}
-            canAddExpense={!isWorking(ACTION.EXPENSE) && group.status === "open"}
+            canAddExpense={
+              !isWorking(ACTION.EXPENSE) && group.status === "open"
+            }
             onEdit={(expense) => {
               setEditingExpense(expense);
               setIsExpenseOpen(true);
@@ -367,7 +402,9 @@ export default function GroupDetailsPage() {
           setEditingExpense(null);
           setIsExpenseOpen(false);
         }}
-        onDelete={editingExpense ? () => handleDeleteExpense(editingExpense) : undefined}
+        onDelete={
+          editingExpense ? () => handleDeleteExpense(editingExpense) : undefined
+        }
         onSubmit={async (payload) => {
           if (editingExpense) {
             await runAction(ACTION.EXPENSE, async () => {
