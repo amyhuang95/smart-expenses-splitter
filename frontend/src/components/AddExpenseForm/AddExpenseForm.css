@@ -91,11 +91,6 @@
   text-decoration: none;
 }
 
-.add-expense-form__cancel-btn:hover {
-  border-color: var(--color-danger);
-  color: var(--color-danger);
-  background-color: transparent;
-}
 
 .add-expense-form__empty {
   color: var(--color-text-muted);

@@ -121,7 +121,7 @@ export default function CreateGroupForm({
           disabled={isSubmitting}
           onClick={onClose}
           type="button"
-          variant="outline-secondary"
+          variant="outline-danger"
         >
           Cancel
         </Button>

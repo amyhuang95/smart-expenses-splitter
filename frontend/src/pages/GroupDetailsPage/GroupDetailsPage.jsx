@@ -56,7 +56,7 @@ function ConfirmModal({
         <p className="text-secondary small mb-4">{message}</p>
         <div className="d-flex justify-content-center gap-2">
           <button
-            className="btn btn-secondary"
+            className="btn btn-outline-danger"
             onClick={onCancel}
             type="button"
           >
