@@ -18,6 +18,9 @@ import {
 } from "../../services/expenses.js";
 import "./MyExpenses.css";
 
+const UNDO_TIMEOUT_MS = 5000;
+const EXPENSES_PAGE_SIZE = 10;
+
 export default function MyExpenses() {
   const { user } = useUser();
   const [expenses, setExpenses] = useState([]);
@@ -27,12 +30,28 @@ export default function MyExpenses() {
   const [editingExpense, setEditingExpense] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [visibleExpenseCount, setVisibleExpenseCount] = useState(EXPENSES_PAGE_SIZE);
+  const [hideSettled, setHideSettled] = useState(false);
   const [filters, setFilters] = useState({
     category: "all",
     paidBy: "all",
     sortBy: "date",
     sortOrder: "desc",
   });
+
+  // Reset paging when filters or hideSettled change
+  const handleFilterChange = (newFilters) => {
+    setFilters(newFilters);
+    setVisibleExpenseCount(EXPENSES_PAGE_SIZE);
+  };
+  const handleHideSettledChange = (val) => {
+    setHideSettled(val);
+    setVisibleExpenseCount(EXPENSES_PAGE_SIZE);
+  };
+
+  // Undo toast state
+  const [undoToast, setUndoToast] = useState(null);
+  const undoTimeoutRef = useRef(null);
 
   const modalRef = useRef(null);
   const deleteModalRef = useRef(null);
@@ -61,6 +80,13 @@ export default function MyExpenses() {
   useEffect(() => {
     if (confirmDelete && deleteModalRef.current) deleteModalRef.current.focus();
   }, [confirmDelete]);
+
+  // Cleanup undo timeout on unmount
+  useEffect(() => {
+    return () => {
+      if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
+    };
+  }, []);
 
   const loadExpenses = useCallback(async () => {
     if (!userName) return;
@@ -103,6 +129,7 @@ export default function MyExpenses() {
 
   useEffect(() => {
     refreshAll();
+    setVisibleExpenseCount(EXPENSES_PAGE_SIZE);
   }, [refreshAll]);
 
   const handleCreate = async (data) => {
@@ -134,15 +161,86 @@ export default function MyExpenses() {
     }
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (expense) => {
     try {
-      await deleteExpense(id);
+      await deleteExpense(expense._id);
       setConfirmDelete(null);
+
+      // Clear any existing undo toast
+      if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
+
+      // Show undo toast for 5 seconds
+      const timeoutId = setTimeout(() => {
+        setUndoToast(null);
+      }, UNDO_TIMEOUT_MS);
+
+      undoTimeoutRef.current = timeoutId;
+      setUndoToast({ expense });
+
       refreshAll();
     } catch (err) {
       console.error("Error deleting expense:", err);
     }
   };
+
+  const handleUndo = async () => {
+    if (!undoToast) return;
+    if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
+    setUndoToast(null);
+
+    try {
+      // Re-create the deleted expense
+      const { _id, dateCreated, settled, paidStatus, splitDetails, ...restorable } = undoToast.expense;
+      await createExpense(restorable);
+      refreshAll();
+    } catch (err) {
+      console.error("Error restoring expense:", err);
+    }
+  };
+
+  const dismissUndoToast = () => {
+    if (undoTimeoutRef.current) clearTimeout(undoTimeoutRef.current);
+    setUndoToast(null);
+  };
+
+  // Active filter chips
+  const activeFilters = [];
+  if (filters.category !== "all") {
+    activeFilters.push({
+      key: "category",
+      label: filters.category.charAt(0).toUpperCase() + filters.category.slice(1),
+      clear: () => setFilters((f) => ({ ...f, category: "all" })),
+    });
+  }
+  if (filters.paidBy !== "all") {
+    activeFilters.push({
+      key: "paidBy",
+      label: `Paid by: ${filters.paidBy}`,
+      clear: () => setFilters((f) => ({ ...f, paidBy: "all" })),
+    });
+  }
+  if (filters.sortBy !== "date") {
+    activeFilters.push({
+      key: "sortBy",
+      label: `Sort: ${filters.sortBy.charAt(0).toUpperCase() + filters.sortBy.slice(1)}`,
+      clear: () => setFilters((f) => ({ ...f, sortBy: "date" })),
+    });
+  }
+  if (hideSettled) {
+    activeFilters.push({
+      key: "hideSettled",
+      label: "Hiding settled",
+      clear: () => setHideSettled(false),
+    });
+  }
+
+  const visibleExpenses = hideSettled
+    ? expenses.filter((e) => !e.settled)
+    : expenses;
+
+  const pagedExpenses = visibleExpenses.slice(0, visibleExpenseCount);
+  const hasMoreExpenses = visibleExpenseCount < visibleExpenses.length;
+  const remainingExpenses = visibleExpenses.length - visibleExpenseCount;
 
   const allPeople = [
     ...new Set(expenses.flatMap((e) => e.splitBetween || [])),
@@ -198,10 +296,10 @@ export default function MyExpenses() {
           <div className="d-flex align-items-center gap-2 mb-2">
             <h2 className="h6 fw-bold mb-0">Quick Stats</h2>
             <HelpTooltip
-              content="Overview of your spending. 'You Owe' = total you haven't paid back. 'Owed to You' = total others haven't paid you."
+              content="Overview of your spending. 'You Paid' = total you personally paid out-of-pocket. 'You Owe' = total you haven't paid back. 'Owed to You' = total others haven't paid you."
             />
           </div>
-          <QuickStats stats={stats} />
+          <QuickStats stats={stats} currentUser={userName} expenses={expenses} />
         </section>
       )}
 
@@ -215,10 +313,38 @@ export default function MyExpenses() {
         </div>
         <ExpenseFilter
           filters={filters}
-          onFilterChange={setFilters}
+          onFilterChange={handleFilterChange}
           people={allPeople}
+          hideSettled={hideSettled}
+          onHideSettledChange={handleHideSettledChange}
         />
       </section>
+
+      {/* Active filter chips */}
+      {activeFilters.length > 0 && (
+        <div className="d-flex flex-wrap gap-2 mb-3" aria-label="Active filters">
+          {activeFilters.map((f) => (
+            <button
+              key={f.key}
+              className="my-expenses__filter-chip btn btn-sm"
+              onClick={f.clear}
+              aria-label={`Remove filter: ${f.label}`}
+            >
+              {f.label} <span aria-hidden="true">&times;</span>
+            </button>
+          ))}
+          <button
+            className="btn btn-sm btn-link text-secondary p-0 ms-1"
+            onClick={() => {
+              setFilters({ category: "all", paidBy: "all", sortBy: "date", sortOrder: "desc" });
+              setHideSettled(false);
+              setVisibleExpenseCount(EXPENSES_PAGE_SIZE);
+            }}
+          >
+            Clear all
+          </button>
+        </div>
+      )}
 
       <div className="row g-4">
         {/* Left: Expense List */}
@@ -230,29 +356,49 @@ export default function MyExpenses() {
               </div>
               Loading expenses...
             </div>
-          ) : expenses.length === 0 ? (
+          ) : visibleExpenses.length === 0 ? (
             <div className="my-expenses__empty text-center py-5" role="status">
               <p className="fs-1 mb-2">💸</p>
-              <p className="fw-semibold mb-1">No expenses yet</p>
+              <p className="fw-semibold mb-1">
+                {hideSettled && expenses.length > 0
+                  ? "All expenses are settled"
+                  : "No expenses yet"}
+              </p>
               <p className="text-secondary small">
-                Click <strong>&quot;+ New Expense&quot;</strong> above to log
-                your first expense. You can split it with any registered user.
+                {hideSettled && expenses.length > 0
+                  ? <>Toggle <strong>&quot;Hide Settled&quot;</strong> off to see your settled expenses.</>
+                  : <>Click <strong>&quot;+ New Expense&quot;</strong> above to log your first expense. You can split it with any registered user.</>}
               </p>
             </div>
           ) : (
-            <ol className="list-unstyled" aria-label="Expenses">
-              {expenses.map((exp) => (
-                <li key={exp._id} className="mb-2">
-                  <ExpenseCard
-                    expense={exp}
-                    currentUser={userName}
-                    onEdit={() => setEditingExpense(exp)}
-                    onDelete={() => setConfirmDelete(exp)}
-                    onMarkPaid={() => handleMarkPaid(exp._id)}
-                  />
-                </li>
-              ))}
-            </ol>
+            <>
+              <ol className="list-unstyled" aria-label="Expenses">
+                {pagedExpenses.map((exp) => (
+                  <li key={exp._id} className="mb-2">
+                    <ExpenseCard
+                      expense={exp}
+                      currentUser={userName}
+                      onEdit={() => setEditingExpense(exp)}
+                      onDelete={() => setConfirmDelete(exp)}
+                      onMarkPaid={() => handleMarkPaid(exp._id)}
+                    />
+                  </li>
+                ))}
+              </ol>
+              {hasMoreExpenses && (
+                <div className="text-center pt-2 pb-3">
+                  <p className="text-secondary small mb-2">
+                    Showing {pagedExpenses.length} of {visibleExpenses.length} expenses
+                  </p>
+                  <button
+                    className="btn btn-outline-secondary"
+                    onClick={() => setVisibleExpenseCount((c) => c + EXPENSES_PAGE_SIZE)}
+                  >
+                    Load {Math.min(EXPENSES_PAGE_SIZE, remainingExpenses)} more
+                  </button>
+                </div>
+              )}
+            </>
           )}
         </section>
 
@@ -311,18 +457,46 @@ export default function MyExpenses() {
           >
             <h2 className="h5 text-danger fw-bold">Delete Expense?</h2>
             <p className="text-secondary small">
-              This will permanently remove &quot;{confirmDelete.name}&quot; ($
-              {confirmDelete.amount.toFixed(2)}). This action cannot be undone.
+              This will remove &quot;{confirmDelete.name}&quot; ($
+              {confirmDelete.amount.toFixed(2)}). You&apos;ll have 5 seconds to undo.
             </p>
             <div className="d-flex justify-content-center gap-2">
               <button className="btn btn-secondary" onClick={() => setConfirmDelete(null)}>
                 Cancel
               </button>
-              <button className="btn btn-danger" onClick={() => handleDelete(confirmDelete._id)}>
+              <button className="btn btn-danger" onClick={() => handleDelete(confirmDelete)}>
                 Delete
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Undo Toast */}
+      {undoToast && (
+        <div
+          className="my-expenses__undo-toast"
+          role="status"
+          aria-live="polite"
+          aria-label="Expense deleted. Undo available."
+        >
+          <span className="my-expenses__undo-toast-text">
+            &quot;{undoToast.expense.name}&quot; deleted
+          </span>
+          <button
+            className="btn btn-sm btn-warning fw-semibold ms-3"
+            onClick={handleUndo}
+          >
+            Undo
+          </button>
+          <button
+            className="btn btn-sm btn-link text-white ms-1 p-0"
+            onClick={dismissUndoToast}
+            aria-label="Dismiss"
+          >
+            &times;
+          </button>
+          <div className="my-expenses__undo-progress" aria-hidden="true" />
         </div>
       )}
     </main>

@@ -3,7 +3,7 @@ import "./ExpenseFilter.css";
 
 const CATEGORIES = ["all", "food", "transport", "utilities", "entertainment", "other"];
 
-export default function ExpenseFilter({ filters, onFilterChange, people }) {
+export default function ExpenseFilter({ filters, onFilterChange, people, hideSettled, onHideSettledChange }) {
   const set = (key, val) => onFilterChange({ ...filters, [key]: val });
 
   const sortLabel = filters.sortOrder === "desc" ? "\u2193 High\u2192Low" : "\u2191 Low\u2192High";
@@ -57,6 +57,21 @@ export default function ExpenseFilter({ filters, onFilterChange, people }) {
       >
         {sortLabel}
       </button>
+
+      {/* Hide Settled toggle */}
+      <div className="form-check form-switch d-flex align-items-center mb-0 ms-1">
+        <input
+          className="form-check-input me-2"
+          type="checkbox"
+          role="switch"
+          id="hide-settled-toggle"
+          checked={hideSettled}
+          onChange={(e) => onHideSettledChange(e.target.checked)}
+        />
+        <label className="form-check-label small" htmlFor="hide-settled-toggle">
+          Hide Settled
+        </label>
+      </div>
     </nav>
   );
 }
@@ -70,4 +85,6 @@ ExpenseFilter.propTypes = {
   }).isRequired,
   onFilterChange: PropTypes.func.isRequired,
   people: PropTypes.arrayOf(PropTypes.string).isRequired,
+  hideSettled: PropTypes.bool.isRequired,
+  onHideSettledChange: PropTypes.func.isRequired,
 };
