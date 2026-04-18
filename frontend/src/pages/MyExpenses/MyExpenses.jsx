@@ -194,10 +194,6 @@ export default function MyExpenses() {
       // Re-create the deleted expense
       const {
         _id,
-        dateCreated,
-        settled,
-        paidStatus,
-        splitDetails,
         ...restorable
       } = undoToast.expense;
       await createExpense(restorable);
