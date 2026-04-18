@@ -24,3 +24,8 @@
 .expense-form__member-tag button:hover {
   color: var(--bs-danger, #dc3545);
 }
+
+/* Search status feedback (searching indicator / no results) */
+.expense-form__search-status {
+  min-height: 1.4rem;
+}

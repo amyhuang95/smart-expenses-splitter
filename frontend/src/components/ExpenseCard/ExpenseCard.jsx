@@ -99,17 +99,17 @@ export default function ExpenseCard({
             })}
         </div>
 
-        {/* Actions */}
+        {/* Actions — larger buttons with text labels */}
         <div className="d-flex justify-content-end gap-2 border-top pt-2">
           <button
-            className="btn btn-sm btn-outline-secondary d-flex align-items-center gap-1"
+            className="btn btn-sm btn-outline-secondary expense-card__action-btn d-flex align-items-center gap-1"
             onClick={onEdit}
             aria-label={`Edit ${expense.name}`}
           >
             <span aria-hidden="true">&#9998;</span> Edit
           </button>
           <button
-            className="btn btn-sm btn-outline-danger d-flex align-items-center gap-1"
+            className="btn btn-sm btn-outline-danger expense-card__action-btn d-flex align-items-center gap-1"
             onClick={onDelete}
             aria-label={`Delete ${expense.name}`}
           >

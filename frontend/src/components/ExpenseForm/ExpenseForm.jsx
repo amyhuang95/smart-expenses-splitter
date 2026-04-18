@@ -26,7 +26,12 @@ function getInitialFormState(expense, currentUser) {
   };
 }
 
-export default function ExpenseForm({ expense, currentUser, onSubmit, onCancel }) {
+export default function ExpenseForm({
+  expense = null,
+  currentUser,
+  onSubmit,
+  onCancel,
+}) {
   const initial = getInitialFormState(expense, currentUser);
   const [name, setName] = useState(initial.name);
   const [description, setDescription] = useState(initial.description);
@@ -37,14 +42,17 @@ export default function ExpenseForm({ expense, currentUser, onSubmit, onCancel }
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     const doSearch = async () => {
       if (searchInput.trim().length < 1) {
         setSearchResults([]);
         setShowDropdown(false);
+        setSearching(false);
         return;
       }
+      setSearching(true);
       try {
         const data = await searchUsers(searchInput.trim());
         const filtered = data.filter((u) => !splitBetween.includes(u.name));
@@ -54,6 +62,8 @@ export default function ExpenseForm({ expense, currentUser, onSubmit, onCancel }
         console.error("Error searching users:", err);
         setSearchResults([]);
         setShowDropdown(false);
+      } finally {
+        setSearching(false);
       }
     };
     const timer = setTimeout(doSearch, 300);
@@ -95,16 +105,24 @@ export default function ExpenseForm({ expense, currentUser, onSubmit, onCancel }
   };
 
   const parsedAmount = parseFloat(amount) || 0;
-  const perPerson = splitBetween.length > 0 ? parsedAmount / splitBetween.length : 0;
+  const perPerson =
+    splitBetween.length > 0 ? parsedAmount / splitBetween.length : 0;
   const isValid = name.trim() && amount && splitBetween.length >= 2;
 
   return (
-    <form onSubmit={handleSubmit} aria-label={expense ? "Edit expense form" : "New expense form"}>
-      <h2 className="h5 fw-bold mb-3">{expense ? "Edit Expense" : "New Expense"}</h2>
+    <form
+      onSubmit={handleSubmit}
+      aria-label={expense ? "Edit expense form" : "New expense form"}
+    >
+      <h2 className="h5 fw-bold mb-3">
+        {expense ? "Edit Expense" : "New Expense"}
+      </h2>
 
       {/* Name */}
       <div className="mb-3">
-        <label htmlFor="expense-name" className="form-label small text-secondary">Name</label>
+        <label htmlFor="expense-name" className="form-label small text-secondary">
+          Expense Name
+        </label>
         <input
           id="expense-name"
           className="form-control"
@@ -118,7 +136,9 @@ export default function ExpenseForm({ expense, currentUser, onSubmit, onCancel }
 
       {/* Description */}
       <div className="mb-3">
-        <label htmlFor="expense-desc" className="form-label small text-secondary">Description (optional)</label>
+        <label htmlFor="expense-desc" className="form-label small text-secondary">
+          Description (optional)
+        </label>
         <input
           id="expense-desc"
           className="form-control"
@@ -131,7 +151,9 @@ export default function ExpenseForm({ expense, currentUser, onSubmit, onCancel }
       {/* Amount + Category */}
       <div className="row g-2 mb-3">
         <div className="col-6">
-          <label htmlFor="expense-amount" className="form-label small text-secondary">Amount ($)</label>
+          <label htmlFor="expense-amount" className="form-label small text-secondary">
+            Amount ($)
+          </label>
           <input
             id="expense-amount"
             type="number"
@@ -145,7 +167,9 @@ export default function ExpenseForm({ expense, currentUser, onSubmit, onCancel }
           />
         </div>
         <div className="col-6">
-          <label htmlFor="expense-category" className="form-label small text-secondary">Category</label>
+          <label htmlFor="expense-category" className="form-label small text-secondary">
+            Category
+          </label>
           <select
             id="expense-category"
             className="form-select"
@@ -153,28 +177,15 @@ export default function ExpenseForm({ expense, currentUser, onSubmit, onCancel }
             onChange={(e) => setCategory(e.target.value)}
           >
             {CATEGORIES.map((c) => (
-              <option key={c} value={c}>{c.charAt(0).toUpperCase() + c.slice(1)}</option>
+              <option key={c} value={c}>
+                {c.charAt(0).toUpperCase() + c.slice(1)}
+              </option>
             ))}
           </select>
         </div>
       </div>
 
-      {/* Paid By */}
-      <div className="mb-3">
-        <label htmlFor="expense-paidby" className="form-label small text-secondary">Who paid for this?</label>
-        <select
-          id="expense-paidby"
-          className="form-select"
-          value={paidBy}
-          onChange={(e) => setPaidBy(e.target.value)}
-        >
-          {splitBetween.map((p) => (
-            <option key={p} value={p}>{p === currentUser ? `${p} (You)` : p}</option>
-          ))}
-        </select>
-      </div>
-
-      {/* Split With */}
+      {/* Split With — BEFORE Paid By */}
       <fieldset className="mb-3">
         <legend className="form-label small text-secondary">Split With</legend>
         <div className="position-relative">
@@ -192,6 +203,25 @@ export default function ExpenseForm({ expense, currentUser, onSubmit, onCancel }
             role="combobox"
             autoComplete="off"
           />
+
+          {/* Searching indicator — shown while debounce is pending or request in flight */}
+          {searching && searchInput.trim().length > 0 && (
+            <div className="expense-form__search-status text-secondary small mt-1" aria-live="polite" aria-busy="true">
+              <span
+                className="spinner-border spinner-border-sm me-1"
+                role="status"
+                aria-hidden="true"
+              />
+              Searching...
+            </div>
+          )}
+
+          {/* No results feedback */}
+          {!searching && searchInput.trim().length > 0 && searchResults.length === 0 && !showDropdown && (
+            <div className="expense-form__search-status text-secondary small mt-1" aria-live="polite">
+              No users found for &ldquo;{searchInput}&rdquo;
+            </div>
+          )}
 
           {showDropdown && searchResults.length > 0 && (
             <ul
@@ -212,7 +242,9 @@ export default function ExpenseForm({ expense, currentUser, onSubmit, onCancel }
                 >
                   <div>
                     <strong>{u.name}</strong>
-                    {u.email && <small className="text-secondary ms-2">{u.email}</small>}
+                    {u.email && (
+                      <small className="text-secondary ms-2">{u.email}</small>
+                    )}
                   </div>
                   <span className="badge bg-primary">+ Add</span>
                 </li>
@@ -223,12 +255,19 @@ export default function ExpenseForm({ expense, currentUser, onSubmit, onCancel }
 
         {/* Participant tags */}
         {splitBetween.length > 0 && (
-          <div className="d-flex flex-wrap gap-2 mt-2" aria-label="Selected participants">
+          <div
+            className="d-flex flex-wrap gap-2 mt-2"
+            aria-label="Selected participants"
+          >
             {splitBetween.map((p) => (
               <span key={p} className="expense-form__member-tag">
                 {p === currentUser ? `${p} (You)` : p}
                 {p !== currentUser && (
-                  <button onClick={() => handleRemoveUser(p)} type="button" aria-label={`Remove ${p}`}>
+                  <button
+                    onClick={() => handleRemoveUser(p)}
+                    type="button"
+                    aria-label={`Remove ${p}`}
+                  >
                     &times;
                   </button>
                 )}
@@ -244,17 +283,44 @@ export default function ExpenseForm({ expense, currentUser, onSubmit, onCancel }
         )}
       </fieldset>
 
+      {/* Paid By — AFTER Split With, with clarified label */}
+      <div className="mb-3">
+        <label htmlFor="expense-paidby" className="form-label small text-secondary">
+          Who paid for this?
+        </label>
+        <select
+          id="expense-paidby"
+          className="form-select"
+          value={paidBy}
+          onChange={(e) => setPaidBy(e.target.value)}
+        >
+          {splitBetween.map((p) => (
+            <option key={p} value={p}>
+              {p === currentUser ? `${p} (You)` : p}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Split preview */}
       {parsedAmount > 0 && splitBetween.length >= 2 && (
         <div className="alert alert-light small mb-3" role="status">
-          <strong>Equal split:</strong> ${perPerson.toFixed(2)} per person ({splitBetween.length} people)
+          <strong>Equal split:</strong> ${perPerson.toFixed(2)} per person (
+          {splitBetween.length} people)
         </div>
       )}
 
       {/* Buttons */}
       <div className="d-flex justify-content-end gap-2">
-        <button className="btn btn-secondary" onClick={onCancel} type="button">Cancel</button>
-        <button className="btn btn-primary" type="submit" disabled={!isValid} aria-disabled={!isValid}>
+        <button className="btn btn-secondary" onClick={onCancel} type="button">
+          Cancel
+        </button>
+        <button
+          className="btn btn-primary"
+          type="submit"
+          disabled={!isValid}
+          aria-disabled={!isValid}
+        >
           {expense ? "Save Changes" : "Add Expense"}
         </button>
       </div>
@@ -267,8 +333,4 @@ ExpenseForm.propTypes = {
   currentUser: PropTypes.string.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-};
-
-ExpenseForm.defaultProps = {
-  expense: null,
 };
