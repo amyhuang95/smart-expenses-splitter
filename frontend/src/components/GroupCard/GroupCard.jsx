@@ -17,13 +17,17 @@ export default function GroupCard({ group }) {
   const expenseCount = group.summary.totalExpenses;
 
   return (
-    <Card as={Link} to={`/groups/${group._id}`} className="group-card h-100 text-decoration-none text-reset">
+    <Card
+      as={Link}
+      to={`/groups/${group._id}`}
+      className="group-card h-100 text-decoration-none text-reset"
+    >
       <Card.Body className="d-flex flex-column gap-3">
         <div>
           <div className="d-flex justify-content-between align-items-center mb-2">
             <Card.Title className="mb-0">{group.name}</Card.Title>
             <Badge bg={statusVariant} pill>
-                {group.status}
+              {group.status}
             </Badge>
           </div>
           <Card.Subtitle className="group-card__subtitle text-muted fw-normal">
@@ -43,7 +47,6 @@ export default function GroupCard({ group }) {
             <dd>{currency(group.summary.outstandingDebtAmount)}</dd>
           </div>
         </dl>
-
       </Card.Body>
     </Card>
   );

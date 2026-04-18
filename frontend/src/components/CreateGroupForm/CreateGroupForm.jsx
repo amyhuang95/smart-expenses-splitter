@@ -112,9 +112,7 @@ export default function CreateGroupForm({
           isSubmitting={isSubmitting}
           onAddMember={handleAddMember}
         />
-        <Form.Text muted>
-          The creator is added automatically.
-        </Form.Text>
+        <Form.Text muted>The creator is added automatically.</Form.Text>
       </Modal.Body>
       <Modal.Footer>
         <Button

@@ -80,7 +80,6 @@
   padding: 0.75rem 0.75rem 0.75rem 2.5rem;
 }
 
-
 .add-expense-form__clear-btn.btn-link {
   color: var(--color-text-muted);
   text-decoration: none;
@@ -90,7 +89,6 @@
   color: var(--color-text);
   text-decoration: none;
 }
-
 
 .add-expense-form__empty {
   color: var(--color-text-muted);

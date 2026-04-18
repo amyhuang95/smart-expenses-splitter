@@ -7,7 +7,9 @@
 
 /* Hover lift — subtle card interaction */
 .expense-card {
-  transition: box-shadow 0.15s ease, transform 0.15s ease;
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
 }
 
 .expense-card:hover {

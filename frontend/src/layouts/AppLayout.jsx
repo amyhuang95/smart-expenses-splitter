@@ -21,7 +21,11 @@ export default function AppLayout() {
                 Single Expenses
               </NavLink>
             </Nav>
-            <button onClick={logout} type="button" className="startup-page__logout-btn">
+            <button
+              onClick={logout}
+              type="button"
+              className="startup-page__logout-btn"
+            >
               Log Out
             </button>
           </div>

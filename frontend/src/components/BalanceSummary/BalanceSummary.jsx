@@ -103,18 +103,22 @@ export default function BalanceSummary({
           <div className="d-flex align-items-center gap-2">
             <Card.Title className="mb-0">Settlement Plan</Card.Title>
             <HelpTooltip
-            position="right"
-            content={
-              <>
-                <strong>How settlements work:</strong>
-                <br />
-                1. We figure out who's up and who's down across all expenses, then generate the fewest possible payments to zero everything out.
-                <br />
-                2. The group owner must click &quot;Settle Up&quot; before debts can be marked as paid.
-                <br />
-                3. Once settling, the sender, receiver, or group owner can click &quot;Mark Paid&quot; to confirm a payment.
-              </>
-            }
+              position="right"
+              content={
+                <>
+                  <strong>How settlements work:</strong>
+                  <br />
+                  1. We figure out who's up and who's down across all expenses,
+                  then generate the fewest possible payments to zero everything
+                  out.
+                  <br />
+                  2. The group owner must click &quot;Settle Up&quot; before
+                  debts can be marked as paid.
+                  <br />
+                  3. Once settling, the sender, receiver, or group owner can
+                  click &quot;Mark Paid&quot; to confirm a payment.
+                </>
+              }
             />
           </div>
           {isOwner && onSettleUp ? (
@@ -173,9 +177,7 @@ export default function BalanceSummary({
                     </div>
                   </div>
                   <div className="d-flex align-items-center gap-3">
-                    {debt.isPaid ? (
-                      <Badge bg="success">Paid</Badge>
-                    ) : null}
+                    {debt.isPaid ? <Badge bg="success">Paid</Badge> : null}
                     {canMarkPaid && pendingPaid.has(debt.debtId) ? (
                       <button
                         className="btn btn-warning btn-sm py-0 px-2 ms-1"

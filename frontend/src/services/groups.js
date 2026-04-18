@@ -10,10 +10,9 @@ export async function fetchGroups() {
 }
 
 export async function lookupUserByEmail(email) {
-  return request(
-    `/api/users/lookup?email=${encodeURIComponent(email)}`,
-    { method: "GET" },
-  );
+  return request(`/api/users/lookup?email=${encodeURIComponent(email)}`, {
+    method: "GET",
+  });
 }
 
 export async function createGroup(payload) {

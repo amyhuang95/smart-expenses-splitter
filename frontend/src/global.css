@@ -6,52 +6,52 @@
    ============================================================ */
 :root {
   /* Core palette */
-  --color-primary:        #3D8EE8;  /* vivid blue */
-  --color-primary-hover:  #1E6FCC;  /* deeper vivid blue */
-  --color-primary-light:  #D6EAFF;  /* blue tint */
-  --color-secondary:      #13C4BC;  /* bright teal — decorative accent only */
-  --color-accent:         #13C4BC;  /* bright teal accent */
-  --color-accent-light:   #C8F5F3;  /* teal tint */
+  --color-primary: #3d8ee8; /* vivid blue */
+  --color-primary-hover: #1e6fcc; /* deeper vivid blue */
+  --color-primary-light: #d6eaff; /* blue tint */
+  --color-secondary: #13c4bc; /* bright teal — decorative accent only */
+  --color-accent: #13c4bc; /* bright teal accent */
+  --color-accent-light: #c8f5f3; /* teal tint */
 
   /* Backgrounds */
-  --color-bg:             #F4F6F8;  /* soft slate — neutral, finance-appropriate */
-  --color-surface:        #FFFFFF;
-  --color-surface-alt:    #EAEEF2;  /* deeper slate */
+  --color-bg: #f4f6f8; /* soft slate — neutral, finance-appropriate */
+  --color-surface: #ffffff;
+  --color-surface-alt: #eaeef2; /* deeper slate */
 
   /* Text */
-  --color-text:           #1a2a35;  /* near-black */
-  --color-text-muted:     #4a6070;  /* muted blue-grey */
-  --color-text-subtle:    #7a96a8;  /* subtle hint text */
+  --color-text: #1a2a35; /* near-black */
+  --color-text-muted: #4a6070; /* muted blue-grey */
+  --color-text-subtle: #7a96a8; /* subtle hint text */
 
   /* Borders */
-  --color-border:         rgba(61, 142, 232, 0.15);
-  --color-border-strong:  rgba(61, 142, 232, 0.30);
+  --color-border: rgba(61, 142, 232, 0.15);
+  --color-border-strong: rgba(61, 142, 232, 0.3);
 
   /* Status — each state has a distinct color */
-  --color-success:        #10C27A;  /* bright emerald — settled / paid */
-  --color-success-bg:     #C8F5E2;  /* emerald tint */
-  --color-warning:        #F59B00;  /* vivid amber — unpaid / settling */
-  --color-warning-bg:     #FFF0CC;
-  --color-danger:         #E03040;  /* vivid red — danger / error only */
-  --color-danger-bg:      #FFD6DA;  /* red tint */
+  --color-success: #10c27a; /* bright emerald — settled / paid */
+  --color-success-bg: #c8f5e2; /* emerald tint */
+  --color-warning: #f59b00; /* vivid amber — unpaid / settling */
+  --color-warning-bg: #fff0cc;
+  --color-danger: #e03040; /* vivid red — danger / error only */
+  --color-danger-bg: #ffd6da; /* red tint */
 
   /* Shadows */
-  --shadow-sm:  0 2px 8px rgba(61, 142, 232, 0.10);
-  --shadow-md:  0 8px 24px rgba(61, 142, 232, 0.14);
-  --shadow-lg:  0 12px 36px rgba(61, 142, 232, 0.18);
+  --shadow-sm: 0 2px 8px rgba(61, 142, 232, 0.1);
+  --shadow-md: 0 8px 24px rgba(61, 142, 232, 0.14);
+  --shadow-lg: 0 12px 36px rgba(61, 142, 232, 0.18);
 
   /* Bootstrap text utility variables — redefining these lets .text-secondary
      and .text-muted pick up our values through Bootstrap's own cascade,
      removing the need for !important on those rules. */
-  --bs-secondary-color:     #4a6070;
+  --bs-secondary-color: #4a6070;
   --bs-secondary-color-rgb: 74, 96, 112;
-  --bs-tertiary-color:      #7a96a8;
-  --bs-tertiary-color-rgb:  122, 150, 168;
+  --bs-tertiary-color: #7a96a8;
+  --bs-tertiary-color-rgb: 122, 150, 168;
 }
 
 /* Base font for the entire app */
 body {
-  font-family: 'Noto Sans', sans-serif;
+  font-family: "Noto Sans", sans-serif;
   background-color: var(--color-bg);
   color: var(--color-text);
 }
@@ -67,54 +67,54 @@ textarea {
 /* Bootstrap overrides — wire Bootstrap tokens to our palette */
 .btn-primary,
 .btn-dark {
-  --bs-btn-bg:              var(--color-primary);
-  --bs-btn-border-color:    var(--color-primary);
-  --bs-btn-hover-bg:        var(--color-primary-hover);
+  --bs-btn-bg: var(--color-primary);
+  --bs-btn-border-color: var(--color-primary);
+  --bs-btn-hover-bg: var(--color-primary-hover);
   --bs-btn-hover-border-color: var(--color-primary-hover);
-  --bs-btn-active-bg:       var(--color-primary-hover);
-  --bs-btn-color:           #fff;
-  --bs-btn-hover-color:     #fff;
+  --bs-btn-active-bg: var(--color-primary-hover);
+  --bs-btn-color: #fff;
+  --bs-btn-hover-color: #fff;
 }
 
 .btn-light {
-  --bs-btn-bg:           var(--color-surface-alt);
+  --bs-btn-bg: var(--color-surface-alt);
   --bs-btn-border-color: var(--color-border);
-  --bs-btn-color:        var(--color-text);
-  --bs-btn-hover-bg:     var(--color-primary-light);
-  --bs-btn-hover-color:  var(--color-primary);
+  --bs-btn-color: var(--color-text);
+  --bs-btn-hover-bg: var(--color-primary-light);
+  --bs-btn-hover-color: var(--color-primary);
 }
 
 .btn-outline-success {
-  --bs-btn-color:              var(--color-success);
-  --bs-btn-border-color:       var(--color-success);
-  --bs-btn-hover-bg:           var(--color-success);
+  --bs-btn-color: var(--color-success);
+  --bs-btn-border-color: var(--color-success);
+  --bs-btn-hover-bg: var(--color-success);
   --bs-btn-hover-border-color: var(--color-success);
-  --bs-btn-hover-color:        #fff;
+  --bs-btn-hover-color: #fff;
 }
 
 .btn-outline-primary {
-  --bs-btn-color:              var(--color-primary);
-  --bs-btn-border-color:       var(--color-primary);
-  --bs-btn-hover-bg:           var(--color-primary);
+  --bs-btn-color: var(--color-primary);
+  --bs-btn-border-color: var(--color-primary);
+  --bs-btn-hover-bg: var(--color-primary);
   --bs-btn-hover-border-color: var(--color-primary);
-  --bs-btn-hover-color:        #fff;
-  --bs-btn-active-bg:          var(--color-primary-hover);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-active-bg: var(--color-primary-hover);
   --bs-btn-active-border-color: var(--color-primary-hover);
 }
 
 .btn-outline-danger {
-  --bs-btn-color:              var(--color-danger);
-  --bs-btn-border-color:       var(--color-danger);
-  --bs-btn-hover-bg:           var(--color-danger);
+  --bs-btn-color: var(--color-danger);
+  --bs-btn-border-color: var(--color-danger);
+  --bs-btn-hover-bg: var(--color-danger);
   --bs-btn-hover-border-color: var(--color-danger);
-  --bs-btn-hover-color:        #fff;
+  --bs-btn-hover-color: #fff;
 }
 
 .btn-outline-secondary {
-  --bs-btn-color:        var(--color-text-muted);
+  --bs-btn-color: var(--color-text-muted);
   --bs-btn-border-color: var(--color-border-strong);
-  --bs-btn-hover-bg:     var(--color-surface-alt);
-  --bs-btn-hover-color:  var(--color-text);
+  --bs-btn-hover-bg: var(--color-surface-alt);
+  --bs-btn-hover-color: var(--color-text);
 }
 
 /* Badge overrides — redefine Bootstrap's per-element color variables so the
@@ -164,7 +164,7 @@ textarea {
 /* Page titles */
 .page-title {
   color: var(--color-primary);
-  font-family: 'Ruluko', sans-serif;
+  font-family: "Ruluko", sans-serif;
   font-weight: 700;
 }
 
@@ -172,14 +172,14 @@ textarea {
    Category colors
    ============================================================ */
 :root {
-  --color-category-food:          #ff6b6b;
-  --color-category-transport:     #4ecdc4;
-  --color-category-utilities:     #ffd93d;
+  --color-category-food: #ff6b6b;
+  --color-category-transport: #4ecdc4;
+  --color-category-utilities: #ffd93d;
   --color-category-entertainment: #a855f7;
-  --color-category-accommodation: #3D8EE8;
-  --color-category-health:        #10C27A;
-  --color-category-shopping:      #F59B00;
-  --color-category-other:         #6b7280;
+  --color-category-accommodation: #3d8ee8;
+  --color-category-health: #10c27a;
+  --color-category-shopping: #f59b00;
+  --color-category-other: #6b7280;
 }
 
 /* ============================================================
@@ -194,7 +194,7 @@ textarea {
   padding: 4px 10px;
   border-radius: 20px;
   font-size: 0.85rem;
-  background: rgba(61, 142, 232, 0.10);
+  background: rgba(61, 142, 232, 0.1);
   color: var(--color-primary);
   border: 1px solid rgba(61, 142, 232, 0.25);
 }

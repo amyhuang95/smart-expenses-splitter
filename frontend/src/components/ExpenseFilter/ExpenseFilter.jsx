@@ -1,16 +1,37 @@
 import PropTypes from "prop-types";
 import "./ExpenseFilter.css";
 
-const CATEGORIES = ["all", "food", "transport", "utilities", "entertainment", "other"];
+const CATEGORIES = [
+  "all",
+  "food",
+  "transport",
+  "utilities",
+  "entertainment",
+  "other",
+];
 
-export default function ExpenseFilter({ filters, onFilterChange, people, hideSettled, onHideSettledChange }) {
+export default function ExpenseFilter({
+  filters,
+  onFilterChange,
+  people,
+  hideSettled,
+  onHideSettledChange,
+}) {
   const set = (key, val) => onFilterChange({ ...filters, [key]: val });
 
-  const sortLabel = filters.sortOrder === "desc" ? "\u2193 High\u2192Low" : "\u2191 Low\u2192High";
+  const sortLabel =
+    filters.sortOrder === "desc"
+      ? "\u2193 High\u2192Low"
+      : "\u2191 Low\u2192High";
 
   return (
-    <nav className="d-flex flex-wrap gap-2 mb-3" aria-label="Filter and sort expenses">
-      <label htmlFor="filter-category" className="visually-hidden">Filter by category</label>
+    <nav
+      className="d-flex flex-wrap gap-2 mb-3"
+      aria-label="Filter and sort expenses"
+    >
+      <label htmlFor="filter-category" className="visually-hidden">
+        Filter by category
+      </label>
       <select
         id="filter-category"
         className="form-select form-select-sm w-auto"
@@ -19,12 +40,16 @@ export default function ExpenseFilter({ filters, onFilterChange, people, hideSet
       >
         {CATEGORIES.map((c) => (
           <option key={c} value={c}>
-            {c === "all" ? "All Categories" : c.charAt(0).toUpperCase() + c.slice(1)}
+            {c === "all"
+              ? "All Categories"
+              : c.charAt(0).toUpperCase() + c.slice(1)}
           </option>
         ))}
       </select>
 
-      <label htmlFor="filter-paidby" className="visually-hidden">Filter by payer</label>
+      <label htmlFor="filter-paidby" className="visually-hidden">
+        Filter by payer
+      </label>
       <select
         id="filter-paidby"
         className="form-select form-select-sm w-auto"
@@ -33,11 +58,15 @@ export default function ExpenseFilter({ filters, onFilterChange, people, hideSet
       >
         <option value="all">All People</option>
         {people.map((p) => (
-          <option key={p} value={p}>{p}</option>
+          <option key={p} value={p}>
+            {p}
+          </option>
         ))}
       </select>
 
-      <label htmlFor="filter-sort" className="visually-hidden">Sort by</label>
+      <label htmlFor="filter-sort" className="visually-hidden">
+        Sort by
+      </label>
       <select
         id="filter-sort"
         className="form-select form-select-sm w-auto"
@@ -51,7 +80,9 @@ export default function ExpenseFilter({ filters, onFilterChange, people, hideSet
 
       <button
         className="btn btn-outline-secondary btn-sm expense-filter__sort-btn"
-        onClick={() => set("sortOrder", filters.sortOrder === "desc" ? "asc" : "desc")}
+        onClick={() =>
+          set("sortOrder", filters.sortOrder === "desc" ? "asc" : "desc")
+        }
         aria-label={`Sort direction: ${sortLabel}. Click to reverse.`}
         title={sortLabel}
       >

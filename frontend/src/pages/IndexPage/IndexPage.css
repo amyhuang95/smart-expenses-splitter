@@ -25,7 +25,7 @@
   max-width: 20ch;
   margin: 0 auto;
   font-size: clamp(1rem, 2.8vw, 2.3rem);
-  font-family: 'Ruluko', sans-serif;
+  font-family: "Ruluko", sans-serif;
   line-height: 1.08;
   letter-spacing: -0.03em;
   color: var(--color-primary);
@@ -35,7 +35,7 @@
   max-width: 58ch;
   margin: 0 auto;
   font-size: 1rem;
-  font-family: 'Ruluko', sans-serif;
+  font-family: "Ruluko", sans-serif;
   line-height: 1.7;
 }
 

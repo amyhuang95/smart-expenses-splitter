@@ -15,8 +15,14 @@ export default function HomePage() {
           Start logging shared expenses and settling balances...
         </p>
       </div>
-      <section className="home-page__feature-section" aria-label="Feature overview">
-        <Link to="/groups" className="home-page__feature-block home-page__feature-block--link">
+      <section
+        className="home-page__feature-section"
+        aria-label="Feature overview"
+      >
+        <Link
+          to="/groups"
+          className="home-page__feature-block home-page__feature-block--link"
+        >
           <h2 className="home-page__feature-title">Group Expenses</h2>
           <ul className="home-page__feature-list">
             <li>Create groups for trips, roommates, or events.</li>
@@ -25,7 +31,10 @@ export default function HomePage() {
           </ul>
           <span className="home-page__feature-cta">Go to Groups →</span>
         </Link>
-        <Link to="/single-expenses" className="home-page__feature-block home-page__feature-block--link">
+        <Link
+          to="/single-expenses"
+          className="home-page__feature-block home-page__feature-block--link"
+        >
           <h2 className="home-page__feature-title">Single Expenses</h2>
           <ul className="home-page__feature-list">
             <li>Log a one-off expense and split it with anyone.</li>

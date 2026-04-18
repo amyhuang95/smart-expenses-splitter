@@ -12,7 +12,7 @@
   margin: 0.35rem 0 0;
   font-size: clamp(2rem, 4vw, 3rem);
   color: var(--color-primary);
-  font-family: 'Ruluko', sans-serif;
+  font-family: "Ruluko", sans-serif;
   line-height: 1.05;
   letter-spacing: -0.03em;
   padding-left: 0;
@@ -37,7 +37,11 @@
   border: 1px solid var(--color-border);
   border-radius: 18px;
   padding: 1.25rem;
-  background: linear-gradient(180deg, transparent 0%, rgba(214, 234, 255, 0.7) 100%);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(214, 234, 255, 0.7) 100%
+  );
 }
 
 .home-page__feature-block--link {
@@ -45,7 +49,9 @@
   text-decoration: none;
   color: inherit;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .home-page__feature-block--link:hover,
@@ -69,7 +75,7 @@
   color: var(--color-text-muted);
 }
 
-.home-page__feature-list li+li {
+.home-page__feature-list li + li {
   margin-top: 0.45rem;
 }
 
@@ -87,7 +93,6 @@
 }
 
 @media (max-width: 767px) {
-
   .home-page__hero,
   .home-page__feature-block {
     padding: 1.1rem;

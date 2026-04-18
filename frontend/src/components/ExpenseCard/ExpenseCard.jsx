@@ -43,16 +43,24 @@ export default function ExpenseCard({
       <div className="card-body py-2">
         {/* Top row */}
         <div className="d-flex align-items-center gap-3 mb-2">
-          <span className="fs-4" aria-hidden="true">{icon}</span>
+          <span className="fs-4" aria-hidden="true">
+            {icon}
+          </span>
           <div className="flex-grow-1 min-width-0">
             <div className="d-flex justify-content-between align-items-baseline">
-              <h3 className="fs-6 fw-bold mb-0 text-truncate">{expense.name}</h3>
-              <span className="fw-bold text-nowrap">${expense.amount.toFixed(2)}</span>
+              <h3 className="fs-6 fw-bold mb-0 text-truncate">
+                {expense.name}
+              </h3>
+              <span className="fw-bold text-nowrap">
+                ${expense.amount.toFixed(2)}
+              </span>
             </div>
             <p className="small text-secondary mb-0">
               Paid by <strong>{isPayer ? "You" : expense.paidBy}</strong>
               <span aria-hidden="true"> &middot; </span>
-              <span className={`expense-card__category--${expense.category}`}>{categoryLabel}</span>
+              <span className={`expense-card__category--${expense.category}`}>
+                {categoryLabel}
+              </span>
               <span aria-hidden="true"> &middot; </span>
               <time dateTime={expense.dateCreated}>{date}</time>
               {expense.settled && (
@@ -75,15 +83,22 @@ export default function ExpenseCard({
               const isMe = person === currentUser;
 
               return (
-                <div key={person} className="d-flex align-items-center gap-2 small mb-1">
+                <div
+                  key={person}
+                  className="d-flex align-items-center gap-2 small mb-1"
+                >
                   <span className={paid ? "text-success" : "text-danger"}>
                     {isMe ? "You" : person}
                   </span>
                   <span className="text-secondary">${share.toFixed(2)}</span>
                   {paid ? (
-                    <span className="badge bg-success expense-card__badge">Paid</span>
+                    <span className="badge bg-success expense-card__badge">
+                      Paid
+                    </span>
                   ) : (
-                    <span className="badge bg-warning text-dark expense-card__badge">Unpaid</span>
+                    <span className="badge bg-warning text-dark expense-card__badge">
+                      Unpaid
+                    </span>
                   )}
                   {isMe && canMarkPaid && (
                     <button

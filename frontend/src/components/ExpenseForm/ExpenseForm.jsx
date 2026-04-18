@@ -120,7 +120,10 @@ export default function ExpenseForm({
 
       {/* Name */}
       <div className="mb-3">
-        <label htmlFor="expense-name" className="form-label small text-secondary">
+        <label
+          htmlFor="expense-name"
+          className="form-label small text-secondary"
+        >
           Expense Name
         </label>
         <input
@@ -136,7 +139,10 @@ export default function ExpenseForm({
 
       {/* Description */}
       <div className="mb-3">
-        <label htmlFor="expense-desc" className="form-label small text-secondary">
+        <label
+          htmlFor="expense-desc"
+          className="form-label small text-secondary"
+        >
           Description (optional)
         </label>
         <input
@@ -151,7 +157,10 @@ export default function ExpenseForm({
       {/* Amount + Category */}
       <div className="row g-2 mb-3">
         <div className="col-6">
-          <label htmlFor="expense-amount" className="form-label small text-secondary">
+          <label
+            htmlFor="expense-amount"
+            className="form-label small text-secondary"
+          >
             Amount ($)
           </label>
           <input
@@ -167,7 +176,10 @@ export default function ExpenseForm({
           />
         </div>
         <div className="col-6">
-          <label htmlFor="expense-category" className="form-label small text-secondary">
+          <label
+            htmlFor="expense-category"
+            className="form-label small text-secondary"
+          >
             Category
           </label>
           <select
@@ -206,7 +218,11 @@ export default function ExpenseForm({
 
           {/* Searching indicator — shown while debounce is pending or request in flight */}
           {searching && searchInput.trim().length > 0 && (
-            <div className="expense-form__search-status text-secondary small mt-1" aria-live="polite" aria-busy="true">
+            <div
+              className="expense-form__search-status text-secondary small mt-1"
+              aria-live="polite"
+              aria-busy="true"
+            >
               <span
                 className="spinner-border spinner-border-sm me-1"
                 role="status"
@@ -217,11 +233,17 @@ export default function ExpenseForm({
           )}
 
           {/* No results feedback */}
-          {!searching && searchInput.trim().length > 0 && searchResults.length === 0 && !showDropdown && (
-            <div className="expense-form__search-status text-secondary small mt-1" aria-live="polite">
-              No users found for &ldquo;{searchInput}&rdquo;
-            </div>
-          )}
+          {!searching &&
+            searchInput.trim().length > 0 &&
+            searchResults.length === 0 &&
+            !showDropdown && (
+              <div
+                className="expense-form__search-status text-secondary small mt-1"
+                aria-live="polite"
+              >
+                No users found for &ldquo;{searchInput}&rdquo;
+              </div>
+            )}
 
           {showDropdown && searchResults.length > 0 && (
             <ul
@@ -285,7 +307,10 @@ export default function ExpenseForm({
 
       {/* Paid By — AFTER Split With, with clarified label */}
       <div className="mb-3">
-        <label htmlFor="expense-paidby" className="form-label small text-secondary">
+        <label
+          htmlFor="expense-paidby"
+          className="form-label small text-secondary"
+        >
           Who paid for this?
         </label>
         <select

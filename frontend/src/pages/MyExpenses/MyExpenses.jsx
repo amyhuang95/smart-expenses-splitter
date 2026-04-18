@@ -30,7 +30,8 @@ export default function MyExpenses() {
   const [editingExpense, setEditingExpense] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [visibleExpenseCount, setVisibleExpenseCount] = useState(EXPENSES_PAGE_SIZE);
+  const [visibleExpenseCount, setVisibleExpenseCount] =
+    useState(EXPENSES_PAGE_SIZE);
   const [hideSettled, setHideSettled] = useState(false);
   const [filters, setFilters] = useState({
     category: "all",
@@ -74,7 +75,8 @@ export default function MyExpenses() {
 
   // Auto-focus modal on open
   useEffect(() => {
-    if ((showForm || editingExpense) && modalRef.current) modalRef.current.focus();
+    if ((showForm || editingExpense) && modalRef.current)
+      modalRef.current.focus();
   }, [showForm, editingExpense]);
 
   useEffect(() => {
@@ -190,7 +192,14 @@ export default function MyExpenses() {
 
     try {
       // Re-create the deleted expense
-      const { _id, dateCreated, settled, paidStatus, splitDetails, ...restorable } = undoToast.expense;
+      const {
+        _id,
+        dateCreated,
+        settled,
+        paidStatus,
+        splitDetails,
+        ...restorable
+      } = undoToast.expense;
       await createExpense(restorable);
       refreshAll();
     } catch (err) {
@@ -208,7 +217,8 @@ export default function MyExpenses() {
   if (filters.category !== "all") {
     activeFilters.push({
       key: "category",
-      label: filters.category.charAt(0).toUpperCase() + filters.category.slice(1),
+      label:
+        filters.category.charAt(0).toUpperCase() + filters.category.slice(1),
       clear: () => setFilters((f) => ({ ...f, category: "all" })),
     });
   }
@@ -268,17 +278,24 @@ export default function MyExpenses() {
               content={
                 <>
                   <strong>How to use Single Expenses:</strong>
-                  <br />1. Click &quot;+ New Expense&quot; to log a bill
-                  <br />2. Search and add people to split with
-                  <br />3. Use filters to find specific expenses
-                  <br />4. Check &quot;My Balance&quot; on the right to see who owes you
-                  <br />5. Click &quot;Mark Paid&quot; when someone pays their share
+                  <br />
+                  1. Click &quot;+ New Expense&quot; to log a bill
+                  <br />
+                  2. Search and add people to split with
+                  <br />
+                  3. Use filters to find specific expenses
+                  <br />
+                  4. Check &quot;My Balance&quot; on the right to see who owes
+                  you
+                  <br />
+                  5. Click &quot;Mark Paid&quot; when someone pays their share
                 </>
               }
             />
           </h1>
           <p className="text-secondary small mb-0">
-            Track one-off expenses, see who owes you, and mark payments as settled.
+            Track one-off expenses, see who owes you, and mark payments as
+            settled.
           </p>
         </div>
         <button
@@ -295,11 +312,13 @@ export default function MyExpenses() {
         <section aria-label="Spending statistics">
           <div className="d-flex align-items-center gap-2 mb-2">
             <h2 className="h6 fw-bold mb-0">Quick Stats</h2>
-            <HelpTooltip
-              content="Overview of your spending. 'You Paid' = total you personally paid out-of-pocket. 'You Owe' = total you haven't paid back. 'Owed to You' = total others haven't paid you."
-            />
+            <HelpTooltip content="Overview of your spending. 'You Paid' = total you personally paid out-of-pocket. 'You Owe' = total you haven't paid back. 'Owed to You' = total others haven't paid you." />
           </div>
-          <QuickStats stats={stats} currentUser={userName} expenses={expenses} />
+          <QuickStats
+            stats={stats}
+            currentUser={userName}
+            expenses={expenses}
+          />
         </section>
       )}
 
@@ -307,9 +326,7 @@ export default function MyExpenses() {
       <section aria-label="Filter and sort expenses">
         <div className="d-flex align-items-center gap-2 mb-2">
           <h2 className="h6 fw-bold mb-0">Filters</h2>
-          <HelpTooltip
-            content="Narrow your expense list by category or payer. Use the sort button to reorder by date, amount, or category."
-          />
+          <HelpTooltip content="Narrow your expense list by category or payer. Use the sort button to reorder by date, amount, or category." />
         </div>
         <ExpenseFilter
           filters={filters}
@@ -322,7 +339,10 @@ export default function MyExpenses() {
 
       {/* Active filter chips */}
       {activeFilters.length > 0 && (
-        <div className="d-flex flex-wrap gap-2 mb-3" aria-label="Active filters">
+        <div
+          className="d-flex flex-wrap gap-2 mb-3"
+          aria-label="Active filters"
+        >
           {activeFilters.map((f) => (
             <button
               key={f.key}
@@ -336,7 +356,12 @@ export default function MyExpenses() {
           <button
             className="btn btn-sm btn-link text-secondary p-0 ms-1"
             onClick={() => {
-              setFilters({ category: "all", paidBy: "all", sortBy: "date", sortOrder: "desc" });
+              setFilters({
+                category: "all",
+                paidBy: "all",
+                sortBy: "date",
+                sortOrder: "desc",
+              });
               setHideSettled(false);
               setVisibleExpenseCount(EXPENSES_PAGE_SIZE);
             }}
@@ -351,7 +376,10 @@ export default function MyExpenses() {
         <section className="col-lg-8" aria-label="Expense list">
           {loading ? (
             <div className="text-center text-secondary py-4" aria-busy="true">
-              <div className="spinner-border spinner-border-sm me-2" role="status">
+              <div
+                className="spinner-border spinner-border-sm me-2"
+                role="status"
+              >
                 <span className="visually-hidden">Loading</span>
               </div>
               Loading expenses...
@@ -365,9 +393,18 @@ export default function MyExpenses() {
                   : "No expenses yet"}
               </p>
               <p className="text-secondary small">
-                {hideSettled && expenses.length > 0
-                  ? <>Toggle <strong>&quot;Hide Settled&quot;</strong> off to see your settled expenses.</>
-                  : <>Click <strong>&quot;+ New Expense&quot;</strong> above to log your first expense. You can split it with any registered user.</>}
+                {hideSettled && expenses.length > 0 ? (
+                  <>
+                    Toggle <strong>&quot;Hide Settled&quot;</strong> off to see
+                    your settled expenses.
+                  </>
+                ) : (
+                  <>
+                    Click <strong>&quot;+ New Expense&quot;</strong> above to
+                    log your first expense. You can split it with any registered
+                    user.
+                  </>
+                )}
               </p>
             </div>
           ) : (
@@ -388,11 +425,14 @@ export default function MyExpenses() {
               {hasMoreExpenses && (
                 <div className="text-center pt-2 pb-3">
                   <p className="text-secondary small mb-2">
-                    Showing {pagedExpenses.length} of {visibleExpenses.length} expenses
+                    Showing {pagedExpenses.length} of {visibleExpenses.length}{" "}
+                    expenses
                   </p>
                   <button
                     className="btn btn-outline-secondary"
-                    onClick={() => setVisibleExpenseCount((c) => c + EXPENSES_PAGE_SIZE)}
+                    onClick={() =>
+                      setVisibleExpenseCount((c) => c + EXPENSES_PAGE_SIZE)
+                    }
                   >
                     Load {Math.min(EXPENSES_PAGE_SIZE, remainingExpenses)} more
                   </button>
@@ -417,7 +457,10 @@ export default function MyExpenses() {
       {(showForm || editingExpense) && (
         <div
           className="my-expenses__modal-backdrop"
-          onClick={() => { setShowForm(false); setEditingExpense(null); }}
+          onClick={() => {
+            setShowForm(false);
+            setEditingExpense(null);
+          }}
           role="dialog"
           aria-modal="true"
           aria-label={editingExpense ? "Edit expense" : "Add new expense"}
@@ -433,7 +476,10 @@ export default function MyExpenses() {
               expense={editingExpense}
               currentUser={userName}
               onSubmit={editingExpense ? handleUpdate : handleCreate}
-              onCancel={() => { setShowForm(false); setEditingExpense(null); }}
+              onCancel={() => {
+                setShowForm(false);
+                setEditingExpense(null);
+              }}
             />
           </div>
         </div>
@@ -458,13 +504,20 @@ export default function MyExpenses() {
             <h2 className="h5 text-danger fw-bold">Delete Expense?</h2>
             <p className="text-secondary small">
               This will remove &quot;{confirmDelete.name}&quot; ($
-              {confirmDelete.amount.toFixed(2)}). You&apos;ll have 5 seconds to undo.
+              {confirmDelete.amount.toFixed(2)}). You&apos;ll have 5 seconds to
+              undo.
             </p>
             <div className="d-flex justify-content-center gap-2">
-              <button className="btn btn-secondary" onClick={() => setConfirmDelete(null)}>
+              <button
+                className="btn btn-secondary"
+                onClick={() => setConfirmDelete(null)}
+              >
                 Cancel
               </button>
-              <button className="btn btn-danger" onClick={() => handleDelete(confirmDelete)}>
+              <button
+                className="btn btn-danger"
+                onClick={() => handleDelete(confirmDelete)}
+              >
                 Delete
               </button>
             </div>

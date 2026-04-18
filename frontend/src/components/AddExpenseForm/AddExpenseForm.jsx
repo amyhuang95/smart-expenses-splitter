@@ -122,7 +122,9 @@ export default function AddExpenseForm({
 
   function handleClearVisible() {
     handleSelectMembers(
-      selectedMemberIds.filter((memberId) => !visibleMemberIds.includes(memberId)),
+      selectedMemberIds.filter(
+        (memberId) => !visibleMemberIds.includes(memberId),
+      ),
     );
   }
 
@@ -313,10 +315,7 @@ export default function AddExpenseForm({
         </Modal.Body>
         <Modal.Footer className="d-flex">
           {onDelete ? (
-            <DeleteButton
-              label="Delete this expense"
-              onClick={onDelete}
-            />
+            <DeleteButton label="Delete this expense" onClick={onDelete} />
           ) : null}
           <div className="ms-auto d-flex gap-2">
             <Button

@@ -17,7 +17,7 @@
 
 /* inactive tab (variant="light") — text matches the active tab's background */
 .auth-form__mode-button.btn-light {
-  --bs-btn-color:       var(--color-primary);
+  --bs-btn-color: var(--color-primary);
   --bs-btn-hover-color: var(--color-primary-hover);
 }
 

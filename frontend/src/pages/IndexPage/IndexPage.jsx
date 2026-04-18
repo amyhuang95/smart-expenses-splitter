@@ -20,7 +20,8 @@ export default function IndexPage() {
           <Col xs={12} className="text-center">
             <p className="startup-page__description text-secondary">
               SplitEasy keeps group spendings organized, and generates smart
-              settlements so you don't have to make multiple payments in a group.
+              settlements so you don't have to make multiple payments in a
+              group.
             </p>
           </Col>
           <Col xs={12} className="d-flex justify-content-center">

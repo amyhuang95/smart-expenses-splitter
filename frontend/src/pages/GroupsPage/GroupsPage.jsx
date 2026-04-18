@@ -141,11 +141,15 @@ export default function GroupsPage() {
                 <>
                   <strong>How to use Group Expenses:</strong>
                   <br />
-                  1. Click &quot;+ New Group&quot; to create a new group and add members to split expenses with.
+                  1. Click &quot;+ New Group&quot; to create a new group and add
+                  members to split expenses with.
                   <br />
-                  2. Find the newly created group in the list and click the group card to open the group details page where you can add expenses and track balances.
+                  2. Find the newly created group in the list and click the
+                  group card to open the group details page where you can add
+                  expenses and track balances.
                   <br />
-                  3. Use filters to find groups that are still open, being settled, or fully settled.
+                  3. Use filters to find groups that are still open, being
+                  settled, or fully settled.
                 </>
               }
             />
@@ -191,11 +195,15 @@ export default function GroupsPage() {
                 <>
                   <strong>Group statuses:</strong>
                   <br />
-                  <strong>Open</strong> — Members can add, edit, and delete expenses.
+                  <strong>Open</strong> — Members can add, edit, and delete
+                  expenses.
                   <br />
-                  <strong>Settling</strong> — The owner has initiated settlement. Members can mark debts as paid, but expenses are locked.
+                  <strong>Settling</strong> — The owner has initiated
+                  settlement. Members can mark debts as paid, but expenses are
+                  locked.
                   <br />
-                  <strong>Settled</strong> — All debts have been paid and the group is fully resolved.
+                  <strong>Settled</strong> — All debts have been paid and the
+                  group is fully resolved.
                 </>
               }
             />

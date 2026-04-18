@@ -6,7 +6,9 @@
   font-size: 0.9rem;
   font-weight: 500;
   text-decoration: none;
-  transition: color 0.15s ease, gap 0.15s ease;
+  transition:
+    color 0.15s ease,
+    gap 0.15s ease;
   width: fit-content;
 }
 
@@ -20,8 +22,8 @@
 /* .group-details-page__member-tag replaced by shared .member-tag in global.css */
 
 .group-details-page__members-more {
-  background: rgba(123, 162, 193, 0.10);
-  border: 1px dashed rgba(123, 162, 193, 0.30);
+  background: rgba(123, 162, 193, 0.1);
+  border: 1px dashed rgba(123, 162, 193, 0.3);
   border-radius: 999px;
   color: var(--color-text);
   font-size: 0.85rem;

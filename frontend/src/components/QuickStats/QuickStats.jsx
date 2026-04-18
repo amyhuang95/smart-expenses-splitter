@@ -5,9 +5,9 @@ export default function QuickStats({ stats, currentUser, expenses }) {
   // Calculate how much the current user personally paid out-of-pocket
   const youPaid = expenses
     ? expenses
-      .filter((e) => e.paidBy === currentUser)
-      .reduce((sum, e) => sum + (e.amount || 0), 0)
-    : stats.youPaid ?? 0;
+        .filter((e) => e.paidBy === currentUser)
+        .reduce((sum, e) => sum + (e.amount || 0), 0)
+    : (stats.youPaid ?? 0);
 
   const items = [
     {
@@ -39,7 +39,11 @@ export default function QuickStats({ stats, currentUser, expenses }) {
   ];
 
   return (
-    <div className="row g-3 mb-4" role="region" aria-label="Quick spending statistics">
+    <div
+      className="row g-3 mb-4"
+      role="region"
+      aria-label="Quick spending statistics"
+    >
       {items.map(({ label, value, colorClass, title }) => (
         <div key={label} className="col">
           <div className="card" title={title}>

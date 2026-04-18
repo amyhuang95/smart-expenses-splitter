@@ -40,7 +40,9 @@
   font-weight: 500;
   padding: 0.2rem 0.65rem;
   cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition:
+    background 0.15s ease,
+    color 0.15s ease;
 }
 
 .my-expenses__filter-chip:hover {

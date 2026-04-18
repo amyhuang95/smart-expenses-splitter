@@ -77,9 +77,7 @@ export default function EditGroupModal({
       <Modal.Body className="edit-group-modal__body">
         <Form onSubmit={handleSaveName}>
           {nameError ? <Alert variant="danger">{nameError}</Alert> : null}
-          {nameSuccess ? (
-            <Alert variant="success">{nameSuccess}</Alert>
-          ) : null}
+          {nameSuccess ? <Alert variant="success">{nameSuccess}</Alert> : null}
           <Form.Group controlId="edit-group-name">
             <Form.Label>Group name</Form.Label>
             <div className="d-flex gap-2">
@@ -103,11 +101,7 @@ export default function EditGroupModal({
         <div>
           <div className="edit-group-modal__section-label">Members</div>
           {memberError ? (
-            <Alert
-              variant="danger"
-              dismissible
-              onClose={onClearMemberError}
-            >
+            <Alert variant="danger" dismissible onClose={onClearMemberError}>
               {memberError}
             </Alert>
           ) : null}
@@ -138,10 +132,7 @@ export default function EditGroupModal({
           </ListGroup>
         </div>
 
-        <AddMemberForm
-          isSubmitting={isSubmitting}
-          onAddMember={onAddMember}
-        />
+        <AddMemberForm isSubmitting={isSubmitting} onAddMember={onAddMember} />
       </Modal.Body>
     </Modal>
   );
