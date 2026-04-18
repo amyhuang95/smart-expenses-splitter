@@ -4,6 +4,7 @@ import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Modal from "react-bootstrap/Modal";
+import DeleteButton from "../DeleteButton/DeleteButton.jsx";
 import "./AddExpenseForm.css";
 
 const CATEGORIES = [
@@ -49,6 +50,7 @@ export default function AddExpenseForm({
   initialValues,
   members,
   onClose,
+  onDelete,
   onSubmit,
   submitLabel = "Save Expense",
   title = "Add Shared Expense",
@@ -120,7 +122,9 @@ export default function AddExpenseForm({
 
   function handleClearVisible() {
     handleSelectMembers(
-      selectedMemberIds.filter((memberId) => !visibleMemberIds.includes(memberId)),
+      selectedMemberIds.filter(
+        (memberId) => !visibleMemberIds.includes(memberId),
+      ),
     );
   }
 
@@ -237,31 +241,36 @@ export default function AddExpenseForm({
                     {selectedMemberIds.length} of {memberIds.length} selected
                   </div>
                   <div className="add-expense-form__member-actions">
-                    <Button
-                      disabled={isSubmitting}
-                      onClick={() => handleSelectMembers(memberIds)}
-                      size="sm"
-                      type="button"
-                      variant="outline-dark"
-                    >
-                      Select all
-                    </Button>
-                    <Button
-                      disabled={isSubmitting}
-                      onClick={() => handleSelectMembers([])}
-                      size="sm"
-                      type="button"
-                      variant="outline-secondary"
-                    >
-                      Clear all
-                    </Button>
+                    {!hasMemberQuery ? (
+                      <Button
+                        disabled={isSubmitting}
+                        onClick={() => handleSelectMembers(memberIds)}
+                        size="sm"
+                        type="button"
+                        variant="outline-primary"
+                      >
+                        Select all
+                      </Button>
+                    ) : null}
+                    {!hasMemberQuery ? (
+                      <Button
+                        disabled={isSubmitting}
+                        onClick={() => handleSelectMembers([])}
+                        size="sm"
+                        type="button"
+                        variant="link"
+                        className="add-expense-form__clear-btn"
+                      >
+                        Clear all
+                      </Button>
+                    ) : null}
                     {hasMemberQuery ? (
                       <Button
                         disabled={isSubmitting || !visibleMemberIds.length}
                         onClick={handleSelectVisible}
                         size="sm"
                         type="button"
-                        variant="outline-dark"
+                        variant="outline-primary"
                       >
                         Select visible
                       </Button>
@@ -272,7 +281,8 @@ export default function AddExpenseForm({
                         onClick={handleClearVisible}
                         size="sm"
                         type="button"
-                        variant="outline-secondary"
+                        variant="link"
+                        className="add-expense-form__clear-btn"
                       >
                         Clear visible
                       </Button>
@@ -303,18 +313,24 @@ export default function AddExpenseForm({
             </div>
           </div>
         </Modal.Body>
-        <Modal.Footer>
-          <Button
-            disabled={isSubmitting}
-            onClick={onClose}
-            type="button"
-            variant="outline-secondary"
-          >
-            Cancel
-          </Button>
-          <Button disabled={isSubmitting} type="submit" variant="dark">
-            {isSubmitting ? "Saving..." : submitLabel}
-          </Button>
+        <Modal.Footer className="d-flex">
+          {onDelete ? (
+            <DeleteButton label="Delete this expense" onClick={onDelete} />
+          ) : null}
+          <div className="ms-auto d-flex gap-2">
+            <Button
+              className="add-expense-form__cancel-btn"
+              disabled={isSubmitting}
+              onClick={onClose}
+              type="button"
+              variant="outline-danger"
+            >
+              Cancel
+            </Button>
+            <Button disabled={isSubmitting} type="submit" variant="dark">
+              {isSubmitting ? "Saving..." : submitLabel}
+            </Button>
+          </div>
         </Modal.Footer>
       </Form>
     </Modal>
@@ -338,6 +354,7 @@ AddExpenseForm.propTypes = {
     }),
   ).isRequired,
   onClose: PropTypes.func.isRequired,
+  onDelete: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,
   submitLabel: PropTypes.string,
   title: PropTypes.string,

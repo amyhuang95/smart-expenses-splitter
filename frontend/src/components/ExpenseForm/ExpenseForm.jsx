@@ -16,7 +16,6 @@ function getInitialFormState(expense, currentUser) {
       splitBetween: expense.splitBetween || [],
     };
   }
-
   return {
     name: "",
     description: "",
@@ -28,42 +27,43 @@ function getInitialFormState(expense, currentUser) {
 }
 
 export default function ExpenseForm({
-  expense,
+  expense = null,
   currentUser,
   onSubmit,
   onCancel,
 }) {
-  const initialState = getInitialFormState(expense, currentUser);
-  const [name, setName] = useState(initialState.name);
-  const [description, setDescription] = useState(initialState.description);
-  const [amount, setAmount] = useState(initialState.amount);
-  const [category, setCategory] = useState(initialState.category);
-  const [paidBy, setPaidBy] = useState(initialState.paidBy);
-  const [splitBetween, setSplitBetween] = useState(initialState.splitBetween);
+  const initial = getInitialFormState(expense, currentUser);
+  const [name, setName] = useState(initial.name);
+  const [description, setDescription] = useState(initial.description);
+  const [amount, setAmount] = useState(initial.amount);
+  const [category, setCategory] = useState(initial.category);
+  const [paidBy, setPaidBy] = useState(initial.paidBy);
+  const [splitBetween, setSplitBetween] = useState(initial.splitBetween);
   const [searchInput, setSearchInput] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [showDropdown, setShowDropdown] = useState(false);
+  const [searching, setSearching] = useState(false);
 
-  // Search users as they type — uses GET /api/users/search?q=xxx
   useEffect(() => {
     const doSearch = async () => {
       if (searchInput.trim().length < 1) {
         setSearchResults([]);
         setShowDropdown(false);
+        setSearching(false);
         return;
       }
+      setSearching(true);
       try {
         const data = await searchUsers(searchInput.trim());
-        // Filter out users already in splitBetween (match by name)
-        const filtered = data.filter(
-          (u) => !splitBetween.includes(u.name),
-        );
+        const filtered = data.filter((u) => !splitBetween.includes(u.name));
         setSearchResults(filtered);
         setShowDropdown(filtered.length > 0);
       } catch (err) {
         console.error("Error searching users:", err);
         setSearchResults([]);
         setShowDropdown(false);
+      } finally {
+        setSearching(false);
       }
     };
     const timer = setTimeout(doSearch, 300);
@@ -71,7 +71,6 @@ export default function ExpenseForm({
   }, [searchInput, splitBetween]);
 
   const handleSelectUser = (user) => {
-    // Store by name (consistent with how currentUser is stored)
     if (!splitBetween.includes(user.name)) {
       setSplitBetween([...splitBetween, user.name]);
     }
@@ -81,11 +80,12 @@ export default function ExpenseForm({
   };
 
   const handleRemoveUser = (userName) => {
-    if (userName === currentUser) return; // can't remove yourself
+    if (userName === currentUser) return;
     setSplitBetween(splitBetween.filter((n) => n !== userName));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     if (!name.trim() || !amount || !paidBy || splitBetween.length < 2) return;
     onSubmit({
       name: name.trim(),
@@ -97,31 +97,56 @@ export default function ExpenseForm({
     });
   };
 
+  const handleSearchKeyDown = (e) => {
+    if (e.key === "Enter" && searchResults.length > 0) {
+      e.preventDefault();
+      handleSelectUser(searchResults[0]);
+    }
+  };
+
   const parsedAmount = parseFloat(amount) || 0;
   const perPerson =
     splitBetween.length > 0 ? parsedAmount / splitBetween.length : 0;
+  const isValid = name.trim() && amount && splitBetween.length >= 2;
 
   return (
-    <div>
-      <h5 className="mb-3">{expense ? "Edit Expense" : "New Expense"}</h5>
+    <form
+      onSubmit={handleSubmit}
+      aria-label={expense ? "Edit expense form" : "New expense form"}
+    >
+      <h2 className="h5 fw-bold mb-3">
+        {expense ? "Edit Expense" : "New Expense"}
+      </h2>
 
       {/* Name */}
       <div className="mb-3">
-        <label className="form-label small text-secondary">Name</label>
+        <label
+          htmlFor="expense-name"
+          className="form-label small text-secondary"
+        >
+          Expense Name
+        </label>
         <input
+          id="expense-name"
           className="form-control"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="e.g., Dinner with Mike"
+          required
+          autoFocus
         />
       </div>
 
       {/* Description */}
       <div className="mb-3">
-        <label className="form-label small text-secondary">
+        <label
+          htmlFor="expense-desc"
+          className="form-label small text-secondary"
+        >
           Description (optional)
         </label>
         <input
+          id="expense-desc"
           className="form-control"
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -132,20 +157,33 @@ export default function ExpenseForm({
       {/* Amount + Category */}
       <div className="row g-2 mb-3">
         <div className="col-6">
-          <label className="form-label small text-secondary">Amount ($)</label>
+          <label
+            htmlFor="expense-amount"
+            className="form-label small text-secondary"
+          >
+            Amount ($)
+          </label>
           <input
+            id="expense-amount"
             type="number"
             className="form-control"
-            min="0"
+            min="0.01"
             step="0.01"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
             placeholder="0.00"
+            required
           />
         </div>
         <div className="col-6">
-          <label className="form-label small text-secondary">Category</label>
+          <label
+            htmlFor="expense-category"
+            className="form-label small text-secondary"
+          >
+            Category
+          </label>
           <select
+            id="expense-category"
             className="form-select"
             value={category}
             onChange={(e) => setCategory(e.target.value)}
@@ -159,25 +197,9 @@ export default function ExpenseForm({
         </div>
       </div>
 
-      {/* Paid By */}
-      <div className="mb-3">
-        <label className="form-label small text-secondary">Paid By</label>
-        <select
-          className="form-select"
-          value={paidBy}
-          onChange={(e) => setPaidBy(e.target.value)}
-        >
-          {splitBetween.map((p) => (
-            <option key={p} value={p}>
-              {p === currentUser ? `${p} (You)` : p}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      {/* Split With — search registered users */}
-      <div className="mb-3">
-        <label className="form-label small text-secondary">Split With</label>
+      {/* Split With — BEFORE Paid By */}
+      <fieldset className="mb-3">
+        <legend className="form-label small text-secondary">Split With</legend>
         <div className="position-relative">
           <input
             className="form-control"
@@ -185,14 +207,51 @@ export default function ExpenseForm({
             onChange={(e) => setSearchInput(e.target.value)}
             onFocus={() => searchResults.length > 0 && setShowDropdown(true)}
             onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-            placeholder="Search registered users to split with"
+            onKeyDown={handleSearchKeyDown}
+            placeholder="Type a name to search registered users"
+            aria-label="Search users to split with"
+            aria-expanded={showDropdown}
+            aria-controls="user-search-results"
+            role="combobox"
+            autoComplete="off"
           />
 
-          {/* Search results dropdown */}
+          {/* Searching indicator — shown while debounce is pending or request in flight */}
+          {searching && searchInput.trim().length > 0 && (
+            <div
+              className="expense-form__search-status text-secondary small mt-1"
+              aria-live="polite"
+              aria-busy="true"
+            >
+              <span
+                className="spinner-border spinner-border-sm me-1"
+                role="status"
+                aria-hidden="true"
+              />
+              Searching...
+            </div>
+          )}
+
+          {/* No results feedback */}
+          {!searching &&
+            searchInput.trim().length > 0 &&
+            searchResults.length === 0 &&
+            !showDropdown && (
+              <div
+                className="expense-form__search-status text-secondary small mt-1"
+                aria-live="polite"
+              >
+                No users found for &ldquo;{searchInput}&rdquo;
+              </div>
+            )}
+
           {showDropdown && searchResults.length > 0 && (
             <ul
-              className="list-group position-absolute w-100 shadow"
+              id="user-search-results"
+              className="list-group position-absolute w-100 shadow-sm"
               style={{ zIndex: 1000, maxHeight: 180, overflowY: "auto" }}
+              role="listbox"
+              aria-label="Search results"
             >
               {searchResults.map((u) => (
                 <li
@@ -200,6 +259,8 @@ export default function ExpenseForm({
                   className="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
                   style={{ cursor: "pointer" }}
                   onMouseDown={() => handleSelectUser(u)}
+                  role="option"
+                  aria-selected={false}
                 >
                   <div>
                     <strong>{u.name}</strong>
@@ -216,12 +277,19 @@ export default function ExpenseForm({
 
         {/* Participant tags */}
         {splitBetween.length > 0 && (
-          <div className="d-flex flex-wrap gap-2 mt-2">
+          <div
+            className="d-flex flex-wrap gap-2 mt-2"
+            aria-label="Selected participants"
+          >
             {splitBetween.map((p) => (
               <span key={p} className="expense-form__member-tag">
                 {p === currentUser ? `${p} (You)` : p}
                 {p !== currentUser && (
-                  <button onClick={() => handleRemoveUser(p)} type="button">
+                  <button
+                    onClick={() => handleRemoveUser(p)}
+                    type="button"
+                    aria-label={`Remove ${p}`}
+                  >
                     &times;
                   </button>
                 )}
@@ -231,13 +299,37 @@ export default function ExpenseForm({
         )}
 
         {splitBetween.length < 2 && (
-          <small className="text-danger">Add at least one other person</small>
+          <small className="text-danger d-block mt-1" role="alert">
+            Add at least one other person to split with
+          </small>
         )}
+      </fieldset>
+
+      {/* Paid By — AFTER Split With, with clarified label */}
+      <div className="mb-3">
+        <label
+          htmlFor="expense-paidby"
+          className="form-label small text-secondary"
+        >
+          Who paid for this?
+        </label>
+        <select
+          id="expense-paidby"
+          className="form-select"
+          value={paidBy}
+          onChange={(e) => setPaidBy(e.target.value)}
+        >
+          {splitBetween.map((p) => (
+            <option key={p} value={p}>
+              {p === currentUser ? `${p} (You)` : p}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Split preview */}
       {parsedAmount > 0 && splitBetween.length >= 2 && (
-        <div className="alert alert-light small mb-3">
+        <div className="alert alert-light small mb-3" role="status">
           <strong>Equal split:</strong> ${perPerson.toFixed(2)} per person (
           {splitBetween.length} people)
         </div>
@@ -250,14 +342,14 @@ export default function ExpenseForm({
         </button>
         <button
           className="btn btn-primary"
-          onClick={handleSubmit}
-          disabled={!name.trim() || !amount || splitBetween.length < 2}
-          type="button"
+          type="submit"
+          disabled={!isValid}
+          aria-disabled={!isValid}
         >
           {expense ? "Save Changes" : "Add Expense"}
         </button>
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -266,8 +358,4 @@ ExpenseForm.propTypes = {
   currentUser: PropTypes.string.isRequired,
   onSubmit: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-};
-
-ExpenseForm.defaultProps = {
-  expense: null,
 };

@@ -17,15 +17,23 @@ export default function GroupCard({ group }) {
   const expenseCount = group.summary.totalExpenses;
 
   return (
-    <Card className="group-card h-100">
+    <Card
+      as={Link}
+      to={`/groups/${group._id}`}
+      className="group-card h-100 text-decoration-none text-reset"
+    >
       <Card.Body className="d-flex flex-column gap-3">
         <div>
-          <Badge bg={statusVariant} pill className="mb-2">
-            {group.status}
-          </Badge>
-          <Card.Title className="mb-2">{group.name}</Card.Title>
+          <div className="d-flex justify-content-between align-items-center mb-2">
+            <Card.Title className="mb-0">{group.name}</Card.Title>
+            <Badge bg={statusVariant} pill>
+              {group.status}
+            </Badge>
+          </div>
           <Card.Subtitle className="group-card__subtitle text-muted fw-normal">
-            {memberCount} member{memberCount !== 1 ? "s" : ""} · {expenseCount > 999 ? "999+" : expenseCount} expense{expenseCount !== 1 ? "s" : ""}
+            {memberCount} member{memberCount !== 1 ? "s" : ""} ·{" "}
+            {expenseCount > 999 ? "999+" : expenseCount} expense
+            {expenseCount !== 1 ? "s" : ""}
           </Card.Subtitle>
         </div>
 
@@ -39,10 +47,6 @@ export default function GroupCard({ group }) {
             <dd>{currency(group.summary.outstandingDebtAmount)}</dd>
           </div>
         </dl>
-
-        <Link to={`/groups/${group._id}`} className="group-card__link mt-auto">
-          Open Group →
-        </Link>
       </Card.Body>
     </Card>
   );

@@ -1,8 +1,11 @@
 import PropTypes from "prop-types";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
 import ListGroup from "react-bootstrap/ListGroup";
+import HelpTooltip from "../HelpTooltip/HelpTooltip.jsx";
+import "./BalanceSummary.css";
 
 const FILTER = {
   ALL: "all",
@@ -28,10 +31,55 @@ export default function BalanceSummary({
   debts,
   groupStatus,
   groupOwnerId,
+  isOwner,
+  isSettling,
   isSubmitting,
   onMarkPaid,
+  onSettleUp,
 }) {
   const [statusFilter, setStatusFilter] = useState(FILTER.ALL);
+  const [pendingPaid, setPendingPaid] = useState(new Map()); // debtId -> countdown seconds
+  const timersRef = useRef(new Map()); // debtId -> { timeoutId, intervalId }
+
+  function handleMarkPaidClick(debtId) {
+    setPendingPaid((prev) => new Map(prev).set(debtId, 5));
+
+    const intervalId = setInterval(() => {
+      setPendingPaid((prev) => {
+        const next = new Map(prev);
+        const current = next.get(debtId);
+        if (current !== undefined) next.set(debtId, current - 1);
+        return next;
+      });
+    }, 1000);
+
+    const timeoutId = setTimeout(() => {
+      clearInterval(intervalId);
+      timersRef.current.delete(debtId);
+      setPendingPaid((prev) => {
+        const next = new Map(prev);
+        next.delete(debtId);
+        return next;
+      });
+      onMarkPaid(debtId);
+    }, 5000);
+
+    timersRef.current.set(debtId, { timeoutId, intervalId });
+  }
+
+  function handleUndo(debtId) {
+    const timers = timersRef.current.get(debtId);
+    if (timers) {
+      clearTimeout(timers.timeoutId);
+      clearInterval(timers.intervalId);
+      timersRef.current.delete(debtId);
+    }
+    setPendingPaid((prev) => {
+      const next = new Map(prev);
+      next.delete(debtId);
+      return next;
+    });
+  }
   const filteredDebts = debts.filter((debt) => {
     if (statusFilter === FILTER.PAID) {
       return debt.isPaid;
@@ -49,9 +97,42 @@ export default function BalanceSummary({
       : `No ${statusFilter} balances found.`;
 
   return (
-    <Card className="rounded-4 overflow-hidden">
+    <Card className="rounded-4" style={{ overflow: "visible" }}>
       <Card.Body>
-        <Card.Title>Settlement Plan</Card.Title>
+        <div className="d-flex justify-content-between align-items-center">
+          <div className="d-flex align-items-center gap-2">
+            <Card.Title className="mb-0">Settlement Plan</Card.Title>
+            <HelpTooltip
+              position="right"
+              content={
+                <>
+                  <strong>How settlements work:</strong>
+                  <br />
+                  1. We figure out who's up and who's down across all expenses,
+                  then generate the fewest possible payments to zero everything
+                  out.
+                  <br />
+                  2. The group owner must click &quot;Settle Up&quot; before
+                  debts can be marked as paid.
+                  <br />
+                  3. Once settling, the sender, receiver, or group owner can
+                  click &quot;Mark Paid&quot; to confirm a payment.
+                </>
+              }
+            />
+          </div>
+          {isOwner && onSettleUp ? (
+            <Button
+              disabled={isSettling || groupStatus !== "open"}
+              onClick={onSettleUp}
+              size="sm"
+              type="button"
+              variant="primary"
+            >
+              {isSettling ? "Settling\u2026" : "Settle Up"}
+            </Button>
+          ) : null}
+        </div>
         <div
           aria-label="Filter settlements"
           className="d-flex flex-wrap gap-2 mt-3"
@@ -72,7 +153,7 @@ export default function BalanceSummary({
           ))}
         </div>
       </Card.Body>
-      <div style={{ maxHeight: "28rem", overflowY: "auto", borderTop: "1px solid rgba(0,0,0,.125)" }}>
+      <div className="balance-summary__list">
         <ListGroup variant="flush">
           {filteredDebts.length ? (
             filteredDebts.map((debt) => {
@@ -96,14 +177,21 @@ export default function BalanceSummary({
                     </div>
                   </div>
                   <div className="d-flex align-items-center gap-3">
-                    {debt.isPaid ? (
-                      <Badge bg="success">Paid</Badge>
-                    ) : null}
-                    {canMarkPaid ? (
+                    {debt.isPaid ? <Badge bg="success">Paid</Badge> : null}
+                    {canMarkPaid && pendingPaid.has(debt.debtId) ? (
+                      <button
+                        className="btn btn-warning btn-sm py-0 px-2 ms-1"
+                        onClick={() => handleUndo(debt.debtId)}
+                        style={{ fontSize: "0.7rem", whiteSpace: "nowrap" }}
+                        type="button"
+                      >
+                        Undo ({pendingPaid.get(debt.debtId)}s)
+                      </button>
+                    ) : canMarkPaid ? (
                       <button
                         className="btn btn-outline-success btn-sm py-0 px-2 ms-1"
                         disabled={isSubmitting}
-                        onClick={() => onMarkPaid(debt.debtId)}
+                        onClick={() => handleMarkPaidClick(debt.debtId)}
                         style={{ fontSize: "0.7rem", whiteSpace: "nowrap" }}
                         type="button"
                       >
@@ -142,6 +230,9 @@ BalanceSummary.propTypes = {
   ).isRequired,
   groupStatus: PropTypes.string.isRequired,
   groupOwnerId: PropTypes.string.isRequired,
+  isOwner: PropTypes.bool,
+  isSettling: PropTypes.bool,
   isSubmitting: PropTypes.bool.isRequired,
   onMarkPaid: PropTypes.func.isRequired,
+  onSettleUp: PropTypes.func,
 };

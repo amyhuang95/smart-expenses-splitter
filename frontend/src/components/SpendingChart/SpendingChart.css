@@ -1,0 +1,6 @@
+/* Chart title sizing */
+.spending-chart__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}

@@ -1,31 +1,36 @@
-.member-list-modal__body {
+.edit-group-modal__body {
   display: grid;
-  gap: 1rem;
+  gap: 1.25rem;
 }
 
-.member-list-modal__item {
+.edit-group-modal__section-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.edit-group-modal__item {
   align-items: center;
   display: flex;
   gap: 1rem;
   justify-content: space-between;
 }
 
-.member-list-modal__name {
+.edit-group-modal__name {
   font-weight: 600;
 }
 
-.member-list-modal__meta {
+.edit-group-modal__meta {
   color: var(--color-text-muted);
   font-size: 0.875rem;
 }
 
 @media (max-width: 767px) {
-  .member-list-modal__item {
+  .edit-group-modal__item {
     align-items: flex-start;
     flex-direction: column;
   }
 
-  .member-list-modal__item .btn {
+  .edit-group-modal__item .btn {
     width: 100%;
   }
 }

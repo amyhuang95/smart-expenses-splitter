@@ -9,6 +9,7 @@ import {
   markGroupDebtPaid,
   removeMemberFromGroup,
   serializeGroup,
+  updateGroupName,
   updateGroupSettlement,
 } from "../db/groupsCollection.js";
 import {
@@ -250,6 +251,38 @@ router.get("/:groupId", async (req, res, next) => {
     }
 
     const payload = await buildGroupPayload(group, req.currentUser._id);
+    res.json(payload);
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Only the owner can rename a group.
+router.patch("/:groupId", async (req, res, next) => {
+  const name = readBodyString(req.body?.name);
+
+  if (!name) {
+    res.status(400).json({ error: "Group name is required." });
+    return;
+  }
+
+  try {
+    const group = await findGroupById(req.params.groupId);
+
+    if (!group || !isGroupMember(group, req.currentUser._id)) {
+      res.status(404).json({ error: "Group not found." });
+      return;
+    }
+
+    if (!isGroupOwner(group, req.currentUser._id)) {
+      res
+        .status(403)
+        .json({ error: "Only the group owner can rename this group." });
+      return;
+    }
+
+    const updatedGroup = await updateGroupName(req.params.groupId, name);
+    const payload = await buildGroupPayload(updatedGroup, req.currentUser._id);
     res.json(payload);
   } catch (error) {
     next(error);

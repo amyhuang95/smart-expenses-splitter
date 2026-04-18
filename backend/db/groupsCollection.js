@@ -152,6 +152,22 @@ export async function removeMemberFromGroup(groupId, memberId) {
   return findGroupById(groupId);
 }
 
+export async function updateGroupName(groupId, name) {
+  if (!ObjectId.isValid(groupId)) {
+    logger.warn("[groups] updateGroupName — invalid groupId", { groupId });
+    return null;
+  }
+
+  logger.debug("[groups] updateOne name", { groupId });
+  await getGroupsCollection().updateOne(
+    { _id: ObjectId.createFromHexString(groupId) },
+    { $set: { name: name.trim() } },
+  );
+  logger.debug("[groups] updateOne name OK", { groupId });
+
+  return findGroupById(groupId);
+}
+
 export async function updateGroupSettlement(groupId, { debts, status }) {
   if (!ObjectId.isValid(groupId)) {
     logger.warn("[groups] updateGroupSettlement — invalid groupId", {
@@ -221,10 +237,12 @@ export async function listGroupSummariesByMember(userId) {
       {
         $lookup: {
           from: "groupExpenses",
-          localField: "_id",
-          foreignField: "groupId",
+          let: { groupId: { $toString: "$_id" } },
+          pipeline: [
+            { $match: { $expr: { $eq: ["$groupId", "$$groupId"] } } },
+            { $project: { amount: 1 } },
+          ],
           as: "_expenseDocs",
-          pipeline: [{ $project: { amount: 1 } }],
         },
       },
       {

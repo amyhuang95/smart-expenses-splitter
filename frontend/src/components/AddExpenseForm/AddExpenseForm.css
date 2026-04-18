@@ -3,6 +3,16 @@
   gap: 1rem;
 }
 
+.add-expense-form .form-control,
+.add-expense-form .form-select {
+  border-color: var(--color-surface-alt);
+}
+
+.add-expense-form .form-control:focus,
+.add-expense-form .form-select:focus {
+  border-color: var(--color-primary);
+}
+
 .add-expense-form__layout {
   display: grid;
   gap: 1rem;
@@ -45,7 +55,7 @@
 }
 
 .add-expense-form__members-summary {
-  color: #6c757d;
+  color: var(--color-text-muted);
   font-size: 0.9rem;
 }
 
@@ -70,8 +80,18 @@
   padding: 0.75rem 0.75rem 0.75rem 2.5rem;
 }
 
+.add-expense-form__clear-btn.btn-link {
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.add-expense-form__clear-btn.btn-link:hover {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
 .add-expense-form__empty {
-  color: #6c757d;
+  color: var(--color-text-muted);
   grid-column: 1 / -1;
   margin: 0;
 }

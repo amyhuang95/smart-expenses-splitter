@@ -9,7 +9,9 @@ import Spinner from "react-bootstrap/Spinner";
 import { Link, useNavigate, useParams } from "react-router";
 import AddExpenseForm from "../../components/AddExpenseForm/AddExpenseForm.jsx";
 import BalanceSummary from "../../components/BalanceSummary/BalanceSummary.jsx";
+import EditGroupModal from "../../components/EditGroupModal/EditGroupModal.jsx";
 import ExpenseList from "../../components/ExpenseList/ExpenseList.jsx";
+import HelpTooltip from "../../components/HelpTooltip/HelpTooltip.jsx";
 import MemberListModal from "../../components/MemberListModal/MemberListModal.jsx";
 import { useUser } from "../../context/useUser.js";
 import {
@@ -21,6 +23,7 @@ import {
   markDebtAsPaid,
   removeGroupMember,
   settleGroup,
+  updateGroup,
   updateGroupExpense,
 } from "../../services/groups.js";
 import { currency } from "../../utils/format.js";
@@ -32,13 +35,21 @@ const ACTION = {
   SETTLE: "settle",
   MARK_PAID: "markPaid",
   DELETE: "delete",
+  RENAME: "rename",
 };
 
 const MEMBER_PREVIEW_LIMIT = 6;
 
-function ConfirmModal({ title, message, confirmLabel = "Confirm", confirmVariant = "danger", onConfirm, onCancel }) {
+function ConfirmModal({
+  title,
+  message,
+  confirmLabel = "Confirm",
+  confirmVariant = "danger",
+  onConfirm,
+  onCancel,
+}) {
   return (
-    <div className="group-details-page__modal-backdrop" onClick={onCancel}>
+    <div className="modal-backdrop-custom" onClick={onCancel}>
       <div
         className="bg-white rounded-3 p-4 shadow text-center"
         style={{ maxWidth: 400, width: "100%" }}
@@ -47,10 +58,18 @@ function ConfirmModal({ title, message, confirmLabel = "Confirm", confirmVariant
         <h5 className="mb-2">{title}</h5>
         <p className="text-secondary small mb-4">{message}</p>
         <div className="d-flex justify-content-center gap-2">
-          <button className="btn btn-secondary" onClick={onCancel} type="button">
+          <button
+            className="btn btn-outline-secondary"
+            onClick={onCancel}
+            type="button"
+          >
             Cancel
           </button>
-          <button className={`btn btn-${confirmVariant}`} onClick={onConfirm} type="button">
+          <button
+            className={`btn btn-${confirmVariant}`}
+            onClick={onConfirm}
+            type="button"
+          >
             {confirmLabel}
           </button>
         </div>
@@ -68,6 +87,8 @@ export default function GroupDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isExpenseOpen, setIsExpenseOpen] = useState(false);
   const [isMembersOpen, setIsMembersOpen] = useState(false);
+  const [isEditGroupOpen, setIsEditGroupOpen] = useState(false);
+  const [editGroupError, setEditGroupError] = useState("");
   const [workingActions, setWorkingActions] = useState(new Set());
   const [editingExpense, setEditingExpense] = useState(null);
 
@@ -131,9 +152,17 @@ export default function GroupDetailsPage() {
       confirmVariant: "danger",
       onConfirm: async () => {
         setConfirm(null);
-        await runAction(ACTION.MEMBER, () =>
-          removeGroupMember(groupData.group._id, member._id),
-        );
+        try {
+          setEditGroupError("");
+          await runAction(ACTION.MEMBER, () =>
+            removeGroupMember(groupData.group._id, member._id),
+          );
+        } catch (removeError) {
+          if (isEditGroupOpen) {
+            setEditGroupError(removeError.message);
+            setError("");
+          }
+        }
       },
     });
   }
@@ -198,7 +227,10 @@ export default function GroupDetailsPage() {
 
   if (isLoading) {
     return (
-      <div className="d-flex align-items-center justify-content-center" style={{ minHeight: "40vh" }}>
+      <div
+        className="d-flex align-items-center justify-content-center"
+        style={{ minHeight: "40vh" }}
+      >
         <Spinner animation="border" role="status" variant="dark" />
       </div>
     );
@@ -219,7 +251,9 @@ export default function GroupDetailsPage() {
 
   const { debts, expenses, group, summary } = groupData;
   const isOwner = group.currentUserRole === "owner";
-  const expenseFormTitle = editingExpense ? "Edit Shared Expense" : "Add Shared Expense";
+  const expenseFormTitle = editingExpense
+    ? "Edit Shared Expense"
+    : "Add Shared Expense";
   const expenseSubmitLabel = editingExpense ? "Save Changes" : "Save Expense";
   const members = group.members ?? [];
   const previewMembers = members.slice(0, MEMBER_PREVIEW_LIMIT);
@@ -234,52 +268,33 @@ export default function GroupDetailsPage() {
 
   return (
     <section className="d-grid gap-4">
-      <div>
-        <Button as={Link} to="/groups" type="button" variant="link" className="ps-0">
-          ← Back To Groups
-        </Button>
-      </div>
+      <Link to="/groups" className="group-details-page__back-link">
+        ← Back to Groups
+      </Link>
 
-      <Card className="rounded-4 overflow-hidden">
+      <Card className="rounded-4">
         <Card.Body>
           <div className="d-flex flex-column flex-md-row justify-content-between align-items-start gap-3">
             <div>
-              <p
-                className="text-secondary mb-1"
-                style={{ fontSize: "0.75rem", fontWeight: 600, letterSpacing: "0.08em", textTransform: "uppercase" }}
-              >
-                Group Details
-              </p>
+              <Badge bg={statusVariant} pill>
+                {group.status}
+              </Badge>
               <div className="d-flex flex-wrap align-items-center gap-3">
                 <h1 className="mb-0">{group.name}</h1>
-                <Badge bg={statusVariant} pill>
-                  {group.status}
-                </Badge>
               </div>
             </div>
-            <div className="d-flex flex-column flex-md-row flex-wrap justify-content-end align-items-stretch align-items-md-center gap-2">
-              <Button
-                disabled={isWorking(ACTION.EXPENSE) || group.status !== "open"}
-                onClick={() => setIsExpenseOpen(true)}
-                size="sm"
-                type="button"
-                variant="outline-dark"
-              >
-                Add Expense
-              </Button>
-
-              {isOwner ? (
-                <Button
-                  disabled={isWorking(ACTION.SETTLE) || group.status !== "open"}
-                  onClick={handleSettleUp}
-                  size="sm"
-                  type="button"
-                  variant="outline-success"
-                >
-                  {isWorking(ACTION.SETTLE) ? "Settling…" : "Settle Up"}
-                </Button>
-              ) : null}
-              {isOwner ? (
+            {isOwner ? (
+              <div className="d-flex flex-wrap justify-content-end align-items-center gap-2">
+                {group.status === "open" ? (
+                  <Button
+                    onClick={() => setIsEditGroupOpen(true)}
+                    size="sm"
+                    type="button"
+                    variant="outline-secondary"
+                  >
+                    Edit Group
+                  </Button>
+                ) : null}
                 <Button
                   disabled={isWorking(ACTION.DELETE)}
                   onClick={handleDeleteGroup}
@@ -289,14 +304,14 @@ export default function GroupDetailsPage() {
                 >
                   {isWorking(ACTION.DELETE) ? "Deleting..." : "Delete Group"}
                 </Button>
-              ) : null}
-            </div>
+              </div>
+            ) : null}
           </div>
 
           <div className="d-grid gap-2 mt-3">
             <div className="d-flex flex-wrap gap-2 align-items-center">
               {previewMembers.map((member) => (
-                <span key={member._id} className="group-details-page__member-tag">
+                <span key={member._id} className="member-tag">
                   {member.name}
                   {member._id === group.ownerId ? " (owner)" : ""}
                 </span>
@@ -307,23 +322,15 @@ export default function GroupDetailsPage() {
                   onClick={() => setIsMembersOpen(true)}
                   type="button"
                 >
-                  +{hiddenMemberCount} more
+                  Show all ({members.length})
                 </button>
-              ) : (
-                <button
-                  className="group-details-page__members-more"
-                  onClick={() => setIsMembersOpen(true)}
-                  type="button"
-                >
-                  {isOwner && group.status === "open" ? "✏️" : "View All"}
-                </button>
-              )}
+              ) : null}
             </div>
           </div>
 
           <Row className="g-3 mt-2">
             <Col sm={4}>
-              <Card className="rounded-3 overflow-hidden">
+              <Card className="rounded-3">
                 <Card.Body>
                   <div className="text-muted">Total Spent</div>
                   <strong>{currency(summary.totalSpent)}</strong>
@@ -331,17 +338,29 @@ export default function GroupDetailsPage() {
               </Card>
             </Col>
             <Col sm={4}>
-              <Card className="rounded-3 overflow-hidden">
+              <Card className="rounded-3">
                 <Card.Body>
-                  <div className="text-muted">Outstanding</div>
+                  <div className="text-muted d-flex align-items-center gap-1">
+                    Outstanding
+                    <HelpTooltip
+                      content="The total amount still owed between members that hasn't been paid back yet."
+                      position="right"
+                    />
+                  </div>
                   <strong>{currency(summary.outstandingDebtAmount)}</strong>
                 </Card.Body>
               </Card>
             </Col>
             <Col sm={4}>
-              <Card className="rounded-3 overflow-hidden">
+              <Card className="rounded-3">
                 <Card.Body>
-                  <div className="text-muted">Settled Debts</div>
+                  <div className="text-muted d-flex align-items-center gap-1">
+                    Settled Debts
+                    <HelpTooltip
+                      content="The number of individual debts that have been marked as paid during settlement."
+                      position="right"
+                    />
+                  </div>
                   <strong>{summary.settledDebtCount}</strong>
                 </Card.Body>
               </Card>
@@ -359,7 +378,10 @@ export default function GroupDetailsPage() {
             expenses={expenses}
             groupOwnerId={group.ownerId}
             groupStatus={group.status}
-            onDelete={handleDeleteExpense}
+            onAddExpense={() => setIsExpenseOpen(true)}
+            canAddExpense={
+              !isWorking(ACTION.EXPENSE) && group.status === "open"
+            }
             onEdit={(expense) => {
               setEditingExpense(expense);
               setIsExpenseOpen(true);
@@ -372,12 +394,15 @@ export default function GroupDetailsPage() {
             debts={debts}
             groupStatus={group.status}
             groupOwnerId={group.ownerId}
+            isOwner={isOwner}
+            isSettling={isWorking(ACTION.SETTLE)}
             isSubmitting={isWorking(ACTION.MARK_PAID)}
             onMarkPaid={(debtId) =>
               runAction(ACTION.MARK_PAID, () =>
                 markDebtAsPaid(group._id, debtId),
               )
             }
+            onSettleUp={handleSettleUp}
           />
         </Col>
       </Row>
@@ -392,6 +417,9 @@ export default function GroupDetailsPage() {
           setEditingExpense(null);
           setIsExpenseOpen(false);
         }}
+        onDelete={
+          editingExpense ? () => handleDeleteExpense(editingExpense) : undefined
+        }
         onSubmit={async (payload) => {
           if (editingExpense) {
             await runAction(ACTION.EXPENSE, async () => {
@@ -413,10 +441,21 @@ export default function GroupDetailsPage() {
       <MemberListModal
         groupName={group.name}
         isOpen={isMembersOpen}
-        isOwner={isOwner && group.status === "open"}
+        isOwner={false}
         isSubmitting={isAnyWorking}
         members={members}
-        onAddMember={async (email) => {
+        onAddMember={async () => {}}
+        onClose={() => setIsMembersOpen(false)}
+        onRemoveMember={() => {}}
+        ownerId={group.ownerId}
+      />
+
+      <EditGroupModal
+        groupName={group.name}
+        isOpen={isEditGroupOpen}
+        isSubmitting={isAnyWorking}
+        members={members}
+        onAddMember={async ({ email }) => {
           try {
             setWorkingActions((prev) => new Set(prev).add(ACTION.MEMBER));
             const nextData = await addGroupMember(group._id, email);
@@ -429,8 +468,18 @@ export default function GroupDetailsPage() {
             });
           }
         }}
-        onClose={() => setIsMembersOpen(false)}
+        memberError={editGroupError}
+        onClearMemberError={() => setEditGroupError("")}
+        onClose={() => {
+          setIsEditGroupOpen(false);
+          setEditGroupError("");
+        }}
         onRemoveMember={handleRemoveMember}
+        onRenameGroup={async (nextName) => {
+          await runAction(ACTION.RENAME, () =>
+            updateGroup(group._id, { name: nextName }),
+          );
+        }}
         ownerId={group.ownerId}
       />
 

@@ -15,6 +15,12 @@
   font-weight: 700;
 }
 
+/* inactive tab (variant="light") — text matches the active tab's background */
+.auth-form__mode-button.btn-light {
+  --bs-btn-color: var(--color-primary);
+  --bs-btn-hover-color: var(--color-primary-hover);
+}
+
 .auth-form__feedback {
   margin: 18px 0 0;
   border-radius: 12px;
@@ -31,7 +37,7 @@
 }
 
 .auth-form__field .form-label {
-  color: #334155;
+  color: var(--color-text);
   font-size: 0.9rem;
   font-weight: 600;
 }
@@ -39,12 +45,12 @@
 .auth-form__field .form-control {
   min-height: 44px;
   border-radius: 12px;
-  border-color: #cbd5e1;
+  border-color: var(--color-border-strong);
 }
 
 .auth-form__field .form-control:focus {
-  border-color: #64748b;
-  box-shadow: 0 0 0 0.2rem rgba(100, 116, 139, 0.12);
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 0.2rem rgba(61, 142, 232, 0.22);
 }
 
 .auth-form__submit {

@@ -3,81 +3,58 @@ import { useState } from "react";
 import Alert from "react-bootstrap/Alert";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
-import Modal from "react-bootstrap/Modal";
-import "./AddMemberForm.css";
+import { lookupUserByEmail } from "../../services/groups.js";
 
-export default function AddMemberForm({
-  isOpen,
-  isSubmitting,
-  onClose,
-  onSubmit,
-}) {
+export default function AddMemberForm({ isSubmitting, onAddMember }) {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [isLooking, setIsLooking] = useState(false);
 
-  function handleExited() {
-    setEmail("");
-    setError("");
-  }
+  const disabled = isSubmitting || isLooking;
 
   async function handleSubmit(event) {
     event.preventDefault();
-
     if (!email.trim()) {
       setError("Enter an email to add a member.");
       return;
     }
 
+    setIsLooking(true);
     try {
       setError("");
-      await onSubmit(email.trim());
+      const found = await lookupUserByEmail(email.trim());
+      await onAddMember({ name: found.name, email: found.email });
       setEmail("");
     } catch (submitError) {
       setError(submitError.message);
+    } finally {
+      setIsLooking(false);
     }
   }
 
   return (
-    <Modal show={isOpen} onExited={handleExited} onHide={onClose}>
-      <Form className="add-member-form" onSubmit={handleSubmit}>
-        <Modal.Header closeButton>
-          <Modal.Title>Add Member</Modal.Title>
-        </Modal.Header>
-        <Modal.Body className="add-member-form__body">
-          {error ? <Alert variant="danger">{error}</Alert> : null}
-          <Form.Group controlId="add-member-email">
-            <Form.Label>Add a member by email</Form.Label>
-            <Form.Control
-              autoFocus
-              disabled={isSubmitting}
-              onChange={(event) => setEmail(event.target.value)}
-              placeholder="name@example.com"
-              type="email"
-              value={email}
-            />
-          </Form.Group>
-        </Modal.Body>
-        <Modal.Footer>
-          <Button
-            disabled={isSubmitting}
-            onClick={onClose}
-            type="button"
-            variant="outline-secondary"
-          >
-            Cancel
+    <Form onSubmit={handleSubmit}>
+      {error ? <Alert variant="danger">{error}</Alert> : null}
+      <Form.Group controlId="add-member-email">
+        <Form.Label>Add a member by email</Form.Label>
+        <div className="d-flex gap-2">
+          <Form.Control
+            disabled={disabled}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="name@example.com"
+            type="email"
+            value={email}
+          />
+          <Button disabled={disabled} type="submit" variant="dark">
+            {disabled ? "Adding..." : "Add"}
           </Button>
-          <Button disabled={isSubmitting} type="submit" variant="dark">
-            {isSubmitting ? "Adding..." : "Add Member"}
-          </Button>
-        </Modal.Footer>
-      </Form>
-    </Modal>
+        </div>
+      </Form.Group>
+    </Form>
   );
 }
 
 AddMemberForm.propTypes = {
-  isOpen: PropTypes.bool.isRequired,
   isSubmitting: PropTypes.bool.isRequired,
-  onClose: PropTypes.func.isRequired,
-  onSubmit: PropTypes.func.isRequired,
+  onAddMember: PropTypes.func.isRequired,
 };

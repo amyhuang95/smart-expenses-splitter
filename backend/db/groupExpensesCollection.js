@@ -23,6 +23,7 @@ export function serializeGroupExpense(expense) {
     category: expense.category,
     paidBy: expense.paidBy,
     splitBetween: expense.splitBetween ?? [],
+    splitDetails: expense.splitDetails ?? {},
     dateCreated: expense.dateCreated,
   };
 }

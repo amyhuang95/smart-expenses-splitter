@@ -55,8 +55,7 @@ export async function deleteExpense(id) {
 }
 
 export async function searchUsers(query) {
-  return request(
-    `/api/users/search?q=${encodeURIComponent(query)}`,
-    { method: "GET" },
-  );
+  return request(`/api/users/search?q=${encodeURIComponent(query)}`, {
+    method: "GET",
+  });
 }

@@ -135,6 +135,27 @@ router.post("/logout", requireAuth, (req, res, next) => {
   });
 });
 
+// Look up a single user by exact email (returns name + email, or 404).
+router.get("/lookup", async (req, res, next) => {
+  try {
+    const email = (req.query.email ?? "").trim().toLowerCase();
+    if (!email) {
+      res.status(400).json({ error: "Email query parameter is required." });
+      return;
+    }
+
+    const user = await findUserByEmail(email);
+    if (!user) {
+      res.status(404).json({ error: "No account found for that email." });
+      return;
+    }
+
+    res.json({ name: user.name, email: user.email });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // Search users by name
 router.get("/search", async (req, res, next) => {
   try {

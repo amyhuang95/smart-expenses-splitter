@@ -1,19 +1,70 @@
+/* Settled state — creative fade effect */
+.expense-card--settled {
+  opacity: 0.5;
+  filter: grayscale(30%);
+  transition: opacity 0.2s ease;
+}
+
+/* Hover lift — subtle card interaction */
+.expense-card {
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.expense-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+/* Category label colors — WCAG AA contrast-safe on white background */
 .expense-card__category--food {
-  color: #ff6b6b;
+  color: var(--bs-danger, #dc3545);
 }
 
 .expense-card__category--transport {
-  color: #4ecdc4;
+  color: #0a7c8e;
+  /* darkened from #0dcaf0 (1.95 ratio) to pass 4.5:1 */
 }
 
 .expense-card__category--utilities {
-  color: #ffd93d;
+  color: #997404;
+  /* darkened from #ffc107 to pass 4.5:1 */
 }
 
 .expense-card__category--entertainment {
-  color: #a855f7;
+  color: #7c3aed;
 }
 
 .expense-card__category--other {
-  color: #6b7280;
+  color: var(--bs-secondary, #6c757d);
+}
+
+/* Badge sizing — larger for contrast compliance */
+.expense-card__badge {
+  font-size: 0.7rem;
+  padding: 0.2rem 0.5rem;
+  font-weight: 600;
+}
+
+/* Mark paid button sizing */
+.expense-card__mark-btn {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.5rem;
+}
+
+/* Action buttons — increased padding and font size for usability */
+.expense-card__action-btn {
+  font-size: 0.8rem;
+  padding: 0.3rem 0.75rem;
+  font-weight: 500;
+}
+
+/* Hint text — contrast-safe on white */
+.expense-card__hint {
+  font-size: 0.65rem;
+  color: #6c757d;
+  /* changed from var with opacity to solid color for contrast */
+  font-style: italic;
+  margin: 0 0 0.25rem;
 }

@@ -7,7 +7,7 @@ export function hasAtMostTwoDecimals(value) {
     return false;
   }
 
-  return Math.round(value * 100) === value * 100;
+  return Math.abs(Math.round(value * 100) - value * 100) < 1e-6;
 }
 
 /**
