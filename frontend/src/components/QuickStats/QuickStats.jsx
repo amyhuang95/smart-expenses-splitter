@@ -39,11 +39,7 @@ export default function QuickStats({ stats, currentUser, expenses }) {
   ];
 
   return (
-    <div
-      className="row g-3 mb-4"
-      role="region"
-      aria-label="Quick spending statistics"
-    >
+    <div className="row g-3 mb-4">
       {items.map(({ label, value, colorClass, title }) => (
         <div key={label} className="col">
           <div className="card" title={title}>

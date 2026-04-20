@@ -457,15 +457,15 @@ export default function MyExpenses() {
             setShowForm(false);
             setEditingExpense(null);
           }}
-          role="dialog"
-          aria-modal="true"
-          aria-label={editingExpense ? "Edit expense" : "Add new expense"}
         >
           <div
             className="my-expenses__modal-content bg-white rounded-3 p-4 shadow"
             onClick={(e) => e.stopPropagation()}
             ref={modalRef}
             tabIndex={-1}
+            role="dialog"
+            aria-modal="true"
+            aria-label={editingExpense ? "Edit expense" : "Add new expense"}
           >
             <ExpenseForm
               key={editingExpense?._id ?? `new-expense-${userName}`}
@@ -486,9 +486,6 @@ export default function MyExpenses() {
         <div
           className="my-expenses__modal-backdrop"
           onClick={() => setConfirmDelete(null)}
-          role="alertdialog"
-          aria-modal="true"
-          aria-label="Confirm delete expense"
         >
           <div
             className="bg-white rounded-3 p-4 shadow text-center"
@@ -496,6 +493,9 @@ export default function MyExpenses() {
             onClick={(e) => e.stopPropagation()}
             ref={deleteModalRef}
             tabIndex={-1}
+            role="alertdialog"
+            aria-modal="true"
+            aria-label="Confirm delete expense"
           >
             <h2 className="h5 text-danger fw-bold">Delete Expense?</h2>
             <p className="text-secondary small">
