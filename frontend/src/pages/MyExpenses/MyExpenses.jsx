@@ -264,11 +264,11 @@ export default function MyExpenses() {
   }
 
   return (
-    <main aria-label="Single Expenses Tracker">
+    <section aria-label="Single Expenses Tracker">
       {/* Header */}
       <header className="d-flex justify-content-between align-items-start mb-4 flex-wrap gap-2">
         <div>
-          <h1 className="h2 page-title mb-1">
+          <h2 className="h2 page-title mb-1">
             My Expenses{" "}
             <HelpTooltip
               content={
@@ -288,7 +288,7 @@ export default function MyExpenses() {
                 </>
               }
             />
-          </h1>
+          </h2>
           <p className="text-secondary small mb-0">
             Track one-off expenses, see who owes you, and mark payments as
             settled.
@@ -548,6 +548,6 @@ export default function MyExpenses() {
           <div className="my-expenses__undo-progress" aria-hidden="true" />
         </div>
       )}
-    </main>
+    </section>
   );
 }
