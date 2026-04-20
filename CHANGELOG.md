@@ -61,3 +61,12 @@
 - **[Group Detail] Expense edit permissions hint** — Added instructions to the expense list clarifying that only the group owner and the expense logger can edit an expense.
 - **[Group List] Status filter explanation** — Added an instruction tooltip explaining what the status tag filters do.
 - **[Group Detail] Outstanding value explanation** — Added a tooltip clarifying what the "Outstanding" dashboard value represents.
+- **[Single Expense] Search loading indicator** — Added a "Searching..." spinner in the Split With field so users know the app is looking up registered users.
+- **[Single Expense] Form field reorder** — Moved "Split With" before "Paid By" so users add participants first, then select who paid, which follows a more natural workflow.
+- **[Single Expense] Paid By label clarification** — Renamed "Paid By" to "Who paid for this?" to make the dropdown purpose clearer for first-time users.
+- **[Single Expense] Undo delete** — Added a 5-second "Undo" toast at the bottom of the page after deleting an expense, allowing users to restore it before permanent removal.
+- **[Single Expense] Hide settled toggle** — Added a "Hide Settled" switch to filter out fully settled expenses from the list so users can focus on active ones.
+- **[Single Expense] Active filter chips** — When a category or payer filter is active, a removable chip badge (e.g., "Food ×") now appears above the list so users always know what filter is applied.
+- **[Single Expense] Load More pagination** — Expenses now load 20 at a time with a "Load More" button, replacing the previous infinite scroll of all records.
+- **[Single Expense] Color contrast fixes** — Darkened the Transport category label and hint text colors to meet WCAG AA 4.5:1 contrast ratio, and increased the Paid badge font size for better readability.
+- **[Single Expense] Help tooltips** — Added "?" help buttons next to the page title, Quick Stats, Filters, My Balance, and Spending by Category sections with usage instructions for new users.
