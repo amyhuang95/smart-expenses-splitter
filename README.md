@@ -34,11 +34,11 @@ Track single expenses in one place for ad hoc splits.
 
 | Landing Page | Home Page |
 | --- | --- |
-| ![Landing Page](screenshots/index-page.png) | ![Home Page](screenshots/home-page.png) |
+| ![Landing Page](screenshots/index-page_v2.png) | ![Home Page](screenshots/home-page_v2.png) |
 | Group Dashboard | Group Details |
-| ![Group Dashboard](screenshots/group-expense-list.png) | ![Group Details](screenshots/group-expense-detail.png) |
+| ![Group Dashboard](screenshots/group-expense-list_v2.png) | ![Group Details](screenshots/group-expense-detail_v2.png) |
 | Single Expenses | Single Expense Details |
-| ![Single Expenses](screenshots/single-expense-list.png) | ![Single Expense Details](screenshots/single-expense-detail.png) |
+| ![Single Expenses](screenshots/single-expense-list_v2.png) | ![Single Expense Details](screenshots/single-expense-detail_v2.png) |
 
 
 ## Tech Stack
