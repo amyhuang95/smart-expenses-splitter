@@ -132,36 +132,42 @@ export default function GroupsPage() {
   return (
     <section className="d-grid gap-4">
       <div className="d-flex flex-column gap-3">
-        <div className="d-flex align-items-center justify-content-between">
-          <div className="d-flex align-items-center gap-2">
-            <h2 className="mb-0 page-title">My Groups</h2>
-            <HelpTooltip
-              position="right"
-              content={
-                <>
-                  <strong>How to use Group Expenses:</strong>
-                  <br />
-                  1. Click &quot;+ New Group&quot; to create a new group and add
-                  members to split expenses with.
-                  <br />
-                  2. Find the newly created group in the list and click the
-                  group card to open the group details page where you can add
-                  expenses and track balances.
-                  <br />
-                  3. Use filters to find groups that are still open, being
-                  settled, or fully settled.
-                </>
-              }
-            />
+        <div>
+          <div className="d-flex align-items-center justify-content-between">
+            <div className="d-flex align-items-center gap-2">
+              <h1 className="h2 page-title mb-1">My Groups</h1>
+              <HelpTooltip
+                position="right"
+                content={
+                  <>
+                    <strong>How to use Group Expenses:</strong>
+                    <br />
+                    1. Click &quot;+ New Group&quot; to create a new group and
+                    add members to split expenses with.
+                    <br />
+                    2. Find the newly created group in the list and click the
+                    group card to open the group details page where you can add
+                    expenses and track balances.
+                    <br />
+                    3. Use filters to find groups that are still open, being
+                    settled, or fully settled.
+                  </>
+                }
+              />
+            </div>
+            <Button
+              className="flex-shrink-0 fw-semibold"
+              onClick={() => setIsCreateOpen(true)}
+              type="button"
+            >
+              + New Group
+            </Button>
           </div>
-          <Button
-            className="flex-shrink-0 fw-semibold"
-            onClick={() => setIsCreateOpen(true)}
-            type="button"
-          >
-            + New Group
-          </Button>
+          <p className="text-secondary small mb-0">
+            Track group expenses with multiple people and simplify debts.
+          </p>
         </div>
+
         <div className="d-flex align-items-center gap-3">
           <Form.Control
             aria-label="Search groups"
