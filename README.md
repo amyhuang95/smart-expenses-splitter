@@ -3,6 +3,7 @@
 SplitEasy is a full-stack expense sharing application for roommates, travel groups, and other small groups who need a clearer way to track shared costs. It supports both recurring group workflows and quick one-off expense splits, with balance summaries that show who owes whom.
 
 - Deployment: https://spliteasy-4q1v.onrender.com
+- [Change log](CHANGELOG.md)
 
 ## Features
 
@@ -61,6 +62,7 @@ Track single expenses in one place for ad hoc splits.
 ```text
 smart-expenses-splitter/
 ├── README.md
+├── CHANGELOG.md
 ├── LICENSE
 ├── design/
 │   ├── DESIGN.md
