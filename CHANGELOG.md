@@ -29,7 +29,7 @@
 
 ### Lighthouse Accessibility — 96% Score Justification
 
-- Achieved a **96% accessibility score** on the Lighthouse audit (v13.0.2, emulated desktop, `/groups` page)
+- Achieved a **96% accessibility score** on the Lighthouse audit
 - **Remaining 4% deduction** is due to a single contrast flag — Lighthouse detected insufficient contrast ratios on several elements within the Groups page:
   - Navigation link in active state (`a.startup-page__nav-link.active`)
   - Hero container text (`div.startup-page__hero.container`)

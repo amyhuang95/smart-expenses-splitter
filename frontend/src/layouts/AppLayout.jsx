@@ -9,30 +9,37 @@ export default function AppLayout() {
   const { logout } = useUser();
 
   return (
-    <main className="startup-page">
+    <div className="startup-page">
       <Container className="startup-page__hero">
-        <AppNavBar>
-          <div className="startup-page__topbar-actions">
-            <Nav className="startup-page__nav">
-              <NavLink to="/groups" className="startup-page__nav-link">
-                Group Expenses
-              </NavLink>
-              <NavLink to="/single-expenses" className="startup-page__nav-link">
-                Single Expenses
-              </NavLink>
-            </Nav>
-            <button
-              onClick={logout}
-              type="button"
-              className="startup-page__logout-btn"
-            >
-              Log Out
-            </button>
-          </div>
-        </AppNavBar>
+        <header>
+          <AppNavBar>
+            <div className="startup-page__topbar-actions">
+              <Nav className="startup-page__nav">
+                <NavLink to="/groups" className="startup-page__nav-link">
+                  Group Expenses
+                </NavLink>
+                <NavLink
+                  to="/single-expenses"
+                  className="startup-page__nav-link"
+                >
+                  Single Expenses
+                </NavLink>
+              </Nav>
+              <button
+                onClick={logout}
+                type="button"
+                className="startup-page__logout-btn"
+              >
+                Log Out
+              </button>
+            </div>
+          </AppNavBar>
+        </header>
 
-        <Outlet />
+        <main>
+          <Outlet />
+        </main>
       </Container>
-    </main>
+    </div>
   );
 }

@@ -25,7 +25,7 @@ export default function ExpenseFilter({
       : "\u2191 Low\u2192High";
 
   return (
-    <nav
+    <search
       className="d-flex flex-wrap gap-2 mb-3"
       aria-label="Filter and sort expenses"
     >
@@ -103,7 +103,7 @@ export default function ExpenseFilter({
           Hide Settled
         </label>
       </div>
-    </nav>
+    </search>
   );
 }
 

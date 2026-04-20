@@ -6,15 +6,15 @@ export default function HomePage() {
   const { user } = useUser();
 
   return (
-    <section className="home-page">
-      <div className="home-page__hero">
-        <h1 className="home-page__title">
+    <section className="home-page" aria-labelledby="home-page-title">
+      <header className="home-page__hero">
+        <h1 id="home-page-title" className="home-page__title">
           Welcome back{user?.name ? `, ${user.name}` : ""}.
         </h1>
         <p className="home-page__copy">
           Start logging shared expenses and settling balances...
         </p>
-      </div>
+      </header>
       <section
         className="home-page__feature-section"
         aria-label="Feature overview"
