@@ -75,43 +75,45 @@ export default function ExpenseCard({
           <p className="expense-card__hint">
             Only the person who owes can mark their own share as paid.
           </p>
-          {expense.splitBetween
-            .filter((p) => p !== expense.paidBy)
-            .map((person) => {
-              const share = expense.splitDetails?.[person] || 0;
-              const paid = expense.paidStatus?.[person] || false;
-              const isMe = person === currentUser;
+          <ul className="list-unstyled m-0 p-0" aria-label="Split details">
+            {expense.splitBetween
+              .filter((p) => p !== expense.paidBy)
+              .map((person) => {
+                const share = expense.splitDetails?.[person] || 0;
+                const paid = expense.paidStatus?.[person] || false;
+                const isMe = person === currentUser;
 
-              return (
-                <div
-                  key={person}
-                  className="d-flex align-items-center gap-2 small mb-1"
-                >
-                  <span className={paid ? "text-success" : "text-danger"}>
-                    {isMe ? "You" : person}
-                  </span>
-                  <span className="text-secondary">${share.toFixed(2)}</span>
-                  {paid ? (
-                    <span className="badge bg-success expense-card__badge">
-                      Paid
+                return (
+                  <li
+                    key={person}
+                    className="d-flex align-items-center gap-2 small mb-1"
+                  >
+                    <span className={paid ? "text-success" : "text-danger"}>
+                      {isMe ? "You" : person}
                     </span>
-                  ) : (
-                    <span className="badge bg-warning text-dark expense-card__badge">
-                      Unpaid
-                    </span>
-                  )}
-                  {isMe && canMarkPaid && (
-                    <button
-                      className="btn btn-outline-success btn-sm expense-card__mark-btn"
-                      onClick={onMarkPaid}
-                      aria-label={`Mark your $${share.toFixed(2)} share as paid`}
-                    >
-                      Mark Paid
-                    </button>
-                  )}
-                </div>
-              );
-            })}
+                    <span className="text-secondary">${share.toFixed(2)}</span>
+                    {paid ? (
+                      <span className="badge bg-success expense-card__badge">
+                        Paid
+                      </span>
+                    ) : (
+                      <span className="badge bg-warning text-dark expense-card__badge">
+                        Unpaid
+                      </span>
+                    )}
+                    {isMe && canMarkPaid && (
+                      <button
+                        className="btn btn-outline-success btn-sm expense-card__mark-btn"
+                        onClick={onMarkPaid}
+                        aria-label={`Mark your $${share.toFixed(2)} share as paid`}
+                      >
+                        Mark Paid
+                      </button>
+                    )}
+                  </li>
+                );
+              })}
+          </ul>
         </div>
 
         {/* Actions — larger buttons with text labels */}
