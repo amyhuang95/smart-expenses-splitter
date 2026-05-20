@@ -20,6 +20,11 @@ function fromCents(amountInCents) {
  * debtor-to-creditor settlement plan from those balances.
  */
 export function calculateGroupBalances(memberIds, expenses) {
+  // Safeguarding against empty member list, otherwise you will end up running into a Division by 0 error down the line.
+  if (!memberIds.length) {
+    return {balances: [], debts: [], totalExpenseAmount: 0};
+  }
+  
   const balanceMap = new Map(memberIds.map((memberId) => [memberId, 0]));
 
   for (const expense of expenses) {
@@ -31,6 +36,16 @@ export function calculateGroupBalances(memberIds, expenses) {
       continue;
     }
 
+    // Introducing per-member sanity check in balanceMap to ensure no ghost entries are entered into Database.
+    for (const memberId of splitBetween) {
+      if (!balanceMap.has(memberId)) {
+        throw new Error(
+          `Expense references unknown member in splitBetween: "${memberId}". ` +
+          `All split members must belong to the group.`
+        );
+      }
+    }
+    
     const totalCents = toCents(expense.amount);
     const baseShare = Math.floor(totalCents / splitBetween.length);
     let remainder = totalCents - baseShare * splitBetween.length;
